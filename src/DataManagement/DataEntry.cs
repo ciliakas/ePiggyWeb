@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Text;
+using ePiggyWeb.Utilities;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ePiggyWeb.DataManagement
 {
@@ -43,7 +46,29 @@ namespace ePiggyWeb.DataManagement
 
         public override string ToString()
         {
-            return base.ToString();
+            var sb = new StringBuilder();
+
+            foreach (var property in this.GetType().GetProperties())
+            {
+                var value = property.GetValue(this, null);
+                sb.Append(property.Name);
+                sb.Append(": ");
+                switch (value)
+                {
+                    case DateTime time:
+                        sb.Append(time.ToShortDateString());
+                        break;
+                    case decimal value1:
+                        sb.Append(NumberFormatter.FormatCurrency(value1));
+                        break;
+                    default:
+                        sb.Append(value);
+                        break;
+                }
+                sb.Append(" ");
+            }
+
+            return sb.ToString();
         }
 
         public int CompareTo(object obj)

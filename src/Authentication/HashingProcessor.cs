@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ePiggy.Authentication
+namespace ePiggyWeb.Authentication
 {
     public static class HashingProcessor
     {

@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using ePiggy.DataBase;
-using ePiggy.DataBase.Models;
+using ePiggyWeb.DataBase;
+using ePiggyWeb.DataBase.Models;
 
-namespace ePiggy.Authentication
+namespace ePiggyWeb.Authentication
 {
     public static class UserAuth
     {
@@ -34,7 +34,7 @@ namespace ePiggy.Authentication
             db.Add(user);
             db.SaveChanges();
 
-            Handler.UserId = user.Id;
+            //Handler.UserId = user.Id;
             return true;
         }
 
@@ -52,7 +52,7 @@ namespace ePiggy.Authentication
             {
                 return false;
             }
-            Handler.UserId = userInfo.Id;
+            //Handler.UserId = userInfo.Id;
             return true;
         }
 
