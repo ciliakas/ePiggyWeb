@@ -38,11 +38,6 @@ namespace ePiggyWeb
 
             app.UseHttpsRedirection();
 
-            var options = new DefaultFilesOptions();
-            options.DefaultFileNames.Clear();
-            options.DefaultFileNames.Add("Index.html");
-            options.DefaultFileNames.Add("login.html");
-            app.UseDefaultFiles(options);
             app.UseStaticFiles();
 
             app.UseRouting();
