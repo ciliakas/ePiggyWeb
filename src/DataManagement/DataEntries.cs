@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using ePiggyWeb.Utilities;
 
@@ -14,8 +15,6 @@ namespace ePiggyWeb.DataManagement
         public DataEntries(EntryType entryType)
         {
             EntryType = entryType;
-
-            var a = this.AsEnumerable();
         }
 
 
@@ -29,6 +28,22 @@ namespace ePiggyWeb.DataManagement
         //    };
         //    return a.AsEnumerable();
         //}
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append(this.Count);
+
+            foreach (var dataEntry in this)
+            {
+                sb.Append("dataEntry.ToString()");
+                //sb.Append("\n");
+            }
+            sb.Append("asdasd");
+
+            return sb.ToString();
+        }
 
         public new bool Add(DataEntry dataEntry)
         {

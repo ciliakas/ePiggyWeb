@@ -48,9 +48,10 @@ namespace ePiggyWeb.DataManagement
         {
             var sb = new StringBuilder();
 
-            foreach (var property in this.GetType().GetProperties())
+            foreach (var property in GetType().GetProperties())
             {
                 var value = property.GetValue(this, null);
+                var name = property.Name;
                 sb.Append(property.Name);
                 sb.Append(": ");
                 switch (value)
@@ -60,6 +61,16 @@ namespace ePiggyWeb.DataManagement
                         break;
                     case decimal value1:
                         sb.Append(NumberFormatter.FormatCurrency(value1));
+                        break;
+                    case int num:
+                        if (name.Equals(nameof(Importance)))
+                        {
+                            sb.Append((Importance) num);
+                        }
+                        else // Could remove this later, to not show id and user id
+                        {
+                            sb.Append(value);
+                        }
                         break;
                     default:
                         sb.Append(value);
