@@ -20,35 +20,70 @@ namespace ePiggyWeb.DataManagement
 
         public bool Add(Entry entry)
         {
-            throw new Exception("Not implemented");
+            // get user id
+            var userId = 0;
+
+            //Should check if valid id or something
+            var id = EntryDbUpdater.AddEntry(entry, userId, EntryList.EntryType);
+
+            if (id <= 0)
+            {
+                ExceptionHandler.Log("Invalid id of entry");
+                return false;
+            }
+            EntryList.Add(new Entry(entry, id, userId));
+            return true;
         }
 
         public bool AddRange(EntryList entryList)
         {
-            //base.AddRange(entryList);
-            //DB
-            throw new Exception("Not implemented");
+            var userId = 0;
+            if (!EntryDbUpdater.AddEntryList(entryList, userId))
+            {
+                return false;
+            }
+            EntryList.AddRange(entryList);
+            return true;
         }
 
         public bool Edit(Entry oldEntry, Entry newEntry)
         {
-            throw new Exception("Not implemented");
+            //If something went wrong with database update return false
+            if (!EntryDbUpdater.EditEntry(oldEntry, newEntry, EntryList.EntryType))
+            {
+                return false;
+            }
+            var temp = EntryList.FirstOrDefault(x => x.Id == oldEntry.Id);
+            //If couldn't find the entry return false
+            if (temp is null)
+            {
+                return false;
+            }
+            temp.Edit(newEntry);
+            return true;
         }
 
         public bool Remove(Entry entry)
         {
-
-            //DB
-            //return base.Remove(entry);
-            throw new Exception("Not implemented");
+            if (!EntryDbUpdater.RemoveEntry(entry, EntryList.EntryType)) return false;
+            var temp = EntryList.FirstOrDefault(x => x.Id == entry.Id);
+            if (temp is null)
+            {
+                return false;
+            }
+            EntryList.Remove(temp);
+            return true;
         }
 
         public bool RemoveList(EntryList entryList)
         {
-            //RemoveAll(entryList.Contains);
-            // DATABASE
-            // ERROR CHECKING
-            throw new Exception("Not implemented");
+            if (!EntryDbUpdater.RemoveEntryList(entryList))
+            {
+                return false;
+            }
+            EntryList.RemoveAll(entryList.Contains);
+            return true;
+
         }
 
         public bool ReadFromDb(int userId)

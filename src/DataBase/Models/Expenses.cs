@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using ePiggyWeb.DataManagement;
 
 namespace ePiggyWeb.DataBase.Models
 {
@@ -15,6 +16,24 @@ namespace ePiggyWeb.DataBase.Models
         public bool IsMonthly { get; set; }
         public int Importance { get; set; }
 
+        public Expenses(Entry entry, int userId)
+        {
+            UserId = userId;
+            Amount = entry.Amount;
+            Title = entry.Title;
+            Date = entry.Date;
+            IsMonthly = entry.IsMonthly;
+            Importance = entry.Importance;
+        }
+
+        public void Edit(Entry newEntry)
+        {
+            Amount = newEntry.Amount;
+            Title = newEntry.Title;
+            Date = newEntry.Date;
+            IsMonthly = newEntry.IsMonthly;
+            Importance = newEntry.Importance;
+        }
     }
 
 }

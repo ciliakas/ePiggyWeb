@@ -33,6 +33,13 @@ namespace ePiggyWeb.DataManagement
             UserId = userId;
         }
 
+        public Entry(Entry entry, int id, int userId)
+            :this(entry.Amount, entry.Title, entry.Date, entry.IsMonthly, entry.Importance)
+        {
+            Id = id;
+            UserId = userId;
+        }
+
 		public Entry()
 		{
 			Id = 0;
@@ -43,6 +50,16 @@ namespace ePiggyWeb.DataManagement
 			IsMonthly = false;
 			Importance = 0;
 		}
+
+        //For simpler editing in other methods
+        public void Edit(Entry newEntry)
+        {
+            Amount = newEntry.Amount;
+            Title = newEntry.Title;
+            Date = newEntry.Date;
+            IsMonthly = newEntry.IsMonthly;
+            Importance = newEntry.Importance;
+        }
 
         public override string ToString()
         {
