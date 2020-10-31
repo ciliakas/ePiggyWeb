@@ -1,4 +1,5 @@
 using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

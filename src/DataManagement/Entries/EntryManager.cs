@@ -1,46 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.Utilities;
-using Microsoft.EntityFrameworkCore;
 
-namespace ePiggyWeb.DataManagement
+namespace ePiggyWeb.DataManagement.Entries
 {
     public class EntryManager
     {
         public EntryList EntryList { get; }
 
+        //Somehow I should get user id here
+        private int UserId { get; } = 0;
+
         public EntryManager(EntryList entryList)
         {
             EntryList = entryList;
-            var usedId = 0;
-            ReadFromDb(usedId);
+            ReadFromDb(UserId);
         }
 
         public bool Add(Entry entry)
         {
-            // get user id
-            var userId = 0;
-
             //Should check if valid id or something
-            var id = EntryDbUpdater.AddEntry(entry, userId, EntryList.EntryType);
+            var id = EntryDbUpdater.AddEntry(entry, UserId, EntryList.EntryType);
 
             if (id <= 0)
             {
                 ExceptionHandler.Log("Invalid id of entry");
                 return false;
             }
-            EntryList.Add(new Entry(entry, id, userId));
+            EntryList.Add(new Entry(entry, id, UserId));
             return true;
         }
 
         public bool AddRange(EntryList entryList)
         {
-            var userId = 0;
-            if (!EntryDbUpdater.AddEntryList(entryList, userId))
+            if (!EntryDbUpdater.AddEntryList(entryList, UserId))
             {
                 return false;
             }
@@ -77,7 +71,7 @@ namespace ePiggyWeb.DataManagement
             return true;
         }
 
-        public bool RemoveList(EntryList entryList)
+        public bool RemoveRange(EntryList entryList)
         {
             if (!EntryDbUpdater.RemoveEntryList(entryList))
             {
@@ -85,7 +79,6 @@ namespace ePiggyWeb.DataManagement
             }
             EntryList.RemoveAll(entryList.Contains);
             return true;
-
         }
 
         public bool ReadFromDb(int userId)

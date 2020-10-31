@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace ePiggyWeb.Utilities
 {
-    public class NumberFormatter
+    public static class NumberFormatter
     {
         public static CurrencyWithColor FormatCurrencyWithColor(decimal value)
         {
