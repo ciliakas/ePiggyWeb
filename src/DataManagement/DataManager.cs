@@ -20,8 +20,6 @@ namespace ePiggyWeb.DataManagement
         {
             Income = new EntryManager(LocalIncome);
             Expenses = new EntryManager(LocalExpenses);
-            Income.ReadFromDb(0);
-            Expenses.ReadFromDb(0);
         }
     }
 }

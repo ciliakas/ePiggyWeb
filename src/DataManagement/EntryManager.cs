@@ -11,11 +11,13 @@ namespace ePiggyWeb.DataManagement
 {
     public class EntryManager
     {
-        private EntryList EntryList { get; }
+        public EntryList EntryList { get; }
 
-        public EntryManager(EntryList entryListList)
+        public EntryManager(EntryList entryList)
         {
-            EntryList = entryListList;
+            EntryList = entryList;
+            var usedId = 0;
+            ReadFromDb(usedId);
         }
 
         public bool Add(Entry entry)

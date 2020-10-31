@@ -16,6 +16,8 @@ namespace ePiggyWeb.DataBase.Models
         public bool IsMonthly { get; set; }
         public int Importance { get; set; }
 
+        public Expenses() {}
+
         public Expenses(Entry entry, int userId)
         {
             UserId = userId;
