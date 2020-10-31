@@ -12,9 +12,9 @@ namespace ePiggyWeb.DataManagement.Entries
         //Somehow I should get user id here
         private int UserId { get; } = 0;
 
-        public EntryManager(EntryList entryList)
+        public EntryManager(EntryType entryType)
         {
-            EntryList = entryList;
+            EntryList = new EntryList(entryType);
             ReadFromDb(UserId);
         }
 
@@ -84,19 +84,20 @@ namespace ePiggyWeb.DataManagement.Entries
         public bool ReadFromDb(int userId)
         {
             using var context = new DatabaseContext();
+            
             switch (EntryList.EntryType)
             {
                 case EntryType.Income:
-                    foreach (var entry in context.Incomes.Where(x => x.UserId == userId)) // query executed and data obtained from database
+                    foreach (var dbEntry in context.Incomes.Where(x => x.UserId == userId)) // query executed and data obtained from database
                     {
-                        var newEntry = new Entry(entry.Id, entry.UserId, entry.Amount, entry.Title, entry.Date, entry.IsMonthly, entry.Importance);
+                        var newEntry = new Entry(dbEntry);
                         EntryList.Add(newEntry);
                     }
                     break;
                 case EntryType.Expense:
-                    foreach (var entry in context.Expenses.Where(x => x.UserId == userId)) // query executed and data obtained from database
+                    foreach (var dbEntry in context.Expenses.Where(x => x.UserId == userId)) // query executed and data obtained from database
                     {
-                        var newEntry = new Entry(entry.Id, entry.UserId, entry.Amount, entry.Title, entry.Date, entry.IsMonthly, entry.Importance);
+                        var newEntry = new Entry(dbEntry);
                         EntryList.Add(newEntry);
                     }
                     break;

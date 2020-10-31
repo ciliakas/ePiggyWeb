@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.Utilities
 {

@@ -1,6 +1,5 @@
-using System.Linq;
-using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataManagement.Entries;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ePiggyWeb.Pages

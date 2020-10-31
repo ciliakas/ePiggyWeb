@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ePiggyWeb.DataManagement;
+﻿using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.Utilities
 {

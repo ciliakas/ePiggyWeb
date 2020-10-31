@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
+using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.Utilities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace ePiggyWeb.DataManagement
+namespace ePiggyWeb.DataManagement.Entries
 {
 	public class Entry : IComparable, IEquatable<Entry>
 	{
@@ -40,7 +40,11 @@ namespace ePiggyWeb.DataManagement
             UserId = userId;
         }
 
-		public Entry()
+        public Entry(Incomes dbEntry) :this(dbEntry.Id, dbEntry.UserId, dbEntry.Amount, dbEntry.Title, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
+
+        public Entry(Expenses dbEntry) : this(dbEntry.Id, dbEntry.UserId, dbEntry.Amount, dbEntry.Title, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
+
+        public Entry()
 		{
 			Id = 0;
             UserId = 0;

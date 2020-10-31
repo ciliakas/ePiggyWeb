@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataBase.Models
 {

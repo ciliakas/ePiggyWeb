@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ePiggyWeb.DataBase.Models;
-using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataBase
