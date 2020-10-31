@@ -1,0 +1,20 @@
+﻿@page
+@using ePiggyWeb.DataManagement
+@using ePiggyWeb.Utilities
+@model ePiggyWeb.Pages.EntryModel
+<!DOCTYPE html>
+<html>
+<body>
+    @{
+        var entry = new DataEntry();
+        var entries = new DataEntries(EntryType.Income) {
+            new DataEntry(),
+            new DataEntry(),
+            new DataEntry(), entry};
+        var count = entries.Count;
+ 
+    }
+    <h1>Hello Web Pages</h1>
+    <p>@ViewData["EntryList"]</p>
+</body>
+</html> 
