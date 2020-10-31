@@ -10,7 +10,9 @@ namespace ePiggyWeb.DataManagement
 {
     public class DataEntries : List<DataEntry>
     {
-        public EntryType EntryType { get; }
+        public EntryType EntryType { get; set; }
+
+        public DataEntries() { }
 
         public DataEntries(EntryType entryType)
         {
@@ -33,36 +35,39 @@ namespace ePiggyWeb.DataManagement
         {
             var sb = new StringBuilder();
 
-            sb.Append(this.Count);
-
             foreach (var dataEntry in this)
             {
-                sb.Append("dataEntry.ToString()");
+                sb.Append(dataEntry);
                 //sb.Append("\n");
             }
-            sb.Append("asdasd");
 
             return sb.ToString();
         }
 
         public new bool Add(DataEntry dataEntry)
         {
-            return false;
+            base.Add(dataEntry);
+            //DB
+            return true;
         }
 
         public bool AddRange(DataEntries dataEntries)
         {
-            return false;
+            base.AddRange(dataEntries);
+            //DB
+            return true;
         }
 
         public bool Edit(DataEntry oldDataEntry, DataEntry newDataEntry)
         {
-            return false;
+            throw new Exception("Not implemented");
         }
 
         public new bool Remove(DataEntry dataEntry)
         {
-            return false;
+
+            //DB
+            return base.Remove(dataEntry);
         }
 
         public bool RemoveList(DataEntries dataEntries)
