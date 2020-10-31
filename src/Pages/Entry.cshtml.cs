@@ -15,15 +15,9 @@ namespace ePiggyWeb.Pages
     {
         public void OnGet()
         {
-            var Expenses = new DataEntries();
-            using var context = new DatabaseContext();
-            var expenses = context.Expenses; // define query
-            foreach (var expense in expenses.Where(x => x.UserId == 0)) // query executed and data obtained from database
-            {
-                var newExpense = new DataEntry(expense.Id, expense.UserId, expense.Amount, expense.Title, expense.Date, expense.IsMonthly, expense.Importance);
-                Expenses.Add(newExpense);
-            }
-            ViewData["EntryList"] = Expenses;
+
+            var dataManager = new DataManager();
+            ViewData["EntryList"] = dataManager.Income.ToString();
         }
     }
 }

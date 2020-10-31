@@ -68,7 +68,7 @@ namespace ePiggyWeb.DataBase
             }
         }
 
-        public static void RemoveIncomes(IEnumerable<DataEntry> entries)
+        public static void RemoveIncomes(IEnumerable<Entry> entries)
         {
             var db = new DatabaseContext();
             var list = new List<Incomes>();
@@ -82,12 +82,12 @@ namespace ePiggyWeb.DataBase
             db.SaveChanges();
         }
 
-        public static void RemoveIncome(DataEntry dataEntry)
+        public static void RemoveIncome(Entry entry)
         {
             var db = new DatabaseContext();
             try
             {
-                var index = db.Incomes.FirstOrDefault(x => x.Id == dataEntry.Id);
+                var index = db.Incomes.FirstOrDefault(x => x.Id == entry.Id);
                 db.Incomes.Remove(index ?? throw new InvalidOperationException());
                 db.SaveChanges();
             }
@@ -97,7 +97,7 @@ namespace ePiggyWeb.DataBase
             }
         }
 
-        public static void RemoveExpenses(IEnumerable<DataEntry> entries)
+        public static void RemoveExpenses(IEnumerable<Entry> entries)
         {
             var db = new DatabaseContext();
             var list = new List<Expenses>();
@@ -111,12 +111,12 @@ namespace ePiggyWeb.DataBase
             db.SaveChanges();
         }
 
-        public static void RemoveExpense(DataEntry dataEntry)
+        public static void RemoveExpense(Entry entry)
         {
             var db = new DatabaseContext();
             try
             {
-                var index = db.Expenses.FirstOrDefault(x => x.Id == dataEntry.Id);
+                var index = db.Expenses.FirstOrDefault(x => x.Id == entry.Id);
                 db.Expenses.Remove(index ?? throw new InvalidOperationException());
                 db.SaveChanges();
             }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ePiggyWeb.DataManagement
 {
-	public class DataEntry : IComparable, IEquatable<DataEntry>
+	public class Entry : IComparable, IEquatable<Entry>
 	{
         /*Properties*/
         public string Title {get; set; }
@@ -17,7 +17,7 @@ namespace ePiggyWeb.DataManagement
         public int Importance { get; set; }
 
 		/*Constructors*/
-		public DataEntry(decimal amount, string title, DateTime date, bool isMonthly, int importance)
+		public Entry(decimal amount, string title, DateTime date, bool isMonthly, int importance)
         {
             Amount = amount;
             Title = title;
@@ -26,14 +26,14 @@ namespace ePiggyWeb.DataManagement
             Importance = importance;
         }
 
-        public DataEntry(int id, int userId, decimal amount, string title, DateTime date, bool isMonthly, int importance)
+        public Entry(int id, int userId, decimal amount, string title, DateTime date, bool isMonthly, int importance)
             :this(amount, title, date, isMonthly, importance)
 		{
 			Id = id;
             UserId = userId;
         }
 
-		public DataEntry()
+		public Entry()
 		{
 			Id = 0;
             UserId = 0;
@@ -87,12 +87,12 @@ namespace ePiggyWeb.DataManagement
             return obj switch
             {
                 null => 1,
-                DataEntry otherEntry => Amount.CompareTo(otherEntry.Amount),
+                Entry otherEntry => Amount.CompareTo(otherEntry.Amount),
                 _ => throw new ArgumentException("Object is not a DataEntry")
             };
         }
 
-        public bool Equals(DataEntry other)
+        public bool Equals(Entry other)
         {
             if (other is null)
             {
