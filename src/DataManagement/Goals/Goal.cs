@@ -31,6 +31,8 @@ namespace ePiggyWeb.DataManagement.Goals
             Price = price;
         }
 
+        public Goal(DataBase.Models.Goals dbGoals) :this(dbGoals.Id, dbGoals.UserId, dbGoals.Title, dbGoals.Price) { }
+
         public Goal()
         {
             Id = 0;

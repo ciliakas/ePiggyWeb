@@ -16,6 +16,7 @@ namespace ePiggyWeb.DataManagement.Goals
         public GoalManager()
         {
             GoalList = new GoalList();
+            ReadFromDb();
         }
 
         public bool Add(Goal goal)
@@ -59,6 +60,19 @@ namespace ePiggyWeb.DataManagement.Goals
             }
 
             GoalList.Remove(localGoal);
+            return true;
+        }
+
+        public bool ReadFromDb()
+        {
+            using var db = new DatabaseContext();
+
+            foreach (var dbGoal in db.Goals.Where(x => x.UserId == UserId)) // query executed and data obtained from database
+            {
+                var newEntry = new Goal(dbGoal);
+                GoalList.Add(newEntry);
+            }
+
             return true;
         }
     }
