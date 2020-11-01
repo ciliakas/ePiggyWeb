@@ -15,13 +15,13 @@ namespace ePiggyWeb.DataManagement.Entries
         public EntryManager(EntryType entryType)
         {
             EntryList = new EntryList(entryType);
-            ReadFromDb(UserId);
+            ReadFromDb();
         }
 
         public bool Add(Entry entry)
         {
             //Should check if valid id or something
-            var id = EntryDbUpdater.AddEntry(entry, UserId, EntryList.EntryType);
+            var id = EntryDbUpdater.Add(entry, UserId, EntryList.EntryType);
 
             if (id <= 0)
             {
@@ -34,7 +34,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool AddRange(EntryList entryList)
         {
-            if (!EntryDbUpdater.AddEntryList(entryList, UserId))
+            if (!EntryDbUpdater.AddRange(entryList, UserId))
             {
                 return false;
             }
@@ -45,7 +45,7 @@ namespace ePiggyWeb.DataManagement.Entries
         public bool Edit(Entry oldEntry, Entry newEntry)
         {
             //If something went wrong with database update return false
-            if (!EntryDbUpdater.EditEntry(oldEntry, newEntry, EntryList.EntryType))
+            if (!EntryDbUpdater.Edit(oldEntry, newEntry, EntryList.EntryType))
             {
                 return false;
             }
@@ -61,7 +61,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool Remove(Entry entry)
         {
-            if (!EntryDbUpdater.RemoveEntry(entry, EntryList.EntryType)) return false;
+            if (!EntryDbUpdater.Remove(entry, EntryList.EntryType)) return false;
             var temp = EntryList.FirstOrDefault(x => x.Id == entry.Id);
             if (temp is null)
             {
@@ -73,7 +73,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool RemoveRange(EntryList entryList)
         {
-            if (!EntryDbUpdater.RemoveEntryList(entryList))
+            if (!EntryDbUpdater.RemoveRange(entryList))
             {
                 return false;
             }
@@ -81,21 +81,21 @@ namespace ePiggyWeb.DataManagement.Entries
             return true;
         }
 
-        public bool ReadFromDb(int userId)
+        public bool ReadFromDb()
         {
-            using var context = new DatabaseContext();
+            using var db = new DatabaseContext();
             
             switch (EntryList.EntryType)
             {
                 case EntryType.Income:
-                    foreach (var dbEntry in context.Incomes.Where(x => x.UserId == userId)) // query executed and data obtained from database
+                    foreach (var dbEntry in db.Incomes.Where(x => x.UserId == UserId)) // query executed and data obtained from database
                     {
                         var newEntry = new Entry(dbEntry);
                         EntryList.Add(newEntry);
                     }
                     break;
                 case EntryType.Expense:
-                    foreach (var dbEntry in context.Expenses.Where(x => x.UserId == userId)) // query executed and data obtained from database
+                    foreach (var dbEntry in db.Expenses.Where(x => x.UserId == UserId)) // query executed and data obtained from database
                     {
                         var newEntry = new Entry(dbEntry);
                         EntryList.Add(newEntry);

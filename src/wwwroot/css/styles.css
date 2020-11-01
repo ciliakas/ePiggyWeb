@@ -28,6 +28,7 @@ body {
 }
 
 .title-image {
+    /* ReSharper disable once InvalidValue */
     position: inline-block;
     left: 5%;
     bottom: 63%;

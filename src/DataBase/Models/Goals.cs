@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ePiggyWeb.DataManagement.Goals;
 
 namespace ePiggyWeb.DataBase.Models
 {
@@ -11,6 +12,19 @@ namespace ePiggyWeb.DataBase.Models
         [StringLength(255)]
         public string Title { get; set; }
 
-    }
+        public Goals() { }
 
+        public Goals(Goal goal, int userId)
+        {
+            UserId = userId;
+            Price = goal.Price;
+            Title = goal.Title;
+        }
+
+        public void Edit(Goal newGoal)
+        {
+            Price = newGoal.Price;
+            Title = newGoal.Title;
+        }
+    }
 }

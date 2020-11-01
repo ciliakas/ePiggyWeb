@@ -27,6 +27,7 @@ namespace ePiggyWeb.DataBase.Models
             IsMonthly = entry.IsMonthly;
             Importance = entry.Importance;
         }
+
         public void Edit(Entry newEntry)
         {
             Amount = newEntry.Amount;

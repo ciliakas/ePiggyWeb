@@ -103,7 +103,7 @@ namespace ePiggyWeb.DataManagement.Goals
             {
                 var value = property.GetValue(this, null);
                 var name = property.Name;
-                sb.Append(property.Name);
+                sb.Append(name);
                 sb.Append(": ");
                 switch (value)
                 {

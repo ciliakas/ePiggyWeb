@@ -9,39 +9,40 @@ namespace ePiggyWeb.DataBase
 {
     public static class EntryDbUpdater
     {
-        public static int AddEntry(Entry localEntry, int userId, EntryType entryType)
+        public static int Add(Entry localEntry, int userId, EntryType entryType)
         {
             var db = new DatabaseContext();
+            int id;
             if (entryType == EntryType.Income)
             {
                 var entry = new Incomes(localEntry, userId);
                 db.Add(entry);
-                db.SaveChanges();
-                return entry.Id;
+                id = entry.Id;
             }
             else
             {
                 var entry = new Expenses(localEntry, userId);
                 db.Add(entry);
-                db.SaveChanges();
-                return entry.Id;
+                id = entry.Id;
             }
+            db.SaveChanges();
+            return id;
         }
 
-        public static bool RemoveEntry(Entry entry, EntryType entryType)
+        public static bool Remove(Entry entry, EntryType entryType)
         {
             var db = new DatabaseContext();
             try
             {
                 if (entryType == EntryType.Income)
                 {
-                    var index = db.Incomes.FirstOrDefault(x => x.Id == entry.Id);
-                    db.Incomes.Remove(index ?? throw new InvalidOperationException());
+                    var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == entry.Id);
+                    db.Incomes.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 else
                 {
-                    var index = db.Expenses.FirstOrDefault(x => x.Id == entry.Id);
-                    db.Expenses.Remove(index ?? throw new InvalidOperationException());
+                    var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == entry.Id);
+                    db.Expenses.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 db.SaveChanges();
             }
@@ -54,36 +55,36 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool EditEntry(Entry oldEntry, Entry updatedEntry, EntryType entryType)
+        public static bool Edit(Entry oldEntry, Entry updatedEntry, EntryType entryType)
         {
             var db = new DatabaseContext();
 
             if (entryType == EntryType.Income)
             {
-                var temp = db.Incomes.FirstOrDefault(x => x.Id == oldEntry.Id);
-                if (temp == null)
+                var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == oldEntry.Id);
+                if (dbEntry == null)
                 {
                     ExceptionHandler.Log("Couldn't find entry");
                     return false;
                 }
-                temp.Edit(updatedEntry);
+                dbEntry.Edit(updatedEntry);
             }
             else
             {
 
-                var temp = db.Expenses.FirstOrDefault(x => x.Id == oldEntry.Id);
-                if (temp == null)
+                var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == oldEntry.Id);
+                if (dbEntry == null)
                 {
                     ExceptionHandler.Log("Couldn't find entry");
                     return false;
                 }
-                temp.Edit(updatedEntry);
+                dbEntry.Edit(updatedEntry);
             }
             db.SaveChanges();
             return true;
         }
 
-        public static bool RemoveEntryList(EntryList entryList)
+        public static bool RemoveRange(EntryList entryList)
         {
             var db = new DatabaseContext();
 
@@ -102,32 +103,32 @@ namespace ePiggyWeb.DataBase
         }
 
         //As I understand, all the entry lists that were passed to this Method will now have amended Id's and user Id's and are ready to be added locally 
-        public static bool AddEntryList(EntryList entryList, int userId)
+        public static bool AddRange(EntryList entryList, int userId)
         {
             var db = new DatabaseContext();
 
             if (entryList.EntryType == EntryType.Income)
             {
-                var databaseEntryList = new List<Incomes>();
+                var dbEntryList = new List<Incomes>();
                 foreach (var entry in entryList)
                 {
-                    var databaseEntry = new Incomes(entry, userId);
-                    databaseEntryList.Add(databaseEntry);
-                    entry.Id = databaseEntry.Id;
+                    var dbEntry = new Incomes(entry, userId);
+                    dbEntryList.Add(dbEntry);
+                    entry.Id = dbEntry.Id;
                     entry.UserId = userId;
                 }
-                db.AddRange(databaseEntryList);
+                db.AddRange(dbEntryList);
             }
             else
             {
-                var databaseEntryList = new List<Expenses>();
+                var dbEntryList = new List<Expenses>();
                 foreach (var entry in entryList)
                 {
-                    var databaseEntry = new Expenses(entry, userId);
-                    databaseEntryList.Add(databaseEntry);
-                    entry.Id = databaseEntry.Id;
+                    var dbEntry = new Expenses(entry, userId);
+                    dbEntryList.Add(dbEntry);
+                    entry.Id = dbEntry.Id;
                 }
-                db.AddRange(databaseEntryList);
+                db.AddRange(dbEntryList);
             }
 
             db.SaveChanges();
