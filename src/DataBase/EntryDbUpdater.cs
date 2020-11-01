@@ -49,6 +49,7 @@ namespace ePiggyWeb.DataBase
             catch (InvalidOperationException ex)
             {
                 ExceptionHandler.Log(ex.ToString());
+                ExceptionHandler.Log("Couldn't find entry id: " + entry.Id + " in database");
                 return false;
             }
 
@@ -64,18 +65,17 @@ namespace ePiggyWeb.DataBase
                 var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == oldEntry.Id);
                 if (dbEntry == null)
                 {
-                    ExceptionHandler.Log("Couldn't find entry");
+                    ExceptionHandler.Log("Couldn't find entry id: " + oldEntry.Id + " in database");
                     return false;
                 }
                 dbEntry.Edit(updatedEntry);
             }
             else
             {
-
                 var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == oldEntry.Id);
                 if (dbEntry == null)
                 {
-                    ExceptionHandler.Log("Couldn't find entry");
+                    ExceptionHandler.Log("Couldn't find entry id: " + oldEntry.Id + " in database");
                     return false;
                 }
                 dbEntry.Edit(updatedEntry);

@@ -53,6 +53,7 @@ namespace ePiggyWeb.DataManagement.Entries
             //If couldn't find the entry return false
             if (temp is null)
             {
+                ExceptionHandler.Log("Edited entry id: " + oldEntry.Id + " in database but couldn't find it locally");
                 return false;
             }
             temp.Edit(newEntry);
@@ -65,6 +66,7 @@ namespace ePiggyWeb.DataManagement.Entries
             var temp = EntryList.FirstOrDefault(x => x.Id == entry.Id);
             if (temp is null)
             {
+                ExceptionHandler.Log("Removed entry id: " + entry.Id + " from database but couldn't find it locally");
                 return false;
             }
             EntryList.Remove(temp);
