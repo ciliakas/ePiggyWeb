@@ -1,0 +1,152 @@
+.navbar {
+    text-align: center;
+}
+
+.container-fluid {
+    padding: 1% 15%;
+    background-color: #f9f7f7;
+    text-align: center;
+}
+
+hr {
+    width: 60%;
+}
+
+h1, h2 {
+    font-family: Oswald;
+}
+
+body {
+    font-family: Montserrat;
+    text-align: center;
+    background-color: #276dc1;
+}
+
+#siteHeader {
+    margin: 2% 20% 1%;
+    background-color: #276dc1;
+}
+
+.title-image {
+    position: inline-block;
+    left: 5%;
+    bottom: 63%;
+}
+
+.jumbotron {
+    background-color: #276dc1;
+    color: #f9f7f7;
+    text-align: center;
+}
+
+.white-section {
+    color: #fff;
+}
+
+#features {
+    color: #8f8f8f;
+    background-color: #fff;
+    position: relative;
+    text-align: center;
+}
+
+.feature-box {
+    padding: 5%;
+}
+
+.header-features {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #000;
+}
+
+.icon-features {
+    color: #276dc1;
+}
+
+    .icon-features:hover {
+        color: #2e9aed;
+    }
+
+#testimonials {
+    background-color: #276dc1;
+    color: #f9f7f7;
+}
+
+.carousel-item {
+    padding: 7% 15%;
+    background-color: #276dc1;
+}
+
+.testimonial-image {
+    width: 10%;
+    border-radius: 100%;
+    margin: 20px;
+}
+
+.testimonial-text {
+    font-size: 3rem;
+    line-height: 1.5;
+}
+
+.footer {
+    padding-top: 75px;
+    background-color: #f9f7f7;
+    color: #8f8f8f;
+}
+
+/*LOGIN*/
+.login-container {
+    padding-top: 5%;
+    width: 35%;
+    margin-top: 5%;
+    margin-bottom: 16%;
+    text-align: center;
+}
+
+.login-form-2 {
+    padding: 10%;
+    background: #0062cc;
+    box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
+}
+
+    .login-form-2 h3 {
+        text-align: center;
+        color: #fff;
+    }
+
+.login-container form {
+    padding: 10%;
+}
+
+.btnSubmit {
+    width: 50%;
+    border-radius: 1rem;
+    padding: 1.5%;
+    border: none;
+    cursor: pointer;
+}
+
+.login-form-1 .btnSubmit {
+    font-weight: 600;
+    color: #fff;
+    background-color: #0062cc;
+}
+
+.login-form-2 .btnSubmit {
+    font-weight: 600;
+    color: #0062cc;
+    background-color: #fff;
+}
+
+.login-form-2 .ForgetPwd {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-form-1 .ForgetPwd {
+    color: #0062cc;
+    font-weight: 600;
+    text-decoration: none;
+}
