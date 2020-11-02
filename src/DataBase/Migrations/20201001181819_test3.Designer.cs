@@ -20,7 +20,7 @@ namespace ePiggyWeb.DataBase.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("SmartSaver.Expenses", b =>
+            modelBuilder.Entity("SmartSaver.ExpenseModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,7 +33,7 @@ namespace ePiggyWeb.DataBase.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsMonthly")
+                    b.Property<bool>("Recurring")
                         .HasColumnType("bit");
 
                     b.Property<string>("Title")
@@ -45,10 +45,10 @@ namespace ePiggyWeb.DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Expenses");
+                    b.ToTable("ExpenseModel");
                 });
 
-            modelBuilder.Entity("SmartSaver.Incomes", b =>
+            modelBuilder.Entity("SmartSaver.IncomeModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace ePiggyWeb.DataBase.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsMonthly")
+                    b.Property<bool>("Recurring")
                         .HasColumnType("bit");
 
                     b.Property<string>("Title")
@@ -73,10 +73,10 @@ namespace ePiggyWeb.DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Incomes");
+                    b.ToTable("IncomeModel");
                 });
 
-            modelBuilder.Entity("SmartSaver.User", b =>
+            modelBuilder.Entity("SmartSaver.UserModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

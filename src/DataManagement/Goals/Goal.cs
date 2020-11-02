@@ -3,48 +3,46 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using ePiggy.Utilities;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Goals
 {
-    public class Goal : IEquatable<Goal>, IComparable
+    public class Goal : IFinanceable, IComparable<IFinanceable>, IComparable<decimal>, IEquatable<IFinanceable>, IEquatable<decimal>
     {
         public int Id { get; set; }
-
         public int UserId { get; set; }
-
         public string Title { get; set; }
+        public decimal Amount { get; set; }
 
-        public decimal Price { get; set; }
+        public Goal(string title, decimal amount)
+        {
+            Title = title;
+            Amount = amount;
+        }
 
-
-        public Goal(int id, int userId, string title, decimal price)
-            :this(title, price)
+        public Goal(int id, int userId, string title, decimal amount)
+            :this(title, amount)
         {
             Id = id;
             UserId = userId;
         }
 
-        public Goal(string title, decimal price)
-        {
-            Title = title;
-            Price = price;
-        }
 
-        public Goal(DataBase.Models.Goals dbGoals) :this(dbGoals.Id, dbGoals.UserId, dbGoals.Title, dbGoals.Price) { }
+        public Goal(DataBase.Models.GoalModel dbGoalModel) :this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Amount) { }
 
         public Goal()
         {
             Id = 0;
             UserId = 0;
             Title = "unnamed";
-            Price = 0;
+            Amount = 0;
         }
 
         public void Edit(Goal goal)
         {
             Title = goal.Title;
-            Price = goal.Price;
+            Amount = goal.Amount;
         }
 
         // This needs to be amended
@@ -67,7 +65,7 @@ namespace ePiggyWeb.DataManagement.Goals
                 file.ReadLine();
                 Title = file.ReadLine();
                 var priceString = file.ReadLine();
-                Price = Convert.ToDecimal(priceString, System.Globalization.CultureInfo.CurrentCulture);
+                Amount = Convert.ToDecimal(priceString, System.Globalization.CultureInfo.CurrentCulture);
                 file.Close();
             }
             catch (Exception e)
@@ -76,25 +74,31 @@ namespace ePiggyWeb.DataManagement.Goals
             }
         }
 
+        //
 
-        public bool Equals(Goal other)
+        public int CompareTo(IFinanceable other)
+        {
+            return other is null ? 1 : Amount.CompareTo(other.Amount);
+        }
+
+        public int CompareTo(decimal other)
+        {
+            return Amount.CompareTo(other);
+        }
+
+        public bool Equals(IFinanceable other)
         {
             if (other is null)
             {
                 return false;
             }
 
-            return Price == other.Price;
+            return Amount == other.Amount;
         }
 
-        public int CompareTo(object? obj)
+        public bool Equals(decimal other)
         {
-            return obj switch
-            {
-                null => 1,
-                Goal otherGoal => Price.CompareTo(otherGoal.Price),
-                _ => throw new ArgumentException("Object is not a Goal")
-            };
+            return Amount == other;
         }
 
         public override string ToString()

@@ -4,7 +4,7 @@ using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataBase.Models
 {
-    public class Incomes
+    public class IncomeModel
     {
         [Key]
         public int Id { get; set; }
@@ -16,15 +16,15 @@ namespace ePiggyWeb.DataBase.Models
         public bool IsMonthly { get; set; }
         public int Importance { get; set; }
 
-        public Incomes() {}
+        public IncomeModel() {}
 
-        public Incomes(Entry entry, int userId)
+        public IncomeModel(Entry entry, int userId)
         {
             UserId = userId;
             Amount = entry.Amount;
             Title = entry.Title;
             Date = entry.Date;
-            IsMonthly = entry.IsMonthly;
+            IsMonthly = entry.Recurring;
             Importance = entry.Importance;
         }
 
@@ -33,7 +33,7 @@ namespace ePiggyWeb.DataBase.Models
             Amount = newEntry.Amount;
             Title = newEntry.Title;
             Date = newEntry.Date;
-            IsMonthly = newEntry.IsMonthly;
+            IsMonthly = newEntry.Recurring;
             Importance = newEntry.Importance;
         }
     }

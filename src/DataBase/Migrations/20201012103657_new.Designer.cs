@@ -20,7 +20,7 @@ namespace ePiggyWeb.DataBase.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("DataBases.Expenses", b =>
+            modelBuilder.Entity("DataBases.ExpenseModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,7 +36,7 @@ namespace ePiggyWeb.DataBase.Migrations
                     b.Property<int>("Importance")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsMonthly")
+                    b.Property<bool>("Recurring")
                         .HasColumnType("bit");
 
                     b.Property<string>("Title")
@@ -48,10 +48,10 @@ namespace ePiggyWeb.DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Expenses");
+                    b.ToTable("ExpenseModel");
                 });
 
-            modelBuilder.Entity("DataBases.Goals", b =>
+            modelBuilder.Entity("DataBases.GoalModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace ePiggyWeb.DataBase.Migrations
                     b.Property<int>("PlaceInQueue")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
@@ -73,10 +73,10 @@ namespace ePiggyWeb.DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Goals");
+                    b.ToTable("GoalModel");
                 });
 
-            modelBuilder.Entity("DataBases.Incomes", b =>
+            modelBuilder.Entity("DataBases.IncomeModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -92,7 +92,7 @@ namespace ePiggyWeb.DataBase.Migrations
                     b.Property<int>("Importance")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsMonthly")
+                    b.Property<bool>("Recurring")
                         .HasColumnType("bit");
 
                     b.Property<string>("Title")
@@ -104,10 +104,10 @@ namespace ePiggyWeb.DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Incomes");
+                    b.ToTable("IncomeModel");
                 });
 
-            modelBuilder.Entity("DataBases.User", b =>
+            modelBuilder.Entity("DataBases.UserModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

@@ -24,7 +24,7 @@ namespace ePiggy.Utilities
             itemName = WebUtility.UrlEncode(itemName);
             var url = "https://uk.camelcamelcamel.com/search?sq=" + itemName;/*Need tweaking with symbols inside itemName*/
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml");
-            HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0");
+            HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("UserModel-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0");
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Charset", "ISO-8859-1");
 
             var html =  await HttpClient.GetStringAsync(url);

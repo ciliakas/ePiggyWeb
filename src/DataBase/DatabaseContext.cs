@@ -6,11 +6,11 @@ namespace ePiggyWeb.DataBase
     public class DatabaseContext : DbContext
     {
         private const string ConnectionString =
-            "Server=51.75.187.147;Database=SmartSaver;User Id=usern;Password=123456789;";
-        public DbSet<User> Users { get; set; }
-        public DbSet<Expenses> Expenses { get; set; }
-        public DbSet<Incomes> Incomes { get; set; }
-        public DbSet<Goals> Goals { get; set; }
+            "Server=51.75.187.147;Database=SmartSaver;UserModel Id=usern;Password=123456789;";
+        public DbSet<UserModel> Users { get; set; }
+        public DbSet<ExpenseModel> Expenses { get; set; }
+        public DbSet<IncomeModel> Incomes { get; set; }
+        public DbSet<GoalModel> Goals { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

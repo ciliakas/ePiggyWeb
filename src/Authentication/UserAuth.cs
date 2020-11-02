@@ -30,7 +30,7 @@ namespace ePiggyWeb.Authentication
             var salt = HashingProcessor.CreateSalt(SaltSize);
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
 
-            var user = new User { Email = email, Password = passwordHash, Salt = salt };
+            var user = new UserModel { Email = email, Password = passwordHash, Salt = salt };
             db.Add(user);
             db.SaveChanges();
 

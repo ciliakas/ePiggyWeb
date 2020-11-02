@@ -13,7 +13,7 @@ namespace ePiggyWeb.DataBase
         public static int Add(Goal goal, int userid)
         {
             var db = new DatabaseContext();
-            var dbGoal = new Goals (goal, userid);
+            var dbGoal = new GoalModel (goal, userid);
             db.Add(dbGoal);
             db.SaveChanges();
             return dbGoal.Id;

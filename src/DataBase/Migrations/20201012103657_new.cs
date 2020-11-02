@@ -7,7 +7,7 @@ namespace ePiggyWeb.DataBase.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Goals",
+                name: "GoalModel",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -26,7 +26,7 @@ namespace ePiggyWeb.DataBase.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Goals");
+                name: "GoalModel");
         }
     }
 }

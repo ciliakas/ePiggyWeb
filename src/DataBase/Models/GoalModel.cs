@@ -1,29 +1,30 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Goals;
 
 namespace ePiggyWeb.DataBase.Models
 {
-    public class Goals
+    public class GoalModel
     {
         [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
-        public decimal Price { get; set; }
+        public decimal Amount { get; set; }
         [StringLength(255)]
         public string Title { get; set; }
 
-        public Goals() { }
+        public GoalModel() { }
 
-        public Goals(Goal goal, int userId)
+        public GoalModel(IFinanceable goal, int userId)
         {
             UserId = userId;
-            Price = goal.Price;
+            Amount = goal.Amount;
             Title = goal.Title;
         }
 
         public void Edit(Goal newGoal)
         {
-            Price = newGoal.Price;
+            Amount = newGoal.Amount;
             Title = newGoal.Title;
         }
     }

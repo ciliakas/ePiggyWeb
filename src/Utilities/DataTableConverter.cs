@@ -20,7 +20,7 @@ namespace ePiggyWeb.Utilities
         //    foreach (var dataOffer in entrySuggestions)
         //    {
         //        dt.Rows.Add(dataOffer.Entry.Id, dataOffer.Entry.Title, dataOffer.Entry.Amount,
-        //            dataOffer.Entry.Date, dataOffer.Entry.Importance, dataOffer.Entry.IsMonthly, dataOffer.Amount);
+        //            dataOffer.Entry.Date, dataOffer.Entry.Importance, dataOffer.Entry.Recurring, dataOffer.Amount);
         //    }
 
         //    return dt;
@@ -39,7 +39,7 @@ namespace ePiggyWeb.Utilities
             var dataEntries = entryType == EntryType.Expense ? DataManager.Expenses.EntryList : DataManager.Income.EntryList;
             foreach (var data in dataEntries)
             {
-                dt.Rows.Add(data.Id, data.Title, data.Amount, data.Date, data.Importance, data.IsMonthly);
+                dt.Rows.Add(data.Id, data.Title, data.Amount, data.Date, data.Importance, data.Recurring);
             }
             return dt;
         }
@@ -49,7 +49,7 @@ namespace ePiggyWeb.Utilities
             var dt = GenerateEntryTableHeaders();
             foreach (var entry in entryList)
             {
-                dt.Rows.Add(entry.Id, entry.Title, entry.Amount, entry.Date, entry.Importance, entry.IsMonthly);
+                dt.Rows.Add(entry.Id, entry.Title, entry.Amount, entry.Date, entry.Importance, entry.Recurring);
             }
             return dt;
         }

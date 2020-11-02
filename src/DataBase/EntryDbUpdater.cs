@@ -15,13 +15,13 @@ namespace ePiggyWeb.DataBase
             int id;
             if (entryType == EntryType.Income)
             {
-                var entry = new Incomes(localEntry, userId);
+                var entry = new IncomeModel(localEntry, userId);
                 db.Add(entry);
                 id = entry.Id;
             }
             else
             {
-                var entry = new Expenses(localEntry, userId);
+                var entry = new ExpenseModel(localEntry, userId);
                 db.Add(entry);
                 id = entry.Id;
             }
@@ -109,10 +109,10 @@ namespace ePiggyWeb.DataBase
 
             if (entryList.EntryType == EntryType.Income)
             {
-                var dbEntryList = new List<Incomes>();
+                var dbEntryList = new List<IncomeModel>();
                 foreach (var entry in entryList)
                 {
-                    var dbEntry = new Incomes(entry, userId);
+                    var dbEntry = new IncomeModel(entry, userId);
                     dbEntryList.Add(dbEntry);
                     entry.Id = dbEntry.Id;
                     entry.UserId = userId;
@@ -121,10 +121,10 @@ namespace ePiggyWeb.DataBase
             }
             else
             {
-                var dbEntryList = new List<Expenses>();
+                var dbEntryList = new List<ExpenseModel>();
                 foreach (var entry in entryList)
                 {
-                    var dbEntry = new Expenses(entry, userId);
+                    var dbEntry = new ExpenseModel(entry, userId);
                     dbEntryList.Add(dbEntry);
                     entry.Id = dbEntry.Id;
                 }

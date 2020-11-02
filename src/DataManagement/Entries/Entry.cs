@@ -5,44 +5,44 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
-	public class Entry : IComparable, IEquatable<Entry>
-	{
-        /*Properties*/
-        public string Title {get; set; }
-        public decimal Amount { get; set; }
+	public class Entry : IFinanceable, IComparable<IFinanceable>, IComparable<decimal>, IEquatable<IFinanceable>, IEquatable<decimal>
+    {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public string Title {get; set; }
+        public decimal Amount { get; set; }
         public DateTime Date { get; set; }
-        public bool IsMonthly { get; set; }
+        public bool Recurring { get; set; }
         public int Importance { get; set; }
 
-		/*Constructors*/
-		public Entry(decimal amount, string title, DateTime date, bool isMonthly, int importance)
+
+        public Entry(string title, decimal amount,  DateTime date, bool recurring, int importance)
         {
-            Amount = amount;
             Title = title;
+            Amount = amount;
             Date = date;
-            IsMonthly = isMonthly;
+            Recurring = recurring;
             Importance = importance;
         }
 
-        public Entry(int id, int userId, decimal amount, string title, DateTime date, bool isMonthly, int importance)
-            :this(amount, title, date, isMonthly, importance)
-		{
-			Id = id;
-            UserId = userId;
-        }
-
-        public Entry(Entry entry, int id, int userId)
-            :this(entry.Amount, entry.Title, entry.Date, entry.IsMonthly, entry.Importance)
+        public Entry(int id, int userId, string title, decimal amount,  DateTime date, bool recurring, int importance)
+            : this(title, amount, date, recurring, importance)
         {
             Id = id;
             UserId = userId;
         }
 
-        public Entry(Incomes dbEntry) :this(dbEntry.Id, dbEntry.UserId, dbEntry.Amount, dbEntry.Title, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
 
-        public Entry(Expenses dbEntry) : this(dbEntry.Id, dbEntry.UserId, dbEntry.Amount, dbEntry.Title, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
+        public Entry(int id, int userId, Entry entry)
+            :this(entry.Title, entry.Amount, entry.Date, entry.Recurring, entry.Importance)
+        {
+            Id = id;
+            UserId = userId;
+        }
+
+        public Entry(IncomeModel dbEntry) :this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
+
+        public Entry(ExpenseModel dbEntry) : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
 
         public Entry()
 		{
@@ -51,18 +51,43 @@ namespace ePiggyWeb.DataManagement.Entries
 			Amount = 0;
 			Title = "unnamed";
 			Date = DateTime.Now;
-			IsMonthly = false;
+			Recurring = false;
 			Importance = 0;
 		}
 
         //For simpler editing in other methods
         public void Edit(Entry newEntry)
         {
-            Amount = newEntry.Amount;
             Title = newEntry.Title;
+            Amount = newEntry.Amount;
             Date = newEntry.Date;
-            IsMonthly = newEntry.IsMonthly;
+            Recurring = newEntry.Recurring;
             Importance = newEntry.Importance;
+        }
+
+        public int CompareTo(IFinanceable other)
+        {
+            return other is null ? 1 : Amount.CompareTo(other.Amount);
+        }
+
+        public int CompareTo(decimal other)
+        {
+            return Amount.CompareTo(other);
+        }
+
+        public bool Equals(IFinanceable other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            return Amount == other.Amount;
+        }
+
+        public bool Equals(decimal other)
+        {
+            return Amount == other;
         }
 
         public override string ToString()
@@ -86,7 +111,7 @@ namespace ePiggyWeb.DataManagement.Entries
                     case int num:
                         if (name.Equals(nameof(Importance)))
                         {
-                            sb.Append((Importance) num);
+                            sb.Append((Importance)num);
                         }
                         else // Could remove this later, to not show id and user id
                         {
@@ -101,26 +126,6 @@ namespace ePiggyWeb.DataManagement.Entries
             }
 
             return sb.ToString();
-        }
-
-        public int CompareTo(object obj)
-        {
-            return obj switch
-            {
-                null => 1,
-                Entry otherEntry => Amount.CompareTo(otherEntry.Amount),
-                _ => throw new ArgumentException("Object is not a DataEntry")
-            };
-        }
-
-        public bool Equals(Entry other)
-        {
-            if (other is null)
-            {
-                return false;
-            }
-
-            return Amount == other.Amount && Importance == other.Importance && Title.Equals(other.Title);
         }
     }
 }

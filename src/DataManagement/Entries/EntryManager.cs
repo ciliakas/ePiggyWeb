@@ -28,7 +28,7 @@ namespace ePiggyWeb.DataManagement.Entries
                 ExceptionHandler.Log("Invalid id of entry");
                 return false;
             }
-            EntryList.Add(new Entry(entry, id, UserId));
+            EntryList.Add(new Entry(id, UserId, entry));
             return true;
         }
 
