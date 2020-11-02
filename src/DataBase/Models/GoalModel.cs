@@ -9,7 +9,7 @@ namespace ePiggyWeb.DataBase.Models
         [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
-        public decimal Amount { get; set; }
+        public decimal Price { get; set; }
         [StringLength(255)]
         public string Title { get; set; }
 
@@ -18,13 +18,14 @@ namespace ePiggyWeb.DataBase.Models
         public GoalModel(IFinanceable goal, int userId)
         {
             UserId = userId;
-            Amount = goal.Amount;
+            Price = goal.Amount;
             Title = goal.Title;
         }
 
         public void Edit(Goal newGoal)
         {
-            ((IGoalModel)this).Edit(newGoal);
+            Price = newGoal.Amount;
+            Title = newGoal.Title;
         }
     }
 }

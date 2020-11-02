@@ -30,7 +30,7 @@ namespace ePiggyWeb.DataManagement.Goals
         }
 
 
-        public Goal(IGoalModel dbGoalModel) :this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Amount) { }
+        public Goal(IGoalModel dbGoalModel) :this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Price) { }
 
         public Goal()
         {

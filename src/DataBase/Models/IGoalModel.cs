@@ -13,14 +13,10 @@ namespace ePiggyWeb.DataBase.Models
         [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
-        public decimal Amount { get; set; }
+        public decimal Price { get; set; }
         [StringLength(255)]
         public string Title { get; set; }
 
-        public void Edit(Goal newGoal)
-        {
-            Amount = newGoal.Amount;
-            Title = newGoal.Title;
-        }
+        public void Edit(Goal newGoal);
     }
 }

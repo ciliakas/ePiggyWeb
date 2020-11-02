@@ -56,10 +56,7 @@ namespace ePiggyWeb.DataBase.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("PlaceInQueue")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Amount")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
