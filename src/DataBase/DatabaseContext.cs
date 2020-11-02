@@ -6,7 +6,7 @@ namespace ePiggyWeb.DataBase
     public class DatabaseContext : DbContext
     {
         private const string ConnectionString =
-            "Server=51.75.187.147;Database=SmartSaver;UserModel Id=usern;Password=123456789;";
+            "Server=51.75.187.147;Database=SmartSaver;User Id=usern;Password=123456789;";
         public DbSet<UserModel> Users { get; set; }
         public DbSet<ExpenseModel> Expenses { get; set; }
         public DbSet<IncomeModel> Incomes { get; set; }
