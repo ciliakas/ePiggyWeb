@@ -150,3 +150,8 @@ body {
     font-weight: 600;
     text-decoration: none;
 }
+
+.table-wrap {
+    height: 80px;
+    overflow-y: auto;
+}
