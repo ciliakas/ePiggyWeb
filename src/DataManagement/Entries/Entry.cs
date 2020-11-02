@@ -40,9 +40,7 @@ namespace ePiggyWeb.DataManagement.Entries
             UserId = userId;
         }
 
-        public Entry(IncomeModel dbEntry) :this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
-
-        public Entry(ExpenseModel dbEntry) : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
+        public Entry(IEntryModel dbEntry) :this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
 
         public Entry()
 		{

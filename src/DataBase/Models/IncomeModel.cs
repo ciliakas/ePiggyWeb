@@ -4,7 +4,7 @@ using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataBase.Models
 {
-    public class IncomeModel
+    public class IncomeModel : IEntryModel
     {
         [Key]
         public int Id { get; set; }
@@ -30,11 +30,7 @@ namespace ePiggyWeb.DataBase.Models
 
         public void Edit(Entry newEntry)
         {
-            Amount = newEntry.Amount;
-            Title = newEntry.Title;
-            Date = newEntry.Date;
-            IsMonthly = newEntry.Recurring;
-            Importance = newEntry.Importance;
+
         }
     }
 

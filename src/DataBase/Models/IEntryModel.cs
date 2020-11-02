@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataBase.Models
 {
-    public class ExpenseModel : IEntryModel
+    public interface IEntryModel
     {
         [Key]
         public int Id { get; set; }
@@ -16,21 +19,13 @@ namespace ePiggyWeb.DataBase.Models
         public bool IsMonthly { get; set; }
         public int Importance { get; set; }
 
-        public ExpenseModel() {}
-
-        public ExpenseModel(Entry entry, int userId)
-        {
-            UserId = userId;
-            Amount = entry.Amount;
-            Title = entry.Title;
-            Date = entry.Date;
-            IsMonthly = entry.Recurring;
-            Importance = entry.Importance;
-        }
         public void Edit(Entry newEntry)
         {
-            ((IEntryModel)this).Edit(newEntry);
+            Amount = newEntry.Amount;
+            Title = newEntry.Title;
+            Date = newEntry.Date;
+            IsMonthly = newEntry.Recurring;
+            Importance = newEntry.Importance;
         }
     }
-
 }
