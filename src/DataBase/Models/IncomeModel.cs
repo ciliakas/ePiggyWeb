@@ -18,7 +18,7 @@ namespace ePiggyWeb.DataBase.Models
 
         public IncomeModel() {}
 
-        public IncomeModel(Entry entry, int userId)
+        public IncomeModel(IEntry entry, int userId)
         {
             UserId = userId;
             Amount = entry.Amount;
@@ -28,7 +28,7 @@ namespace ePiggyWeb.DataBase.Models
             Importance = entry.Importance;
         }
 
-        public void Edit(Entry newEntry)
+        public void Edit(IEntry newEntry)
         {
             ((IEntryModel)this).Edit(newEntry);
         }

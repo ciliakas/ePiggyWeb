@@ -65,7 +65,7 @@ namespace ePiggyWeb.Utilities
                     var entryList = new EntryList(EntryType.Income);
 					try
 					{
-                        var entry = JsonSerializer.Deserialize<Entry>(line);//TRY CATCH
+                        var entry = JsonSerializer.Deserialize<IEntry>(line);//TRY CATCH
                         entryList.Add(entry);
 					}
 					catch (Exception e)
@@ -95,7 +95,7 @@ namespace ePiggyWeb.Utilities
 					var entryList = new EntryList(EntryType.Expense);
 					try
 					{
-						var entry = JsonSerializer.Deserialize<Entry>(line);//TRY CATCH
+						var entry = JsonSerializer.Deserialize<IEntry>(line);//TRY CATCH
                         entryList.Add(entry);
                     }
 					catch (Exception e)

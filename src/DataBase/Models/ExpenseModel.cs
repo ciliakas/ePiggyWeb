@@ -18,7 +18,7 @@ namespace ePiggyWeb.DataBase.Models
 
         public ExpenseModel() {}
 
-        public ExpenseModel(Entry entry, int userId)
+        public ExpenseModel(IEntry entry, int userId)
         {
             UserId = userId;
             Amount = entry.Amount;
@@ -27,7 +27,7 @@ namespace ePiggyWeb.DataBase.Models
             IsMonthly = entry.Recurring;
             Importance = entry.Importance;
         }
-        public void Edit(Entry newEntry)
+        public void Edit(IEntry newEntry)
         {
             ((IEntryModel)this).Edit(newEntry);
         }

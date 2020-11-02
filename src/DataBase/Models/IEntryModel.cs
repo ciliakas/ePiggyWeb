@@ -19,7 +19,7 @@ namespace ePiggyWeb.DataBase.Models
         public bool IsMonthly { get; set; }
         public int Importance { get; set; }
 
-        public void Edit(Entry newEntry)
+        public void Edit(IEntry newEntry)
         {
             Amount = newEntry.Amount;
             Title = newEntry.Title;

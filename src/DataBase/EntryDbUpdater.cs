@@ -9,7 +9,7 @@ namespace ePiggyWeb.DataBase
 {
     public static class EntryDbUpdater
     {
-        public static int Add(Entry localEntry, int userId, EntryType entryType)
+        public static int Add(IEntry localEntry, int userId, EntryType entryType)
         {
             var db = new DatabaseContext();
             int id;
@@ -29,7 +29,7 @@ namespace ePiggyWeb.DataBase
             return id;
         }
 
-        public static bool Remove(Entry entry, EntryType entryType)
+        public static bool Remove(IEntry entry, EntryType entryType)
         {
             var db = new DatabaseContext();
             try
@@ -56,7 +56,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool Edit(Entry oldEntry, Entry updatedEntry, EntryType entryType)
+        public static bool Edit(IEntry oldEntry, IEntry updatedEntry, EntryType entryType)
         {
             var db = new DatabaseContext();
 

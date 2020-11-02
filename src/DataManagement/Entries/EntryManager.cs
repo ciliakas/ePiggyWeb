@@ -18,7 +18,7 @@ namespace ePiggyWeb.DataManagement.Entries
             ReadFromDb();
         }
 
-        public bool Add(Entry entry)
+        public bool Add(IEntry entry)
         {
             //Should check if valid id or something
             var id = EntryDbUpdater.Add(entry, UserId, EntryList.EntryType);
@@ -42,7 +42,7 @@ namespace ePiggyWeb.DataManagement.Entries
             return true;
         }
 
-        public bool Edit(Entry oldEntry, Entry newEntry)
+        public bool Edit(IEntry oldEntry, IEntry newEntry)
         {
             //If something went wrong with database update return false
             if (!EntryDbUpdater.Edit(oldEntry, newEntry, EntryList.EntryType))
@@ -60,7 +60,7 @@ namespace ePiggyWeb.DataManagement.Entries
             return true;
         }
 
-        public bool Remove(Entry entry)
+        public bool Remove(IEntry entry)
         {
             if (!EntryDbUpdater.Remove(entry, EntryList.EntryType)) return false;
             var temp = EntryList.FirstOrDefault(x => x.Id == entry.Id);

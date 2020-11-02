@@ -5,7 +5,7 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
-	public class Entry : IFinanceable, IComparable<IFinanceable>, IComparable<decimal>, IEquatable<IFinanceable>, IEquatable<decimal>
+	public class Entry : IEntry, IFinanceable, IComparable<IFinanceable>, IComparable<IEntry>, IEquatable<IFinanceable>, IEquatable<IEntry>
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -33,7 +33,7 @@ namespace ePiggyWeb.DataManagement.Entries
         }
 
 
-        public Entry(int id, int userId, Entry entry)
+        public Entry(int id, int userId, IEntry entry)
             :this(entry.Title, entry.Amount, entry.Date, entry.Recurring, entry.Importance)
         {
             Id = id;
@@ -54,7 +54,7 @@ namespace ePiggyWeb.DataManagement.Entries
 		}
 
         //For simpler editing in other methods
-        public void Edit(Entry newEntry)
+        public void Edit(IEntry newEntry)
         {
             Title = newEntry.Title;
             Amount = newEntry.Amount;
@@ -68,9 +68,9 @@ namespace ePiggyWeb.DataManagement.Entries
             return other is null ? 1 : Amount.CompareTo(other.Amount);
         }
 
-        public int CompareTo(decimal other)
+        public int CompareTo(IEntry other)
         {
-            return Amount.CompareTo(other);
+            return other is null ? 1 : Amount.CompareTo(other.Amount);
         }
 
         public bool Equals(IFinanceable other)
@@ -83,9 +83,14 @@ namespace ePiggyWeb.DataManagement.Entries
             return Amount == other.Amount;
         }
 
-        public bool Equals(decimal other)
+        public bool Equals(IEntry other)
         {
-            return Amount == other;
+            if (other is null)
+            {
+                return false;
+            }
+
+            return Amount == other.Amount;
         }
 
         public override string ToString()
