@@ -1,7 +1,5 @@
 ﻿@page
 @model ePiggyWeb.Pages.logInModel
-@{
-}
 
 <div class="container login-container">
     <div class="login-form-2">
@@ -17,8 +15,10 @@
                 <input type="submit" class="btnSubmit" value="Login" />
             </div>
             <div class="form-group">
-
                 <a href="#" class="ForgetPwd" value="Login">Forget Password?</a>
+            </div>
+            <div class="form-group">
+                <a asp-page="/Register" class="ForgetPwd" value="Login">New User?</a>
             </div>
         </form>
     </div>
