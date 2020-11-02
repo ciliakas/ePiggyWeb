@@ -30,7 +30,7 @@ namespace ePiggyWeb.DataBase.Models
 
         public void Edit(Entry newEntry)
         {
-
+            ((IEntryModel)this).Edit(newEntry);
         }
     }
 

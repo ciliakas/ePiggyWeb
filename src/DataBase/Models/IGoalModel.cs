@@ -1,10 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Goals;
 
 namespace ePiggyWeb.DataBase.Models
 {
-    public class GoalModel : IGoalModel
+    public interface IGoalModel
     {
         [Key]
         public int Id { get; set; }
@@ -13,18 +17,10 @@ namespace ePiggyWeb.DataBase.Models
         [StringLength(255)]
         public string Title { get; set; }
 
-        public GoalModel() { }
-
-        public GoalModel(IFinanceable goal, int userId)
-        {
-            UserId = userId;
-            Amount = goal.Amount;
-            Title = goal.Title;
-        }
-
         public void Edit(Goal newGoal)
         {
-            ((IGoalModel)this).Edit(newGoal);
+            Amount = newGoal.Amount;
+            Title = newGoal.Title;
         }
     }
 }

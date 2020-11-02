@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using ePiggy.Utilities;
+using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 
@@ -29,7 +30,7 @@ namespace ePiggyWeb.DataManagement.Goals
         }
 
 
-        public Goal(DataBase.Models.GoalModel dbGoalModel) :this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Amount) { }
+        public Goal(IGoalModel dbGoalModel) :this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Amount) { }
 
         public Goal()
         {
