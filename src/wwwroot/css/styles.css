@@ -152,6 +152,7 @@ body {
 }
 
 .table-wrap {
-    height: 80px;
+    height: 50%;
     overflow-y: auto;
 }
+
