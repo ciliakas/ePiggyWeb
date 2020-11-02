@@ -8,8 +8,18 @@ namespace ePiggyWeb.DataManagement
 {
     public class DataManager
     {
-        //public DataEntries Income { get; } = new DataEntries(EntryType.Income);
+        private EntryList LocalIncome { get; } = new EntryList(EntryType.Income);
 
-        //public DataEntries Expenses { get; } = new DataEntries(EntryType.Expense);
+        private EntryList LocalExpenses { get; } = new EntryList(EntryType.Expense);
+
+        public EntryManager Income { get; }
+
+        public EntryManager Expenses { get; }
+
+        public DataManager()
+        {
+            Income = new EntryManager(LocalIncome);
+            Expenses = new EntryManager(LocalExpenses);
+        }
     }
 }
