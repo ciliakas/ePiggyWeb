@@ -17,6 +17,6 @@ namespace ePiggyWeb.DataBase.Models
         [StringLength(255)]
         public string Title { get; set; }
 
-        public void Edit(Goal newGoal);
+        public void Edit(IFinanceable newGoal);
     }
 }

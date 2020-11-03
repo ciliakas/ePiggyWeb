@@ -22,7 +22,7 @@ namespace ePiggyWeb.DataBase.Models
             Title = goal.Title;
         }
 
-        public void Edit(Goal newGoal)
+        public void Edit(IFinanceable newGoal)
         {
             Price = newGoal.Amount;
             Title = newGoal.Title;

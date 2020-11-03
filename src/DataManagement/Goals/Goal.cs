@@ -40,7 +40,7 @@ namespace ePiggyWeb.DataManagement.Goals
             Amount = 0;
         }
 
-        public void Edit(Goal goal)
+        public void Edit(IFinanceable goal)
         {
             Title = goal.Title;
             Amount = goal.Amount;
