@@ -16,7 +16,7 @@ namespace ePiggyWeb.DataManagement.Goals
             ReadFromDb();
         }
 
-        public bool Add(Goal goal)
+        public bool Add(IGoal goal)
         {
             var id = GoalDbUpdater.Add(goal, UserId);
             //Check if id is correct, return false if something is wrong
@@ -27,7 +27,7 @@ namespace ePiggyWeb.DataManagement.Goals
             return false;
         }
 
-        public bool Edit(Goal oldGoal, Goal newGoal)
+        public bool Edit(IGoal oldGoal, IGoal newGoal)
         {
             if (!GoalDbUpdater.Edit(oldGoal, newGoal))
             {
@@ -43,7 +43,7 @@ namespace ePiggyWeb.DataManagement.Goals
             return true;
         }
 
-        public bool Remove(Goal goal)
+        public bool Remove(IGoal goal)
         {
             if (!GoalDbUpdater.Remove(goal))
             {

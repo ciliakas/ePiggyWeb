@@ -30,7 +30,11 @@ namespace ePiggyWeb.DataBase.Models
 
         public void Edit(IEntry newEntry)
         {
-            ((IEntryModel)this).Edit(newEntry);
+            Amount = newEntry.Amount;
+            Title = newEntry.Title;
+            Date = newEntry.Date;
+            IsMonthly = newEntry.Recurring;
+            Importance = newEntry.Importance;
         }
     }
 

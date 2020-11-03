@@ -25,11 +25,14 @@ namespace ePiggyWeb.Pages
             IEntry entry2 = new Entry();
             IGoal entry3 = new Entry();
 
+            entry2.Title = "labas";
+            entry1.Edit(entry2);
+
             Goal goal1 = new Goal();
             IGoal goal2 = new Goal();
             //IEntry goal3 = new Goal(); -- thats illegla
 
-            ViewData["EntryList"] = goal1.Equals(0M);
+            ViewData["EntryList"] = entry1.ToString();
         }
     }
 }

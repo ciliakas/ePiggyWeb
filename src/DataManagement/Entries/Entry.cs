@@ -12,7 +12,6 @@ namespace ePiggyWeb.DataManagement.Entries
         public int UserId { get; set; }
         public string Title {get; set; }
         public decimal Amount { get; set; }
-
         public DateTime Date { get; set; }
         public bool Recurring { get; set; }
         public int Importance { get; set; }

@@ -118,6 +118,7 @@ namespace ePiggyWeb.DataManagement.Goals
                         sb.Append(value);
                         break;
                 }
+                sb.Append(" ");
             }
 
             return sb.ToString();

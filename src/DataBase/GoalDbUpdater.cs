@@ -8,7 +8,7 @@ namespace ePiggyWeb.DataBase
 {
     public static class GoalDbUpdater
     {
-        public static int Add(Goal goal, int userid)
+        public static int Add(IGoal goal, int userid)
         {
             var db = new DatabaseContext();
             var dbGoal = new GoalModel (goal, userid);
@@ -17,7 +17,7 @@ namespace ePiggyWeb.DataBase
             return dbGoal.Id;
         }
 
-        public static bool Remove(Goal goal)
+        public static bool Remove(IGoal goal)
         {
             var db = new DatabaseContext();
             try
@@ -35,7 +35,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool Edit(Goal oldGoal, Goal newGoal)
+        public static bool Edit(IGoal oldGoal, IGoal newGoal)
         {
             var db = new DatabaseContext();
             var dbGoal = db.Goals.FirstOrDefault(x => x.Id == oldGoal.Id);
