@@ -13,10 +13,11 @@ namespace ePiggyWeb.Pages
 
         [BindProperty] 
         public string Email { get; set; }
+        [BindProperty]
         public string Password { get; set; }
         public void OnPost()
         {
-            Debug.WriteLine("\n\n\n" + UserAuth.Login(Email, Password));
+            Debug.WriteLine("\n\n\n"+ Email + Password + UserAuth.Login(Email, Password));
         }
     }
 }
