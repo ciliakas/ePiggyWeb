@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Goals;
 
 namespace ePiggyWeb.DataBase.Models

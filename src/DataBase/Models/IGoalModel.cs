@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using ePiggyWeb.DataManagement;
+﻿using System.ComponentModel.DataAnnotations;
 using ePiggyWeb.DataManagement.Goals;
 
 namespace ePiggyWeb.DataBase.Models

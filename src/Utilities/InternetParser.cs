@@ -4,10 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ePiggyWeb.Utilities;
 using HtmlAgilityPack;
 
-namespace ePiggy.Utilities
+namespace ePiggyWeb.Utilities
 {
     public static class InternetParser
     {

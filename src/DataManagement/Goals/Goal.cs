@@ -2,9 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using ePiggy.Utilities;
 using ePiggyWeb.DataBase.Models;
-using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Goals

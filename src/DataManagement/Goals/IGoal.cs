@@ -1,5 +1,4 @@
 ﻿using System;
-using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataManagement.Goals
 {
