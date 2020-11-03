@@ -11,6 +11,10 @@
             <div class="form-group">
                 <input asp-for="Password" type="password" class="form-control" placeholder="Your Password *" value="" />
             </div>
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <p class="text-danger">@Model.ErrorMessage</p>
+            }
             <div class="form-group">
                 <input type="submit" class="btnSubmit" value="Login" />
             </div>
