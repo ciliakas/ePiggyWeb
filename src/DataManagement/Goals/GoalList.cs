@@ -3,7 +3,7 @@ using System.Text;
 
 namespace ePiggyWeb.DataManagement.Goals
 {
-    public class GoalList : List<IGoal>
+    public class GoalList : List<IGoal>, IGoalList
     {
         public override string ToString()
         {
