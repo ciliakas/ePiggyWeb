@@ -29,34 +29,38 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public IEntryList GetBy(DateTime dateTime)
         {
-            throw new NotImplementedException();
+            return new EntryList(EntryType, this.Where(x => x.Date.Year == dateTime.Year && x.Date.Month == dateTime.Month).ToList());
         }
 
-        public IEntryList GetBy(DateTime @from, DateTime to)
+        public IEntryList GetBy(DateTime from, DateTime to)
         {
-            throw new NotImplementedException();
-        }
-
-        public IEntryList GetBy(Importance importance, DateTime @from, DateTime to)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEntryList GetBy(Importance importance, DateTime dateTime)
-        {
-            throw new NotImplementedException();
+            return new EntryList(EntryType, this.Where(x => x.Date >= from && x.Date <= to).ToList());
         }
 
         public IEntryList GetBy(bool recurring)
         {
-            throw new NotImplementedException();
+            return new EntryList(EntryType, this.Where(x => x.Recurring == recurring).ToList());
         }
 
         public IEntryList GetUntilToday()
         {
-            throw new NotImplementedException();
+            return new EntryList(EntryType, this.Where(x => x.Date <= DateTime.Today).ToList());
         }
 
+        public DateTime GetOldestEntryDate()
+        {
+            return this.Min(x => x.Date);
+        }
+
+        public DateTime GetNewestEntryDate()
+        {
+            return this.Max(x => x.Date);
+        }
+
+        public decimal GetSum()
+        {
+            return this.Sum(entry => entry.Amount);
+        }
 
         public override string ToString()
         {

@@ -35,7 +35,8 @@ namespace ePiggyWeb.Pages
             IGoal goal2 = new Goal();
             //IEntry goal3 = new Goal(); -- thats illegla
 
-            ViewData["EntryList"] = dataManager.Income.EntryList.GetBy(Importance.Low).ToString();
+            //This should be ill eagle, don't know why I didn't think of this before
+            ViewData["EntryList"] = dataManager.Income.EntryList.GetBy(Importance.Low).GetBy(DateTime.Today).GetSum();
         }
     }
 }
