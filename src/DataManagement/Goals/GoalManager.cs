@@ -4,15 +4,16 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Goals
 {
-    public class GoalManager
+    public class GoalManager : IGoalManager
     {
-        public GoalList GoalList { get; }
+        public IGoalList GoalList { get; }
 
-        private int UserId { get; } = 0;
+        public int UserId { get; }
 
-        public GoalManager()
+        public GoalManager(IGoalList goalList, int userId = 0)
         {
-            GoalList = new GoalList();
+            GoalList = goalList;
+            UserId = userId;
             ReadFromDb();
         }
 

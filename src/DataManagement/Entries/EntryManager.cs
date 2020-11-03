@@ -6,16 +6,17 @@ using IListExtension;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
-    public class EntryManager
+    public class EntryManager : IEntryManager
     {
         public IEntryList EntryList { get; }
 
         //Somehow I should get user id here
-        private int UserId { get; } = 0;
+        public int UserId { get; } = 0;
 
-        public EntryManager(EntryType entryType)
+        public EntryManager(IEntryList entryList, int userId = 0)
         {
-            EntryList = new EntryList(entryType);
+            EntryList = entryList;
+            UserId = userId;
             ReadFromDb();
         }
 

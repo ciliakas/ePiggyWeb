@@ -6,11 +6,11 @@ namespace ePiggyWeb.DataManagement
 {
     public class DataManager
     {
-        public EntryManager Income { get; } = new EntryManager(EntryType.Income);
+        public IEntryManager Income { get; } = new EntryManager(new EntryList(EntryType.Income));
 
-        public EntryManager Expenses { get; } = new EntryManager(EntryType.Expense);
+        public IEntryManager Expenses { get; } = new EntryManager(new EntryList(EntryType.Expense));
 
-        public GoalManager Goals { get; } = new GoalManager();
+        public IGoalManager Goals { get; } = new GoalManager(new GoalList());
 
     }
 }
