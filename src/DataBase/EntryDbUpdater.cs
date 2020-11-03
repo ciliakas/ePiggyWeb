@@ -84,7 +84,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool RemoveRange(IEntryEnumerable entryList)
+        public static bool RemoveAll(IEntryEnumerable entryList)
         {
             var db = new DatabaseContext();
 

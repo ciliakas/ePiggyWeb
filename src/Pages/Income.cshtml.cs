@@ -6,7 +6,7 @@ namespace ePiggyWeb.Pages
 {
     public class IncomesModel : PageModel
     {
-        public EntryList Income { get; set; }
+        public IEntryList Income { get; set; }
         public void OnGet()
         {
             var dataManager = new DataManager();

@@ -6,7 +6,7 @@ namespace ePiggyWeb.Pages
 {
     public class ExpensesModel : PageModel
     {
-        public EntryList Expenses { get; set; }
+        public IEntryList Expenses { get; set; }
 
         public void OnGet()
         {

@@ -2,12 +2,13 @@
 using System.Linq;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
+using IListExtension;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
     public class EntryManager
     {
-        public EntryList EntryList { get; }
+        public IEntryList EntryList { get; }
 
         //Somehow I should get user id here
         private int UserId { get; } = 0;
@@ -38,7 +39,6 @@ namespace ePiggyWeb.DataManagement.Entries
             {
                 return false;
             }
-
             EntryList.AddRange(entryList);
             return true;
         }
@@ -74,12 +74,13 @@ namespace ePiggyWeb.DataManagement.Entries
             return true;
         }
 
-        public bool RemoveRange(IEntryList entryList)
+        public bool RemoveAll(IEntryList entryList)
         {
-            if (!EntryDbUpdater.RemoveRange(entryList))
+            if (!EntryDbUpdater.RemoveAll(entryList))
             {
                 return false;
             }
+            var temp = new EntryList(EntryType.Income);
             EntryList.RemoveAll(entryList.Contains);
             return true;
         }
