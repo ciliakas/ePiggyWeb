@@ -28,8 +28,6 @@ body {
 }
 
 .title-image {
-    /* ReSharper disable once InvalidValue */
-    position: inline-block;
     left: 5%;
     bottom: 63%;
 }
@@ -150,9 +148,4 @@ body {
     color: #0062cc;
     font-weight: 600;
     text-decoration: none;
-}
-
-.table-wrap {
-    height: 80px;
-    overflow-y: auto;
 }

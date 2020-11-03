@@ -10,9 +10,9 @@
         <a class="btn btn-primary form-control">Add Expense</a>
     </div>
 </div>
-<div class="table-wrap col-12 border p-3 mt-3 mb-3">
+<div class="col-12 border p-3 mt-3 mb-3">
         <form method="post">
-            @if (Model.Expenses.Count() > 0)
+            @if (Model.Expenses.Any())
             {
                 <table class="table table-hover border-primary table-bordered">
                     <tr class="table-primary">
