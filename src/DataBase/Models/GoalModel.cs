@@ -15,14 +15,14 @@ namespace ePiggyWeb.DataBase.Models
 
         public GoalModel() { }
 
-        public GoalModel(IFinanceable goal, int userId)
+        public GoalModel(IGoal goal, int userId)
         {
             UserId = userId;
             Price = goal.Amount;
             Title = goal.Title;
         }
 
-        public void Edit(IFinanceable newGoal)
+        public void Edit(IGoal newGoal)
         {
             Price = newGoal.Amount;
             Title = newGoal.Title;

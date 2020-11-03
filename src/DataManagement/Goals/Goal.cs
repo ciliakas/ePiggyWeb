@@ -9,7 +9,7 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Goals
 {
-    public class Goal : IFinanceable, IComparable<IFinanceable>, IComparable<decimal>, IEquatable<IFinanceable>, IEquatable<decimal>
+    public class Goal : IGoal
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -22,15 +22,15 @@ namespace ePiggyWeb.DataManagement.Goals
             Amount = amount;
         }
 
-        public Goal(int id, int userId, string title, decimal amount)
-            :this(title, amount)
+        public Goal(int id, int userId, string title, decimal amount) : this(title, amount)
         {
             Id = id;
             UserId = userId;
         }
 
+        public Goal(IGoalModel dbGoalModel) : this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Price) { }
 
-        public Goal(IGoalModel dbGoalModel) :this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Price) { }
+        public Goal(int id, int userId, IGoal goal) : this(id, userId, goal.Title, goal.Amount) { }
 
         public Goal()
         {
@@ -40,7 +40,7 @@ namespace ePiggyWeb.DataManagement.Goals
             Amount = 0;
         }
 
-        public void Edit(IFinanceable goal)
+        public void Edit(IGoal goal)
         {
             Title = goal.Title;
             Amount = goal.Amount;
@@ -75,19 +75,13 @@ namespace ePiggyWeb.DataManagement.Goals
             }
         }
 
-        //
 
-        public int CompareTo(IFinanceable other)
+        public int CompareTo(IGoal other)
         {
             return other is null ? 1 : Amount.CompareTo(other.Amount);
         }
 
-        public int CompareTo(decimal other)
-        {
-            return Amount.CompareTo(other);
-        }
-
-        public bool Equals(IFinanceable other)
+        public bool Equals(IGoal other)
         {
             if (other is null)
             {
@@ -95,6 +89,11 @@ namespace ePiggyWeb.DataManagement.Goals
             }
 
             return Amount == other.Amount;
+        }
+
+        public int CompareTo(decimal other)
+        {
+            return Amount.CompareTo(other);
         }
 
         public bool Equals(decimal other)

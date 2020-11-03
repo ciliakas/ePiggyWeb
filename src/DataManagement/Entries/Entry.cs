@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Text;
 using ePiggyWeb.DataBase.Models;
+using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
-	public class Entry : IEntry, IFinanceable, IComparable<IFinanceable>, IComparable<IEntry>, IEquatable<IFinanceable>, IEquatable<IEntry>
+	public class Entry : IEntry
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Title {get; set; }
         public decimal Amount { get; set; }
+
         public DateTime Date { get; set; }
         public bool Recurring { get; set; }
         public int Importance { get; set; }
@@ -25,22 +27,21 @@ namespace ePiggyWeb.DataManagement.Entries
             Importance = importance;
         }
 
-        public Entry(int id, int userId, string title, decimal amount,  DateTime date, bool recurring, int importance)
+        public Entry(int id, int userId, string title, decimal amount, DateTime date, bool recurring, int importance) 
             : this(title, amount, date, recurring, importance)
         {
             Id = id;
             UserId = userId;
         }
 
+        public Entry(int id, int userId, IEntry entry) 
+            : this(id, userId, entry.Title, entry.Amount, entry.Date, entry.Recurring, entry.Importance) { }
 
-        public Entry(int id, int userId, IEntry entry)
-            :this(entry.Title, entry.Amount, entry.Date, entry.Recurring, entry.Importance)
-        {
-            Id = id;
-            UserId = userId;
-        }
+        public Entry(IEntryModel dbEntry) 
+            : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
 
-        public Entry(IEntryModel dbEntry) :this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
+        public Entry(int id, IGoal goal, DateTime date, bool recurring, int importance) 
+            : this(id, goal.UserId, goal.Title, goal.Amount, date, recurring, importance) { }
 
         public Entry()
 		{
@@ -51,7 +52,7 @@ namespace ePiggyWeb.DataManagement.Entries
 			Date = DateTime.Now;
 			Recurring = false;
 			Importance = 0;
-		}
+        }
 
         //For simpler editing in other methods
         public void Edit(IEntry newEntry)
@@ -63,17 +64,18 @@ namespace ePiggyWeb.DataManagement.Entries
             Importance = newEntry.Importance;
         }
 
-        public int CompareTo(IFinanceable other)
+        public void Edit(IGoal goal)
+        {
+            Title = goal.Title;
+            Amount = goal.Amount;
+        }
+
+        public int CompareTo(IGoal other)
         {
             return other is null ? 1 : Amount.CompareTo(other.Amount);
         }
 
-        public int CompareTo(IEntry other)
-        {
-            return other is null ? 1 : Amount.CompareTo(other.Amount);
-        }
-
-        public bool Equals(IFinanceable other)
+        public bool Equals(IGoal other)
         {
             if (other is null)
             {
@@ -83,14 +85,14 @@ namespace ePiggyWeb.DataManagement.Entries
             return Amount == other.Amount;
         }
 
-        public bool Equals(IEntry other)
+        public int CompareTo(decimal other)
         {
-            if (other is null)
-            {
-                return false;
-            }
+            return Amount.CompareTo(other);
+        }
 
-            return Amount == other.Amount;
+        public bool Equals(decimal other)
+        {
+            return Amount == other;
         }
 
         public override string ToString()
