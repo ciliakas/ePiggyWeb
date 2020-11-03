@@ -84,7 +84,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool RemoveRange(EntryList entryList)
+        public static bool RemoveRange(IEntryEnumerable entryList)
         {
             var db = new DatabaseContext();
 
@@ -103,7 +103,7 @@ namespace ePiggyWeb.DataBase
         }
 
         //As I understand, all the entry lists that were passed to this Method will now have amended Id's and user Id's and are ready to be added locally 
-        public static bool AddRange(EntryList entryList, int userId)
+        public static bool AddRange(IEntryEnumerable entryList, int userId)
         {
             var db = new DatabaseContext();
 

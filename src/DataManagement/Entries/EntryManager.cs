@@ -32,12 +32,13 @@ namespace ePiggyWeb.DataManagement.Entries
             return true;
         }
 
-        public bool AddRange(EntryList entryList)
+        public bool AddRange(IEntryEnumerable entryList)
         {
             if (!EntryDbUpdater.AddRange(entryList, UserId))
             {
                 return false;
             }
+
             EntryList.AddRange(entryList);
             return true;
         }
@@ -73,7 +74,7 @@ namespace ePiggyWeb.DataManagement.Entries
             return true;
         }
 
-        public bool RemoveRange(EntryList entryList)
+        public bool RemoveRange(IEntryList entryList)
         {
             if (!EntryDbUpdater.RemoveRange(entryList))
             {
