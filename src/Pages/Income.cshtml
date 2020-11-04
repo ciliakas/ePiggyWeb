@@ -41,7 +41,8 @@
                         @Html.DisplayFor(m => item.Amount)
                     </td>
                     <td class="border-primary">
-                        @Html.DisplayFor(m => item.Date)
+                        @item.Date.ToShortDateString()
+                        <!-- Html.DisplayFor(m => item.Date)-->
                     </td>
                     <td class="border-primary">
                         @Html.DisplayFor(m => item.Importance)
