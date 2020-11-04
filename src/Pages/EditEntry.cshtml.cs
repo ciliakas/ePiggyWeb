@@ -14,11 +14,26 @@ namespace ePiggyWeb.Pages
 {
     public class EditEntryModel : PageModel
     {
-        [BindProperty]
         public IEntry Entry { get; set; }
-        [BindProperty]
         public int EntryTypeInt { get; set; }
 
+        [BindProperty]
+        public int Id { get; set; }
+        [BindProperty]
+        public int UserId { get; set; }
+        [Required(ErrorMessage = "Title is required")]
+        [BindProperty]
+        public string Title { get; set; }
+        [Required(ErrorMessage = "Amount is required")]
+        [BindProperty]
+        public string Amount { get; set; }
+        [BindProperty]
+        public string Date { get; set; }
+        [BindProperty]
+        [Required(ErrorMessage = "Importance is required")]
+        public string Importance { get; set; }
+        [BindProperty]
+        public string IsMonthly { get; set; }
 
         public string Error { get; set; }
         public void OnGet(int id, int entryType)
@@ -29,15 +44,21 @@ namespace ePiggyWeb.Pages
             Entry = entryType == 1
                 ? dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
                 : dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
-            
+            if (Entry == null)
+            {
+                Redirect("/Index");
+            }
+            Id = Entry.Id;
+            UserId = Entry.UserId;
+
         }
 
         public void OnPost()
         {
-
+           
             if (!ModelState.IsValid) return;
 
-           /* if (!decimal.TryParse(Amount, out var parsedAmount))
+            if (!decimal.TryParse(Amount, out var parsedAmount))
             {
                 Error = "Amount is not a number!";
                 return;
@@ -46,21 +67,17 @@ namespace ePiggyWeb.Pages
             var parsedDate = Convert.ToDateTime(Date);
             var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
             var parsedImportance = int.Parse(Importance);
-            Entry.Title = Title;
-            Entry.Amount = parsedAmount;
-            Entry.Date = parsedDate;
-            Entry.Recurring = parsedIsMonthly;
-            Entry.Importance = parsedImportance;*/
+            var entry = new Entry(Id,UserId,Title,parsedAmount,parsedDate,parsedIsMonthly,parsedImportance);
 
 
             if (EntryTypeInt == 1)
             {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
+                EntryDbUpdater.Edit(entry.Id, entry, EntryType.Income);
                 Redirect("/Income");
             }
             else
             {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
+                EntryDbUpdater.Edit(entry.Id, entry, EntryType.Expense);
                 Redirect("/Expense");
             }
 
