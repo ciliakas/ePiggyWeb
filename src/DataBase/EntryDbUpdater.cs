@@ -9,6 +9,10 @@ namespace ePiggyWeb.DataBase
 {
     public static class EntryDbUpdater
     {
+        /*
+        I've made all methods here require an EntryType instead of having to call different Add Income or Add Expense methods everywhere else
+        Also moved to a standard of just passing IEntry everywhere, instead of many types of different parameters, because that quickly clogged up the code in this class.
+         */
         public static int Add(IEntry localEntry, int userId, EntryType entryType)
         {
             var db = new DatabaseContext();

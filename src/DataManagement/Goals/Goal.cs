@@ -44,34 +44,35 @@ namespace ePiggyWeb.DataManagement.Goals
             Amount = goal.Amount;
         }
 
-        // This needs to be amended
+        // Since I don't know how this should work with the threads and so on, I will keep this commented for the time being
 
-        public Goal(string title)
-        {
-            SetGoalFromWeb(title);
-        }
+        //public Goal(string title)
+        //{
+        //    SetGoalFromWeb(title);
+        //}
 
-        private static readonly string ResourceDirectoryParsedGoal = Directory.GetParent(Environment.CurrentDirectory)
-                                                                         .Parent?.Parent?.FullName +
-                                                                     @"\resources\textData\parsedGoal.txt";
-        public void SetGoalFromWeb(string itemName)
-        {
-            try
-            {
-                Task.Run(() => InternetParser.ReadPriceFromCamel(itemName)).Wait();
+        //private static readonly string ResourceDirectoryParsedGoal = Directory.GetParent(Environment.CurrentDirectory)
+        //                                                                 .Parent?.Parent?.FullName +
+        //                                                             @"\resources\textData\parsedGoal.txt";
+        //public void SetGoalFromWeb(string itemName)
+        //{
+        //    try
+        //    {
+        //Below line should be amended, as the teacher said this is not the correct way to use threads
+        //        Task.Run(() => InternetParser.ReadPriceFromCamel(itemName)).Wait();
 
-                var file = new StreamReader(ResourceDirectoryParsedGoal);
-                file.ReadLine();
-                Title = file.ReadLine();
-                var priceString = file.ReadLine();
-                Amount = Convert.ToDecimal(priceString, System.Globalization.CultureInfo.CurrentCulture);
-                file.Close();
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e.ToString());
-            }
-        }
+        //        var file = new StreamReader(ResourceDirectoryParsedGoal);
+        //        file.ReadLine();
+        //        Title = file.ReadLine();
+        //        var priceString = file.ReadLine();
+        //        Amount = Convert.ToDecimal(priceString, System.Globalization.CultureInfo.CurrentCulture);
+        //        file.Close();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        ExceptionHandler.Log(e.ToString());
+        //    }
+        //}
 
 
         public int CompareTo(IGoal other)

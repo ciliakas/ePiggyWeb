@@ -8,6 +8,13 @@ namespace ePiggyWeb.DataManagement.Entries
 {
     public class EntryManager : IEntryManager
     {
+        /*
+        So EntryManager (and by extension GoalManager) basically takeover the same functionality as old Data.cs class used to do.
+        EntryManager reflects all the change we do on a local list to the database as well.
+        In other words, if we want to add a entry, we call the EntryManager.Add method, which will first update the database, 
+        and if the database was successfully updated, it will update the local list as well, and analogously for every other method in EntryManager.
+        Also EntryManager has the duty of reading the data from the database on it's creation.
+       */
         public IEntryList EntryList { get; }
 
         //Somehow I should get user id here
