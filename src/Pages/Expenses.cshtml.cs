@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -39,36 +40,33 @@ namespace ePiggyWeb.Pages
         public void OnPostNewEntry()
         {
             var dataManager = new DataManager();
-            if (!ModelState.IsValid)
-            {
-                Expenses = dataManager.Expenses.EntryList;
-                return;
-            }
+            Expenses = dataManager.Expenses.EntryList;
+            if (!ModelState.IsValid) return;
+            
             
             if (!decimal.TryParse(Amount, out var parsedAmount))
             {
                 Error = "Amount is not a number!";
-                Expenses = dataManager.Expenses.EntryList;
                 return;
             }
 
             var parsedDate = Convert.ToDateTime(Date);
             var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
             var parsedImportance = int.Parse(Importance);
-            var Entry = new Entry(Title, parsedAmount, parsedDate, parsedIsMonthly, parsedImportance);
-            // Expenses.EntryList.Add(Entry);
+            var entry = new Entry(Title, parsedAmount, parsedDate, parsedIsMonthly, parsedImportance);
 
-            Expenses = dataManager.Expenses.EntryList;
+            Expenses.Add(entry);
 
 
         }
 
-        public void OnPostDelete()
+        public void OnPostDelete(int id)
         {
 
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
-
+            Debug.WriteLine("\n\n\n\n\n" + id);//passing id is working
+            //line to delete entry
         }
     }
 }
