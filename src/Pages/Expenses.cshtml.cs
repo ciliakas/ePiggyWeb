@@ -43,7 +43,6 @@ namespace ePiggyWeb.Pages
             Expenses = dataManager.Expenses.EntryList;
             if (!ModelState.IsValid) return;
             
-            
             if (!decimal.TryParse(Amount, out var parsedAmount))
             {
                 Error = "Amount is not a number!";
@@ -62,11 +61,9 @@ namespace ePiggyWeb.Pages
 
         public void OnPostDelete(int id)
         {
-
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
-            Debug.WriteLine("\n\n\n\n\n" + id);//passing id is working
-            //line to delete entry
+            //code to remove by id
         }
     }
 }

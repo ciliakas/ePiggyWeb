@@ -7,7 +7,7 @@
     <h2 class="text-info">Expenses</h2>
 </div>
 
-<form method="post" asp-page-handler="OnPost">
+<form method="post" asp-page-handler="NewEntry">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="Title" type="text" placeholder="Title" value="" />
     <span asp-validation-for="Title" class="text-danger"></span>
@@ -32,7 +32,6 @@
     <input asp-for="IsMonthly" type="checkbox" placeholder="" />
     <input type="submit" value="Add" class="btn btn-primary ml-5" />
     <input class="btn btn-danger ml-2" type="reset" value="Reset">
-   
 
 </form>
 <div class="col-12 border p-3 mt-3 mb-3">
@@ -89,8 +88,8 @@
                             }
                         </td>
                         <td class="border-primary">
-                            <input asp-page-handler="Edit" type="submit" class="btn btn-sm btn-success" value="Edit"/>
-                            <input asp-route-id="@item.Id" asp-page-handler="Delete" type="submit" class="btn btn-sm btn-danger" value="Delete"/>
+                            <input type="submit" class="btn btn-sm btn-success" value="Edit"/>
+                            <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete"/>
                         </td>
                     </tr>
                 }
