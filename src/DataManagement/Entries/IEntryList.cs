@@ -18,8 +18,8 @@ namespace ePiggyWeb.DataManagement.Entries
         public IEntryList GetBy(DateTime from, DateTime to);
         public IEntryList GetBy(bool recurring);
         public IEntryList GetUntilToday();
-        public DateTime GetOldestEntry();
-        public DateTime GetNewestEntry();
+        public DateTime GetOldestEntryDate();
+        public DateTime GetNewestEntryDate();
         public decimal GetSum();
 
     }
