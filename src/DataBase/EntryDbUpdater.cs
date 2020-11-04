@@ -16,21 +16,20 @@ namespace ePiggyWeb.DataBase
         public static int Add(IEntry localEntry, int userId, EntryType entryType)
         {
             var db = new DatabaseContext();
-            int id;
             if (entryType == EntryType.Income)
             {
                 var entry = new IncomeModel(localEntry, userId);
                 db.Add(entry);
-                id = entry.Id;
+                db.SaveChanges();
+                return entry.Id;
             }
             else
             {
                 var entry = new ExpenseModel(localEntry, userId);
                 db.Add(entry);
-                id = entry.Id;
+                db.SaveChanges();
+                return entry.Id;
             }
-            db.SaveChanges();
-            return id;
         }
 
         public static bool Remove(int id, EntryType entryType)
