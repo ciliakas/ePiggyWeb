@@ -14,23 +14,11 @@ namespace ePiggyWeb.Pages
 {
     public class EditEntryModel : PageModel
     {
+        [BindProperty]
         public IEntry Entry { get; set; }
+        [BindProperty]
         public int EntryTypeInt { get; set; }
 
-
-        [Required(ErrorMessage = "Title is required")]
-        [BindProperty]
-        public string Title { get; set; }
-        [Required(ErrorMessage = "Amount is required")]
-        [BindProperty]
-        public string Amount { get; set; }
-        [BindProperty]
-        public string Date { get; set; }
-        [BindProperty]
-        [Required(ErrorMessage = "Importance is required")]
-        public string Importance { get; set; }
-        [BindProperty]
-        public string IsMonthly { get; set; }
 
         public string Error { get; set; }
         public void OnGet(int id, int entryType)
@@ -46,9 +34,10 @@ namespace ePiggyWeb.Pages
 
         public void OnPost()
         {
+
             if (!ModelState.IsValid) return;
 
-            if (!decimal.TryParse(Amount, out var parsedAmount))
+           /* if (!decimal.TryParse(Amount, out var parsedAmount))
             {
                 Error = "Amount is not a number!";
                 return;
@@ -61,7 +50,7 @@ namespace ePiggyWeb.Pages
             Entry.Amount = parsedAmount;
             Entry.Date = parsedDate;
             Entry.Recurring = parsedIsMonthly;
-            Entry.Importance = parsedImportance;
+            Entry.Importance = parsedImportance;*/
 
 
             if (EntryTypeInt == 1)
