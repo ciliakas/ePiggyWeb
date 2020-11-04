@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,7 +14,8 @@ namespace ePiggyWeb.Pages
 {
     public class EditEntryModel : PageModel
     {
-        public Entry Entry { get; set; }
+        public IEntry Entry { get; set; }
+        public int EntryTypeInt { get; set; }
 
 
         [Required(ErrorMessage = "Title is required")]
@@ -32,13 +35,51 @@ namespace ePiggyWeb.Pages
         public string Error { get; set; }
         public void OnGet(int id, int entryType)
         {
-            //var dataManager = new DataManager();
+            var dataManager = new DataManager();
+            EntryTypeInt = entryType;
 
+            Entry = entryType == 1
+                ? dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
+                : dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
+            
         }
 
         public void OnPost()
         {
-            //code to edit entry
+            if (!ModelState.IsValid) return;
+
+            if (!decimal.TryParse(Amount, out var parsedAmount))
+            {
+                Error = "Amount is not a number!";
+                return;
+            }
+
+            var parsedDate = Convert.ToDateTime(Date);
+            var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
+            var parsedImportance = int.Parse(Importance);
+            var entry = new Entry(Title, parsedAmount, parsedDate, parsedIsMonthly, parsedImportance);
+
+            if (EntryTypeInt == 1)
+            {
+                EntryDbUpdater.Edit(Entry.Id, entry, EntryType.Income);
+                Redirect("/Income");
+            }
+            else
+            {
+                EntryDbUpdater.Edit(Entry.Id, entry, EntryType.Expense);
+                Redirect("/Expense");
+            }
+
+            
+        }
+
+        public void OnPostCancel()
+        {
+            if (EntryTypeInt == 1)
+            {
+                Redirect("/Income");
+            }
+            Redirect("/Expenses");
         }
 
 

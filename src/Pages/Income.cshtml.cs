@@ -37,8 +37,6 @@ namespace ePiggyWeb.Pages
 
         public void OnPostNewEntry()
         {
-            var dataManager = new DataManager();
-            Income = dataManager.Income.EntryList;
             if (!ModelState.IsValid) return;
 
             if (!decimal.TryParse(Amount, out var parsedAmount))
@@ -52,7 +50,9 @@ namespace ePiggyWeb.Pages
             var parsedImportance = int.Parse(Importance);
             var entry = new Entry(Title, parsedAmount, parsedDate, parsedIsMonthly, parsedImportance);
 
-            Income.Add(entry);
+            EntryDbUpdater.Add(entry, 0, EntryType.Income);
+            var dataManager = new DataManager();
+            Income = dataManager.Income.EntryList;
 
 
         }
