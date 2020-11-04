@@ -2,8 +2,10 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -61,9 +63,9 @@ namespace ePiggyWeb.Pages
 
         public void OnPostDelete(int id)
         {
+            EntryDbUpdater.Remove(id, EntryType.Expense);
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
-            //code to remove by id
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@page
 @using System.Linq
+@using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.IncomesModel
 
 
@@ -74,7 +75,7 @@
                             <!-- Html.DisplayFor(m => item.Date)-->
                         </td>
                         <td class="border-primary">
-                            @Html.DisplayFor(m => item.Importance)
+                            @((Importance)item.Importance)
                         </td>
                         <td class="border-primary">
                             @if (item.Recurring)

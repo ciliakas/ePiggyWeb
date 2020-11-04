@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -57,10 +59,9 @@ namespace ePiggyWeb.Pages
 
         public void OnPostDelete(int id)
         {
+            EntryDbUpdater.Remove(id, EntryType.Income);
             var dataManager = new DataManager();
             Income = dataManager.Income.EntryList;
-            Debug.WriteLine("\n\n\n\n" + id);
-            //code to remove by id
         }
     }
 }
