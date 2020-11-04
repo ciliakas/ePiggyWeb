@@ -1,0 +1,63 @@
+﻿@page
+@model ePiggyWeb.Pages.EditEntryModel
+
+<br />
+<div class="container p-0 mt-3 mb-4">
+    <h2 class="text-info">Expenses</h2>
+</div>
+
+<form method="post" class="mb-5">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Title" type="text" placeholder="Title" value="" />
+    <span asp-validation-for="Title" class="text-danger"></span>
+    <input asp-for="Amount" type="text" placeholder="Amount" value="" />
+    <span asp-validation-for="Amount" class="text-danger"></span>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <label class="text-danger">@Model.Error</label>
+    }
+    <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
+    <!-- <label class="text-light ml-3">Importance</label>-->
+    <select asp-for="Importance" class="ml-3">
+        <option hidden disabled selected value="">Importance</option>
+        <option value="1">Necessary</option>
+        <option value="2">High</option>
+        <option value="3">Medium</option>
+        <option value="4">Low</option>
+        <option value="5">Unnecessary</option>
+    </select>
+    <span asp-validation-for="Importance" class="text-danger"></span>
+    <label class="text-light ml-3">Is Monthly?</label>
+    <input asp-for="IsMonthly" type="checkbox" placeholder="" />
+    <input type="submit" value="Save" class="btn btn-primary ml-5" />
+    <input class="btn btn-danger ml-2" type="submit" value="Cancel">
+ 
+    <br/>
+    <div class="container p-0 mt-5 mb-4">
+        <h4 class="text-info">Quotes by famous people</h4>
+    </div>
+
+    <div class="card-deck mt-2 mb-5">
+        <div class="card">
+            <img src="https://news.tradimo.com/wp-content/uploads/2019/08/Save-Money-1.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">George Lorimer</h5>
+                <p class="card-text">It’s good to have money and the things that money can buy, but it’s good, too, to check up once in a while and make sure that you haven’t lost the things that money can’t buy.</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://theworkingfamily.org/wp-content/uploads/2018/06/Money-Saving-1.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">Thomas T. Munger</h5>
+                <p class="card-text">The habit of saving is itself an education; it fosters every virtue, teaches self-denial, cultivates the sense of order, trains to forethought, and so broadens the mind.</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://ei.marketwatch.com/Multimedia/2017/06/15/Photos/ZQ/MW-FO584_greek__20170615154354_ZQ.jpg?uuid=f6ec1d08-5202-11e7-8d98-9c8e992d421e" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">Aristotle</h5>
+                <p class="card-text">Money is a guarantee that we may have what we want in the future. Though we need nothing at the moment it insures the possibility of satisfying a new desire when it arises.</p>
+            </div>
+        </div>
+    </div>
+</form>
