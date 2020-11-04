@@ -1,6 +1,7 @@
-using System.Linq;
-using ePiggyWeb.DataBase;
+using System;
+using System.Diagnostics;
 using ePiggyWeb.DataManagement;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ePiggyWeb.Pages
@@ -9,10 +10,39 @@ namespace ePiggyWeb.Pages
     {
         public EntryList Expenses { get; set; }
 
+        [BindProperty]
+        public string Title { get; set; }
+        [BindProperty]
+        public string Amount { get; set; }
+        [BindProperty]
+        public string Date { get; set; }
+        [BindProperty]
+        public string Importance { get; set; }
+        [BindProperty]
+        public string IsMonthly { get; set; }
+
+        public string Error { get; set; }
+
         public void OnGet()
         {
+            //kaþkas neveikia paspaudus post, meta kad tuðèias List???
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
+        }
+
+        public void OnPost()
+        {
+            if (!decimal.TryParse(Amount, out var parsedAmount))
+            {
+                Error = "Amount is not a number!";
+                return;
+            }
+
+            var parsedDate = Convert.ToDateTime(Date);
+            var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
+            var parsedImportance = int.Parse(Importance);
+            var Entry = new Entry(parsedAmount,Title,parsedDate,parsedIsMonthly,parsedImportance);
+            //kodas pridët á listus (bûtø gerai jei Arnas padarytø)
         }
     }
 }
