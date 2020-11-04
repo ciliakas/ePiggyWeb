@@ -4,9 +4,9 @@ namespace ePiggyWeb.Utilities
 {
     public readonly struct CurrencyWithColor
     {
-        public string Number { get;  }
+        public string Number { get; }
 
-        public Color Color { get;  }
+        public Color Color { get; }
 
         public CurrencyWithColor(string number, Color color)
         {

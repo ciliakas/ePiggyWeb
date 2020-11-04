@@ -1,90 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ePiggyWeb.DataBase.Models;
-using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataBase
 {
     public static class EntryDbUpdater
     {
-        public static int AddEntry(Entry localEntry, int userId, EntryType entryType)
+        /*
+        I've made all methods here require an EntryType instead of having to call different Add Income or Add Expense methods everywhere else
+        Also moved to a standard of just passing IEntry everywhere, instead of many types of different parameters, because that quickly clogged up the code in this class.
+         */
+        public static int Add(IEntry localEntry, int userId, EntryType entryType)
         {
             var db = new DatabaseContext();
+            int id;
             if (entryType == EntryType.Income)
             {
-                var entry = new Incomes(localEntry, userId);
+                var entry = new IncomeModel(localEntry, userId);
                 db.Add(entry);
-                db.SaveChanges();
-                return entry.Id;
+                id = entry.Id;
             }
             else
             {
-                var entry = new Expenses(localEntry, userId);
+                var entry = new ExpenseModel(localEntry, userId);
                 db.Add(entry);
-                db.SaveChanges();
-                return entry.Id;
+                id = entry.Id;
             }
+            db.SaveChanges();
+            return id;
         }
 
-        public static bool RemoveEntry(Entry entry, EntryType entryType)
+        public static bool Remove(IEntry entry, EntryType entryType)
         {
             var db = new DatabaseContext();
             try
             {
                 if (entryType == EntryType.Income)
                 {
-                    var index = db.Incomes.FirstOrDefault(x => x.Id == entry.Id);
-                    db.Incomes.Remove(index ?? throw new InvalidOperationException());
+                    var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == entry.Id);
+                    db.Incomes.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 else
                 {
-                    var index = db.Expenses.FirstOrDefault(x => x.Id == entry.Id);
-                    db.Expenses.Remove(index ?? throw new InvalidOperationException());
+                    var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == entry.Id);
+                    db.Expenses.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 db.SaveChanges();
             }
             catch (InvalidOperationException ex)
             {
                 ExceptionHandler.Log(ex.ToString());
+                ExceptionHandler.Log("Couldn't find entry id: " + entry.Id + " in database");
                 return false;
             }
 
             return true;
         }
 
-        public static bool EditEntry(Entry oldEntry, Entry updatedEntry, EntryType entryType)
+        public static bool Edit(IEntry oldEntry, IEntry updatedEntry, EntryType entryType)
         {
             var db = new DatabaseContext();
 
             if (entryType == EntryType.Income)
             {
-                var temp = db.Incomes.FirstOrDefault(x => x.Id == oldEntry.Id);
-                if (temp == null)
+                var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == oldEntry.Id);
+                if (dbEntry == null)
                 {
-                    ExceptionHandler.Log("Couldn't find entry");
+                    ExceptionHandler.Log("Couldn't find entry id: " + oldEntry.Id + " in database");
                     return false;
                 }
-                temp.Edit(updatedEntry);
+                dbEntry.Edit(updatedEntry);
             }
             else
             {
-
-                var temp = db.Expenses.FirstOrDefault(x => x.Id == oldEntry.Id);
-                if (temp == null)
+                var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == oldEntry.Id);
+                if (dbEntry == null)
                 {
-                    ExceptionHandler.Log("Couldn't find entry");
+                    ExceptionHandler.Log("Couldn't find entry id: " + oldEntry.Id + " in database");
                     return false;
                 }
-                temp.Edit(updatedEntry);
+                dbEntry.Edit(updatedEntry);
             }
             db.SaveChanges();
             return true;
         }
 
-        public static bool RemoveEntryList(EntryList entryList)
+        public static bool RemoveAll(IEntryEnumerable entryList)
         {
             var db = new DatabaseContext();
 
@@ -103,32 +107,32 @@ namespace ePiggyWeb.DataBase
         }
 
         //As I understand, all the entry lists that were passed to this Method will now have amended Id's and user Id's and are ready to be added locally 
-        public static bool AddEntryList(EntryList entryList, int userId)
+        public static bool AddRange(IEntryEnumerable entryList, int userId)
         {
             var db = new DatabaseContext();
 
             if (entryList.EntryType == EntryType.Income)
             {
-                var databaseEntryList = new List<Incomes>();
+                var dbEntryList = new List<IncomeModel>();
                 foreach (var entry in entryList)
                 {
-                    var databaseEntry = new Incomes(entry, userId);
-                    databaseEntryList.Add(databaseEntry);
-                    entry.Id = databaseEntry.Id;
+                    var dbEntry = new IncomeModel(entry, userId);
+                    dbEntryList.Add(dbEntry);
+                    entry.Id = dbEntry.Id;
                     entry.UserId = userId;
                 }
-                db.AddRange(databaseEntryList);
+                db.AddRange(dbEntryList);
             }
             else
             {
-                var databaseEntryList = new List<Expenses>();
+                var dbEntryList = new List<ExpenseModel>();
                 foreach (var entry in entryList)
                 {
-                    var databaseEntry = new Expenses(entry, userId);
-                    databaseEntryList.Add(databaseEntry);
-                    entry.Id = databaseEntry.Id;
+                    var dbEntry = new ExpenseModel(entry, userId);
+                    dbEntryList.Add(dbEntry);
+                    entry.Id = dbEntry.Id;
                 }
-                db.AddRange(databaseEntryList);
+                db.AddRange(dbEntryList);
             }
 
             db.SaveChanges();
