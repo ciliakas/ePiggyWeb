@@ -57,16 +57,21 @@ namespace ePiggyWeb.Pages
             var parsedDate = Convert.ToDateTime(Date);
             var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
             var parsedImportance = int.Parse(Importance);
-            var entry = new Entry(Title, parsedAmount, parsedDate, parsedIsMonthly, parsedImportance);
+            Entry.Title = Title;
+            Entry.Amount = parsedAmount;
+            Entry.Date = parsedDate;
+            Entry.Recurring = parsedIsMonthly;
+            Entry.Importance = parsedImportance;
+
 
             if (EntryTypeInt == 1)
             {
-                EntryDbUpdater.Edit(Entry.Id, entry, EntryType.Income);
+                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
                 Redirect("/Income");
             }
             else
             {
-                EntryDbUpdater.Edit(Entry.Id, entry, EntryType.Expense);
+                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
                 Redirect("/Expense");
             }
 
