@@ -15,7 +15,8 @@ namespace ePiggyWeb.DataManagement.Entries
          */
         public IEntryList GetBy(Importance importance);
         public IEntryList GetBy(DateTime dateTime);
-        public IEntryList GetBy(DateTime from, DateTime to);
+        public IEntryList GetFrom(DateTime dateTime);
+        public IEntryList GetTo(DateTime dateTime);
         public IEntryList GetBy(bool recurring);
         public IEntryList GetUntilToday();
         public DateTime GetOldestEntryDate();

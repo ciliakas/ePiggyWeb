@@ -4,19 +4,19 @@ namespace ePiggyWeb.Utilities
 {
     public static class TimeManager
     {
-        public static DateTime OneMonthAhead { get; }= GetEndOfMonth(DateTime.Today.AddMonths(1));
+        public static DateTime OneMonthAhead { get; }= GetEndOfTheMonth(DateTime.Today.AddMonths(1));
 
         public static int DifferenceInMonths(DateTime laterTime, DateTime earlierTime)
         {
             return ((laterTime.Year - earlierTime.Year) * 12) + laterTime.Month - earlierTime.Month;
         }
 
-        public static DateTime GetBeginningOfMonth(DateTime dateTime)
+        public static DateTime GetBeginningOfTheMonth(DateTime dateTime)
         {
             return ChangeDay(dateTime, 0);
         }
 
-        public static DateTime GetEndOfMonth(DateTime dateTime)
+        public static DateTime GetEndOfTheMonth(DateTime dateTime)
         {
             var day = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
             return ChangeDay(dateTime, day);
