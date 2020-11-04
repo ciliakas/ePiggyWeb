@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Linq
 @model ePiggyWeb.Pages.ExpensesModel
 
 <br />
@@ -7,8 +8,15 @@
 </div>
 
 <form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="Title" type="text" placeholder="Title" value="" />
+    <span asp-validation-for="Title" class="text-danger"></span>
     <input asp-for="Amount" type="text" placeholder="Amount" value="" />
+    <span asp-validation-for="Amount" class="text-danger"></span>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <label class="text-danger">@Model.Error</label>
+    }
     <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
     <!-- <label class="text-light ml-3">Importance</label>-->
     <select asp-for="Importance" class="ml-3">
@@ -19,43 +27,48 @@
         <option value="4">Low</option>
         <option value="5">Unnecessary</option>
     </select>
+    <span asp-validation-for="Importance" class="text-danger"></span>
     <label class="text-light ml-3">Is Monthly?</label>
     <input asp-for="IsMonthly" type="checkbox" placeholder="" />
-    <input type="submit" value="Add" class="btn btn-primary ml-5" />
+    <input asp-page-handler="NewEntry" type="submit" value="Add" class="btn btn-primary ml-5" />
     <input class="btn btn-danger ml-2" type="reset" value="Reset">
-    @if (!string.IsNullOrEmpty(Model.Error))
-    {
-        <label class="text-danger">@Model.Error</label>
-    }
+   
 
 </form>
 <div class="col-12 border p-3 mt-3 mb-3">
+    <form method="post">
     @if (Model.Expenses.Any())
+    {
+        <table class="table table-hover border-primary table-bordered">
+            <tr class="table-primary">
+                <th style="display: none;">
+                    <label asp-for="Expenses.FirstOrDefault().Id"></label>
+                </th>
+                <th>
+                    <label asp-for="Expenses.FirstOrDefault().Title"></label>
+                </th>
+                <th style="width: 20%">
+                    <label asp-for="Expenses.FirstOrDefault().Amount"></label>
+                </th>
+                <th style="width: 8.5%">
+                    <label asp-for="Expenses.FirstOrDefault().Date"></label>
+                </th>
+                <th style="width: 15%">
+                    <label asp-for="Expenses.FirstOrDefault().Importance"></label>
+                </th>
+                <th style="width: 5%">
+                    <label asp-for="Expenses.FirstOrDefault().Recurring"></label>
+                </th>
+                <th style="width: 10%">
+
+                </th>
+            </tr>
+            @foreach (var item in Model.Expenses)
             {
-                <table class="table table-hover border-primary table-bordered">
-                    <tr class="table-primary">
-                        <th>
-                            <label asp-for="Expenses.FirstOrDefault().Title"></label>
-                        </th>
-                        <th style="width: 20%">
-                            <label asp-for="Expenses.FirstOrDefault().Amount"></label>
-                        </th>
-                        <th style="width: 8.5%">
-                            <label asp-for="Expenses.FirstOrDefault().Date"></label>
-                        </th>
-                        <th style="width: 15%">
-                            <label asp-for="Expenses.FirstOrDefault().Importance"></label>
-                        </th>
-                        <th style="width: 5%">
-                            <label asp-for="Expenses.FirstOrDefault().Recurring"></label>
-                        </th>
-                        <th style="width: 10%">
-                           
-                        </th>
-                    </tr>
-                    @foreach (var item in Model.Expenses)
-                    {
                 <tr class="table-light border-primary">
+                    <td style="display: none;">
+                        @Html.DisplayFor(m => item.Id)
+                    </td>
                     <td class="border-primary">
                         @Html.DisplayFor(m => item.Title)
                     </td>
@@ -76,16 +89,17 @@
                         }
                     </td>
                     <td class="border-primary">
-                        <button class="btn btn-sm btn-success">Edit</button>
-                        <button class="btn btn-sm btn-danger">Delete</button>
+                    <input asp-page-handler="Edit" type="submit" class="btn btn-sm btn-success" value="Edit"/>
+                    <input asp-page-handler="Delete" type="submit" class="btn btn-sm btn-danger" value="Delete"/>
                     </td>
                 </tr>
-                    }
-                </table>
             }
-            else
-            {
-                <p>No expenses available</p>
-            }
+        </table>
+    }
+    else
+    {
+        <p>No expenses available</p>
+    }
+    </form>
 </div>
     
