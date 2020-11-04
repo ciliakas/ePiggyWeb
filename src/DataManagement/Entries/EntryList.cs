@@ -6,7 +6,7 @@ namespace ePiggyWeb.DataManagement.Entries
 {
     public class EntryList : List<IEntry>, IEntryList
     {
-        //EntryType is to save up on the amount of times we have to pass the EntryType in methods
+        //I added EntryType to EntryList so we don't have to pass an EntryType as a parameter in methods as often
         public EntryType EntryType { get; set; }
 
         public EntryList(EntryType entryType)
