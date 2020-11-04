@@ -33,19 +33,19 @@ namespace ePiggyWeb.DataBase
             return id;
         }
 
-        public static bool Remove(IEntry entry, EntryType entryType)
+        public static bool Remove(int id, EntryType entryType)
         {
             var db = new DatabaseContext();
             try
             {
                 if (entryType == EntryType.Income)
                 {
-                    var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == entry.Id);
+                    var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == id);
                     db.Incomes.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 else
                 {
-                    var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == entry.Id);
+                    var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == id);
                     db.Expenses.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 db.SaveChanges();
@@ -53,33 +53,33 @@ namespace ePiggyWeb.DataBase
             catch (InvalidOperationException ex)
             {
                 ExceptionHandler.Log(ex.ToString());
-                ExceptionHandler.Log("Couldn't find entry id: " + entry.Id + " in database");
+                ExceptionHandler.Log("Couldn't find entry id: " + id + " in database");
                 return false;
             }
 
             return true;
         }
 
-        public static bool Edit(IEntry oldEntry, IEntry updatedEntry, EntryType entryType)
+        public static bool Edit(int id, IEntry updatedEntry, EntryType entryType)
         {
             var db = new DatabaseContext();
 
             if (entryType == EntryType.Income)
             {
-                var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == oldEntry.Id);
+                var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == id);
                 if (dbEntry == null)
                 {
-                    ExceptionHandler.Log("Couldn't find entry id: " + oldEntry.Id + " in database");
+                    ExceptionHandler.Log("Couldn't find entry id: " + id + " in database");
                     return false;
                 }
                 dbEntry.Edit(updatedEntry);
             }
             else
             {
-                var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == oldEntry.Id);
+                var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == id);
                 if (dbEntry == null)
                 {
-                    ExceptionHandler.Log("Couldn't find entry id: " + oldEntry.Id + " in database");
+                    ExceptionHandler.Log("Couldn't find entry id: " + id + " in database");
                     return false;
                 }
                 dbEntry.Edit(updatedEntry);
@@ -88,18 +88,18 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool RemoveAll(IEntryEnumerable entryList)
+        public static bool RemoveAll(IEnumerable<int> idArray, EntryType entryType)
         {
             var db = new DatabaseContext();
 
-            if (entryList.EntryType == EntryType.Income)
+            if (entryType == EntryType.Income)
             {
-                var entriesToRemove = entryList.Select(entry => db.Incomes.FirstOrDefault(x => x.Id == entry.Id)).ToList();
+                var entriesToRemove = idArray.Select(id => db.Incomes.FirstOrDefault(x => x.Id == id)).ToList();
                 db.Incomes.RemoveRange(entriesToRemove);
             }
             else
             {
-                var entriesToRemove = entryList.Select(entry => db.Expenses.FirstOrDefault(x => x.Id == entry.Id)).ToList();
+                var entriesToRemove = idArray.Select(id => db.Expenses.FirstOrDefault(x => x.Id == id)).ToList();
                 db.Expenses.RemoveRange(entriesToRemove);
             }
             db.SaveChanges();
