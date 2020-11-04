@@ -6,14 +6,21 @@
 <br />
 <div class="container p-0 mt-3">
     <h2 class="text-info">Income</h2>
-</div>  
+</div>
 
-<form type="submit">
-    <input type="text" placeholder="Title" value="" />
-    <input type="text" placeholder="Amount" value="" />
-    <input type="date" value="@DateTime.Now.ToShortDateString()" />
+<form method="post" asp-page-handler="NewEntry">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Title" type="text" placeholder="Title" value="" />
+    <span asp-validation-for="Title" class="text-danger"></span>
+    <input asp-for="Amount" type="text" placeholder="Amount" value="" />
+    <span asp-validation-for="Amount" class="text-danger"></span>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <label class="text-danger">@Model.Error</label>
+    }
+    <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
     <!-- <label class="text-light ml-3">Importance</label>-->
-    <select class="ml-3">
+    <select asp-for="Importance" class="ml-3">
         <option hidden disabled selected value="">Importance</option>
         <option value="1">Necessary</option>
         <option value="2">High</option>
@@ -21,75 +28,77 @@
         <option value="4">Low</option>
         <option value="5">Unnecessary</option>
     </select>
+    <span asp-validation-for="Importance" class="text-danger"></span>
     <label class="text-light ml-3">Is Monthly?</label>
-    <input type="checkbox" placeholder="" />
+    <input asp-for="IsMonthly" type="checkbox" placeholder="" />
     <input type="submit" value="Add" class="btn btn-primary ml-5" />
     <input class="btn btn-danger ml-2" type="reset" value="Reset">
-
 </form>
 
 <div class="col-12 border p-3 mt-3 mb-3">
-        <form method="post">
-            @if (Model.Income.Any())
-            {
-                <table class="table table-hover border-primary table-bordered">
-                    <tr class="table-primary">
-                        <th>
-                            <label asp-for="Income.FirstOrDefault().Title"></label>
-                        </th>
-                        <th style="width: 20%">
-                            <label asp-for="Income.FirstOrDefault().Amount"></label>
-                        </th>
-                        <th style="width: 8.5%">
-                            <label asp-for="Income.FirstOrDefault().Date"></label>
-                        </th>
-                        <th style="width: 15%">
-                            <label asp-for="Income.FirstOrDefault().Importance"></label>
-                        </th>
-                        <th style="width: 5%">
-                            <label asp-for="Income.FirstOrDefault().Recurring"></label>
-                        </th>
-                        <th style="width: 10%">
+    <form method="post">
+        @if (Model.Income.Any())
+        {
+            <table class="table table-hover border-primary table-bordered">
+                <tr class="table-primary">
+                    <th>
+                        <label asp-for="Income.FirstOrDefault().Title"></label>
+                    </th>
+                    <th style="width: 20%">
+                        <label asp-for="Income.FirstOrDefault().Amount"></label>
+                    </th>
+                    <th style="width: 8.5%">
+                        <label asp-for="Income.FirstOrDefault().Date"></label>
+                    </th>
+                    <th style="width: 15%">
+                        <label asp-for="Income.FirstOrDefault().Importance"></label>
+                    </th>
+                    <th style="width: 5%">
+                        <label asp-for="Income.FirstOrDefault().Recurring"></label>
+                    </th>
+                    <th style="width: 10%">
 
-                        </th>
-                    </tr>
-                    @foreach (var item in Model.Income)
-                    {
-                <tr class="table-light border-primary">
-                    <td class="border-primary">
-                        @Html.DisplayFor(m => item.Title)
-                    </td>
-                    <td class="border-primary">
-                        @Html.DisplayFor(m => item.Amount)
-                    </td>
-                    <td class="border-primary">
-                        @item.Date.ToShortDateString()
-                        <!-- Html.DisplayFor(m => item.Date)-->
-                    </td>
-                    <td class="border-primary">
-                        @Html.DisplayFor(m => item.Importance)
-                    </td>
-                    <td class="border-primary">
-                        @if (item.Recurring)
-                        {
-                            <i class="fas fa-check text-success"></i>
-                        }
-                    </td>
-                    <td class="border-primary">
-                        <button class="btn btn-sm btn-success">Edit</button>
-                        <button class="btn btn-sm btn-danger">Delete</button>
-                    </td>
+                    </th>
                 </tr>
-                    }
-                </table>
-            }
-            else
-            {
-                <p>No income available</p>
-            }
+                @foreach (var item in Model.Income)
+                {
+                    <tr class="table-light border-primary">
+                        <td class="border-primary">
+                            @Html.DisplayFor(m => item.Title)
+                        </td>
+                        <td class="border-primary">
+                            @Html.DisplayFor(m => item.Amount)
+                        </td>
+                        <td class="border-primary">
+                            @item.Date.ToShortDateString()
+                            <!-- Html.DisplayFor(m => item.Date)-->
+                        </td>
+                        <td class="border-primary">
+                            @Html.DisplayFor(m => item.Importance)
+                        </td>
+                        <td class="border-primary">
+                            @if (item.Recurring)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                        </td>
+                        <td class="border-primary">
+                            <input type="submit" class="btn btn-sm btn-success" value="Edit" />
+                            <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <p>No income available</p>
+        }
 
-        </form>
-    </div>
-    
+    </form>
+</div>
 
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
 
