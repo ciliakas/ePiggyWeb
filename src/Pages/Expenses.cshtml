@@ -84,8 +84,8 @@
                             }
                         </td>
                         <td class="border-primary">
-                            <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2"><button class="btn btn-sm btn-success">Edit</button></a>
-                            <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete"/>
+                            <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-success">Edit </a>
+                            <input asp-page-handler="Delete" asp-route-id="@item.Id"  type="submit" class="btn btn-sm btn-danger" value="Delete"/>
                         </td>
                     </tr>
                 }

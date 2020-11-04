@@ -13,7 +13,6 @@ namespace ePiggyWeb.Pages
     public class EditEntryModel : PageModel
     {
         public Entry Entry { get; set; }
-        public int EntryType { get; set; }
 
 
         [Required(ErrorMessage = "Title is required")]
@@ -33,13 +32,7 @@ namespace ePiggyWeb.Pages
         public string Error { get; set; }
         public void OnGet(int id, int entryType)
         {
-            EntryType = entryType;
             //var dataManager = new DataManager();
-            if (entryType == 1)//if 1 income if 2 expense
-            {
-                //Code to get entry by ID
-               // Entry = dataManager.Income.
-            }
 
         }
 
