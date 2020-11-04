@@ -2,7 +2,7 @@
 
 namespace ePiggyWeb.DataBase.Models
 {
-    public class User
+    public class UserModel
     {
         [Key]
         public int Id { get; set; }

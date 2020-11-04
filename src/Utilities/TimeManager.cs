@@ -4,7 +4,7 @@ namespace ePiggyWeb.Utilities
 {
     public static class TimeManager
     {
-        public static readonly DateTime OneMonthAhead = GetEndOfMonth(DateTime.Today.AddMonths(1));
+        public static DateTime OneMonthAhead { get; }= GetEndOfMonth(DateTime.Today.AddMonths(1));
 
         public static int DifferenceInMonths(DateTime laterTime, DateTime earlierTime)
         {

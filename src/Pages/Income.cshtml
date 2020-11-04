@@ -47,7 +47,7 @@
                             <label asp-for="Income.FirstOrDefault().Importance"></label>
                         </th>
                         <th style="width: 5%">
-                            <label asp-for="Income.FirstOrDefault().IsMonthly"></label>
+                            <label asp-for="Income.FirstOrDefault().Recurring"></label>
                         </th>
                         <th style="width: 10%">
 
@@ -70,7 +70,7 @@
                         @Html.DisplayFor(m => item.Importance)
                     </td>
                     <td class="border-primary">
-                        @if (item.IsMonthly)
+                        @if (item.Recurring)
                         {
                             <i class="fas fa-check text-success"></i>
                         }

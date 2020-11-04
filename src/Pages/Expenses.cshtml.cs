@@ -1,6 +1,6 @@
 using System;
-using System.Diagnostics;
 using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataManagement.Entries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,7 +8,7 @@ namespace ePiggyWeb.Pages
 {
     public class ExpensesModel : PageModel
     {
-        public EntryList Expenses { get; set; }
+        public IEntryList Expenses { get; set; }
 
         [BindProperty]
         public string Title { get; set; }
@@ -28,6 +28,8 @@ namespace ePiggyWeb.Pages
             //kaþkas neveikia paspaudus post, meta kad tuðèias List???
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
+            //var expensesManager = new EntryManager(EntryType.Expense);
+            //Expenses = expensesManager.EntryList;
         }
 
         public void OnPost()
@@ -41,7 +43,7 @@ namespace ePiggyWeb.Pages
             var parsedDate = Convert.ToDateTime(Date);
             var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
             var parsedImportance = int.Parse(Importance);
-            var Entry = new Entry(parsedAmount,Title,parsedDate,parsedIsMonthly,parsedImportance);
+            var Entry = new Entry(Title, parsedAmount,parsedDate,parsedIsMonthly,parsedImportance);
             //kodas pridët á listus (bûtø gerai jei Arnas padarytø)
         }
     }

@@ -1,16 +1,16 @@
 using ePiggyWeb.DataManagement;
-using ePiggyWeb.Utilities;
+using ePiggyWeb.DataManagement.Entries;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ePiggyWeb.Pages
 {
     public class IncomesModel : PageModel
     {
-        public EntryList Income { get; set; }
+        public IEntryList Income { get; set; }
         public void OnGet()
         {
-            var incomeManager = new EntryManager(new EntryList(EntryType.Income));
-            Income = incomeManager.EntryList;
+            var dataManager = new DataManager();
+            Income = dataManager.Income.EntryList;
         }
     }
 }

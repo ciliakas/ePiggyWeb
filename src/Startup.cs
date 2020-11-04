@@ -1,4 +1,3 @@
-using System.Diagnostics.Eventing.Reader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
