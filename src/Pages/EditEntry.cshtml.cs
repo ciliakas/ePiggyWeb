@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -34,20 +31,19 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Amount is required")]
         [BindProperty]
-        [DataType(DataType.Currency)]
         public decimal Amount { get; set; }
 
         [BindProperty]
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
 
         [BindProperty]
         [Required(ErrorMessage = "Importance is required")]
-        public string Importance { get; set; }
+        public int Importance { get; set; }
 
         [BindProperty]
-        public string Recurring { get; set; }
+        public bool Recurring { get; set; }
 
-        public string Error { get; set; }
+        //public string Error { get; set; }
         public void OnGet(int id, int entryType)
         {
             var dataManager = new DataManager();
@@ -65,27 +61,14 @@ namespace ePiggyWeb.Pages
             UserId = Entry.UserId;
             Title = Entry.Title;
             Amount = Entry.Amount;
-            Importance = Entry.Importance.ToString();
-
-
+            Importance = Entry.Importance;
         }
 
         public void OnPost()
         {
+            if (!ModelState.IsValid) return;
 
-            Debug.WriteLine("\n\n\n\n" + Id + "\t" + UserId + "\t" + EntryTypeInt);
-           if (!ModelState.IsValid) return;
-
-            /*if (!decimal.TryParse(Amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedAmount))
-            {
-                Error = "Amount is not a number!";
-                return;
-            }*/
-
-            var parsedDate = Convert.ToDateTime(Date);
-            var parsedIsMonthly = Convert.ToBoolean(Recurring);
-            var parsedImportance = int.Parse(Importance);
-            var entry = new Entry(Id,UserId,Title,Amount,parsedDate,parsedIsMonthly,parsedImportance);
+            var entry = new Entry(Id,UserId,Title,Amount, Date, Recurring, Importance);
 
 
             if (EntryTypeInt == 1)

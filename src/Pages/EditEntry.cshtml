@@ -4,6 +4,7 @@
 
 <br />
 <div class="container p-0 mt-3 mb-4">
+    <!--Displays text accordingly to the EntryType-->
     @if (Model.EntryTypeInt == 1)
     {
         <h2 class="text-info">Income</h2>
@@ -14,6 +15,7 @@
     }
 </div>
 
+<!--Base values are taken from already existing Entry-->
 <form method="post" class="mb-5">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="EntryTypeInt"  type="hidden"/>
@@ -23,14 +25,9 @@
     <span asp-validation-for="Title" class="text-danger"></span>
     <input asp-for="Amount" type="text"  />
     <span asp-validation-for="Amount" class="text-danger"></span>
-    @if (!string.IsNullOrEmpty(Model.Error))
-    {
-        <label class="text-danger">@Model.Error</label>
-    }
-    <input asp-for="Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />
-    <!-- <label class="text-light ml-3">Importance</label>-->
+    <input asp-for="Date" type="date" value="@Model.Date.ToShortDateString()" />
     <select asp-for="Importance" class="ml-3">
-        <option hidden disabled selected value="@Model.Importance">@((Importance)Model.Entry.Importance)</option>
+        <option hidden disabled selected value="@Model.Importance">@((Importance)Model.Importance)</option>
         <option value="1">Necessary</option>
         <option value="2">High</option>
         <option value="3">Medium</option>
@@ -54,7 +51,8 @@
     <div class="container p-0 mt-5 mb-4">
         <h4 class="text-info">Quotes by famous people</h4>
     </div>
-
+    
+    <!--Bootstrap cards just to fill space-->
     <div class="card-deck mt-2 mb-5">
         <div class="card">
             <img src="https://news.tradimo.com/wp-content/uploads/2019/08/Save-Money-1.jpg" class="card-img-top" alt="...">
