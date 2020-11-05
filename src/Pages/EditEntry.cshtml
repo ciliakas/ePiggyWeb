@@ -19,30 +19,30 @@
 <form method="post" class="mb-5">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="EntryTypeInt"  type="hidden"/>
-    <input asp-for="Id" type="hidden"/>
-    <input asp-for="UserId" type="hidden" />
-    <input asp-for="Title" type="text"  />
-    <span asp-validation-for="Title" class="text-danger"></span>
-    <input asp-for="Amount" type="text"  />
-    <span asp-validation-for="Amount" class="text-danger"></span>
-    <input asp-for="Date" type="date" value="@Model.Date.ToShortDateString()" />
-    <select asp-for="Importance" class="ml-3">
-        <option hidden disabled selected value="@Model.Importance">@((Importance)Model.Importance)</option>
+    <input asp-for="Entry.Id" type="hidden"/>
+    <input asp-for="Entry.UserId" type="hidden" />
+    <input asp-for="Entry.Title" type="text"  />
+    <span asp-validation-for="Entry.Title" class="text-danger"></span>
+    <input asp-for="Entry.Amount" type="text"  />
+    <span asp-validation-for="Entry.Amount" class="text-danger"></span>
+    <input asp-for="Entry.Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />
+    <select asp-for="Entry.Importance" class="ml-3">
+        <option hidden disabled selected value="@Model.Entry.Importance">@((Importance)Model.Entry.Importance)</option>
         <option value="1">Necessary</option>
         <option value="2">High</option>
         <option value="3">Medium</option>
         <option value="4">Low</option>
         <option value="5">Unnecessary</option>
     </select>
-    <span asp-validation-for="Importance" class="text-danger"></span>
+    <span asp-validation-for="Entry.Importance" class="text-danger"></span>
     <label class="text-light ml-3">Is Monthly?</label>
     @if (@Model.Entry.Recurring)
     {
-        <input asp-for="Recurring" type="checkbox" checked />
+        <input asp-for="Entry.Recurring" type="checkbox" checked />
     }
     else
     {
-        <input asp-for="Recurring" type="checkbox" />
+        <input asp-for="Entry.Recurring" type="checkbox" />
     }
     <input type="submit" value="Save" class="btn btn-primary ml-5" />
     <input asp-page-handler="Cancel" class="btn btn-danger ml-2" type="submit" value="Cancel">

@@ -14,36 +14,12 @@ namespace ePiggyWeb.Pages
     public class EditEntryModel : PageModel
     {
         [BindProperty]
+        [Required]
         public Entry Entry { get; set; }
 
         [BindProperty]
         public int EntryTypeInt { get; set; }
         
-        [BindProperty]
-        public int Id { get; set; }
-
-        [BindProperty]
-        public int UserId { get; set; }
-
-        [Required(ErrorMessage = "Title is required")]
-        [BindProperty]
-        public string Title { get; set; }
-
-        [Required(ErrorMessage = "Amount is required")]
-        [BindProperty]
-        public decimal Amount { get; set; }
-
-        [BindProperty]
-        public DateTime Date { get; set; }
-
-        [BindProperty]
-        [Required(ErrorMessage = "Importance is required")]
-        public int Importance { get; set; }
-
-        [BindProperty]
-        public bool Recurring { get; set; }
-
-        //public string Error { get; set; }
         public void OnGet(int id, int entryType)
         {
             var dataManager = new DataManager();
@@ -53,38 +29,37 @@ namespace ePiggyWeb.Pages
                 ? (Entry)dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
                 : (Entry)dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
 
-            if (Entry == null)
-            {
-                Response.Redirect("/Index");
-            }
-            Id = Entry.Id;
-            UserId = Entry.UserId;
-            Title = Entry.Title;
-            Amount = Entry.Amount;
-            Importance = Entry.Importance;
-        }
-
-        public void OnPost()
-        {
-            if (!ModelState.IsValid) return;
-
-            var entry = new Entry(Id,UserId,Title,Amount, Date, Recurring, Importance);
-
-
+            if (Entry != null) return;
             if (EntryTypeInt == 1)
             {
-                EntryDbUpdater.Edit(entry.Id, entry, EntryType.Income);
+                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
                 Response.Redirect("/Income");
             }
             else
             {
-                EntryDbUpdater.Edit(entry.Id, entry, EntryType.Expense);
+                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
                 Response.Redirect("/Expenses");
             }
-
-            
         }
 
+        /*Editing and redirecting according to EntryType*/
+        public void OnPost()
+        {
+            if (!ModelState.IsValid) return;
+
+            if (EntryTypeInt == 1)
+            {
+                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
+                Response.Redirect("/Income");
+            }
+            else
+            {
+                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
+                Response.Redirect("/Expenses");
+            }
+        }
+
+        /*If cancel pressed return to previous page*/
         public void OnPostCancel()
         {
             Debug.WriteLine("\n\n\n\n"  + EntryTypeInt);
