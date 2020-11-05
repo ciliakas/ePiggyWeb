@@ -21,8 +21,8 @@
     <input asp-for="EntryTypeInt"  type="hidden"/>
     <input asp-for="Entry.Id" type="hidden"/>
     <input asp-for="Entry.UserId" type="hidden" />
-    <input asp-for="Entry.Title" type="text"  />
-    <span asp-validation-for="Entry.Title" class="text-danger"></span>
+    <input asp-for="Title" type="text"  />
+    <span asp-validation-for="Title" class="text-danger"></span>
     <input asp-for="Entry.Amount" type="text"  />
     <span asp-validation-for="Entry.Amount" class="text-danger"></span>
     <input asp-for="Entry.Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />

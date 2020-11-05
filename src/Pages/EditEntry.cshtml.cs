@@ -12,9 +12,13 @@ namespace ePiggyWeb.Pages
 {
     public class EditEntryModel : PageModel
     {
-        [BindProperty]
         [Required]
+        [BindProperty]
         public Entry Entry { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        [BindProperty]
+        public string Title { get; set; }
 
         [BindProperty]
         public int EntryTypeInt { get; set; }
@@ -28,17 +32,12 @@ namespace ePiggyWeb.Pages
                 ? (Entry)dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
                 : (Entry)dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
 
-            if (Entry != null) return;
-            if (EntryTypeInt == 1)
+            if (Entry != null)
             {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
-                Response.Redirect("/Income");
+                Title = Entry.Title;
+                return;
             }
-            else
-            {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
-                Response.Redirect("/Expenses");
-            }
+            Response.Redirect(EntryTypeInt == 1 ? "/Income" : "/Expenses");
         }
 
         /*Editing and redirecting according to EntryType*/
