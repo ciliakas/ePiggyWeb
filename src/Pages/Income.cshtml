@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Globalization
 @using System.Linq
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.IncomesModel
@@ -68,7 +69,7 @@
                             @Html.DisplayFor(m => item.Title)
                         </td>
                         <td class="border-primary">
-                            @Html.DisplayFor(m => item.Amount)
+                            @item.Amount.ToString(CultureInfo.InvariantCulture)
                         </td>
                         <td class="border-primary">
                             @item.Date.ToShortDateString()

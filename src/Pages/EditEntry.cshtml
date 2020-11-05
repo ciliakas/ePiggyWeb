@@ -4,7 +4,14 @@
 
 <br />
 <div class="container p-0 mt-3 mb-4">
-    <h2 class="text-info">Expenses</h2>
+    @if (Model.EntryTypeInt == 1)
+    {
+        <h2 class="text-info">Income</h2>
+    }
+    else
+    {
+        <h2 class="text-info">Expenses</h2>
+    }
 </div>
 
 <form method="post" class="mb-5">
@@ -12,9 +19,9 @@
     <input asp-for="EntryTypeInt"  type="hidden"/>
     <input asp-for="Id" type="hidden"/>
     <input asp-for="UserId" type="hidden" />
-    <input asp-for="Title" type="text" value="@Model.Entry.Title" />
+    <input asp-for="Title" type="text"  />
     <span asp-validation-for="Title" class="text-danger"></span>
-    <input asp-for="Amount" type="text" value="@Model.Entry.Amount" />
+    <input asp-for="Amount" type="text"  />
     <span asp-validation-for="Amount" class="text-danger"></span>
     @if (!string.IsNullOrEmpty(Model.Error))
     {
@@ -23,7 +30,7 @@
     <input asp-for="Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />
     <!-- <label class="text-light ml-3">Importance</label>-->
     <select asp-for="Importance" class="ml-3">
-        <option hidden disabled selected value="@Model.Entry.Importance">@((Importance)Model.Entry.Importance)</option>
+        <option hidden disabled selected value="@Model.Importance">@((Importance)Model.Entry.Importance)</option>
         <option value="1">Necessary</option>
         <option value="2">High</option>
         <option value="3">Medium</option>
@@ -34,11 +41,11 @@
     <label class="text-light ml-3">Is Monthly?</label>
     @if (@Model.Entry.Recurring)
     {
-        <input asp-for="IsMonthly" type="checkbox" checked />
+        <input asp-for="Recurring" type="checkbox" checked />
     }
     else
     {
-        <input asp-for="IsMonthly" type="checkbox" />
+        <input asp-for="Recurring" type="checkbox" />
     }
     <input type="submit" value="Save" class="btn btn-primary ml-5" />
     <input asp-page-handler="Cancel" class="btn btn-danger ml-2" type="submit" value="Cancel">

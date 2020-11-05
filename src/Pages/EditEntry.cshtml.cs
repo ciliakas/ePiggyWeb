@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -14,26 +16,36 @@ namespace ePiggyWeb.Pages
 {
     public class EditEntryModel : PageModel
     {
-        public IEntry Entry { get; set; }
-        public int EntryTypeInt { get; set; }
+        [BindProperty]
+        public Entry Entry { get; set; }
 
         [BindProperty]
+        public int EntryTypeInt { get; set; }
+        
+        [BindProperty]
         public int Id { get; set; }
+
         [BindProperty]
         public int UserId { get; set; }
+
         [Required(ErrorMessage = "Title is required")]
         [BindProperty]
         public string Title { get; set; }
+
         [Required(ErrorMessage = "Amount is required")]
         [BindProperty]
-        public string Amount { get; set; }
+        [DataType(DataType.Currency)]
+        public decimal Amount { get; set; }
+
         [BindProperty]
         public string Date { get; set; }
+
         [BindProperty]
         [Required(ErrorMessage = "Importance is required")]
         public string Importance { get; set; }
+
         [BindProperty]
-        public string IsMonthly { get; set; }
+        public string Recurring { get; set; }
 
         public string Error { get; set; }
         public void OnGet(int id, int entryType)
@@ -42,43 +54,49 @@ namespace ePiggyWeb.Pages
             EntryTypeInt = entryType;
 
             Entry = entryType == 1
-                ? dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
-                : dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
+                ? (Entry)dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
+                : (Entry)dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
+
             if (Entry == null)
             {
-                Redirect("/Index");
+                Response.Redirect("/Index");
             }
             Id = Entry.Id;
             UserId = Entry.UserId;
+            Title = Entry.Title;
+            Amount = Entry.Amount;
+            Importance = Entry.Importance.ToString();
+
 
         }
 
         public void OnPost()
         {
-           
-            if (!ModelState.IsValid) return;
 
-            if (!decimal.TryParse(Amount, out var parsedAmount))
+            Debug.WriteLine("\n\n\n\n" + Id + "\t" + UserId + "\t" + EntryTypeInt);
+           if (!ModelState.IsValid) return;
+
+            /*if (!decimal.TryParse(Amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedAmount))
             {
                 Error = "Amount is not a number!";
                 return;
-            }
+            }*/
 
             var parsedDate = Convert.ToDateTime(Date);
-            var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
+            var parsedIsMonthly = Convert.ToBoolean(Recurring);
             var parsedImportance = int.Parse(Importance);
-            var entry = new Entry(Id,UserId,Title,parsedAmount,parsedDate,parsedIsMonthly,parsedImportance);
+            var entry = new Entry(Id,UserId,Title,Amount,parsedDate,parsedIsMonthly,parsedImportance);
 
 
             if (EntryTypeInt == 1)
             {
                 EntryDbUpdater.Edit(entry.Id, entry, EntryType.Income);
-                Redirect("/Income");
+                Response.Redirect("/Income");
             }
             else
             {
                 EntryDbUpdater.Edit(entry.Id, entry, EntryType.Expense);
-                Redirect("/Expense");
+                Response.Redirect("/Expenses");
             }
 
             
@@ -86,11 +104,12 @@ namespace ePiggyWeb.Pages
 
         public void OnPostCancel()
         {
+            Debug.WriteLine("\n\n\n\n"  + EntryTypeInt);
             if (EntryTypeInt == 1)
             {
-                Redirect("/Income");
+                Response.Redirect("/Income");
             }
-            Redirect("/Expenses");
+            Response.Redirect("/Expenses");
         }
 
 

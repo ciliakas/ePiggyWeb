@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Globalization;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -39,7 +40,7 @@ namespace ePiggyWeb.Pages
         {
             if (!ModelState.IsValid) return;
 
-            if (!decimal.TryParse(Amount, out var parsedAmount))
+            if (!decimal.TryParse(Amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedAmount))
             {
                 Error = "Amount is not a number!";
                 return;
