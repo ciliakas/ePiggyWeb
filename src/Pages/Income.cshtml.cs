@@ -20,16 +20,15 @@ namespace ePiggyWeb.Pages
         public string Title { get; set; }
         [Required(ErrorMessage = "Amount is required")]
         [BindProperty]
-        public string Amount { get; set; }
+        public decimal Amount { get; set; }
         [BindProperty]
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         [BindProperty]
         [Required(ErrorMessage = "Importance is required")]
-        public string Importance { get; set; }
+        public int Importance { get; set; }
         [BindProperty]
-        public string IsMonthly { get; set; }
+        public bool Recurring { get; set; }
 
-        public string Error { get; set; }
         public void OnGet()
         {
             var dataManager = new DataManager();
@@ -38,24 +37,18 @@ namespace ePiggyWeb.Pages
 
         public void OnPostNewEntry()
         {
-            if (!ModelState.IsValid) return;
-
-            if (!decimal.TryParse(Amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedAmount))
+            DataManager dataManager;
+            if (!ModelState.IsValid)
             {
-                Error = "Amount is not a number!";
+                dataManager = new DataManager();
+                Income = dataManager.Income.EntryList;
                 return;
             }
 
-            var parsedDate = Convert.ToDateTime(Date);
-            var parsedIsMonthly = Convert.ToBoolean(IsMonthly);
-            var parsedImportance = int.Parse(Importance);
-            var entry = new Entry(Title, parsedAmount, parsedDate, parsedIsMonthly, parsedImportance);
-
+            var entry = new Entry(Title, Amount, Date, Recurring, Importance);
             EntryDbUpdater.Add(entry, 0, EntryType.Income);
-            var dataManager = new DataManager();
+            dataManager = new DataManager();
             Income = dataManager.Income.EntryList;
-
-
         }
 
         public void OnPostDelete(int id)

@@ -16,10 +16,6 @@
     <span asp-validation-for="Title" class="text-danger"></span>
     <input asp-for="Amount" type="text" placeholder="Amount" value="" />
     <span asp-validation-for="Amount" class="text-danger"></span>
-    @if (!string.IsNullOrEmpty(Model.Error))
-    {
-        <label class="text-danger">@Model.Error</label>
-    }
     <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
     <!-- <label class="text-light ml-3">Importance</label>-->
     <select asp-for="Importance" class="ml-3">
@@ -32,7 +28,7 @@
     </select>
     <span asp-validation-for="Importance" class="text-danger"></span>
     <label class="text-light ml-3">Is Monthly?</label>
-    <input asp-for="IsMonthly" type="checkbox" placeholder="" />
+    <input asp-for="Recurring" type="checkbox" placeholder="" />
     <input type="submit" value="Add" class="btn btn-primary ml-5" />
     <input class="btn btn-danger ml-2" type="reset" value="Reset">
 </form>
@@ -62,18 +58,17 @@
 
                     </th>
                 </tr>
-                @foreach (var item in Model.Income)
+                @foreach (var item in Model.Income.Reverse())
                 {
                     <tr class="table-light border-primary">
                         <td class="border-primary">
                             @Html.DisplayFor(m => item.Title)
                         </td>
                         <td class="border-primary">
-                            @item.Amount.ToString(CultureInfo.InvariantCulture)
+                            @item.Amount.ToString(CultureInfo.CurrentCulture)
                         </td>
                         <td class="border-primary">
                             @item.Date.ToShortDateString()
-                            <!-- Html.DisplayFor(m => item.Date)-->
                         </td>
                         <td class="border-primary">
                             @((Importance)item.Importance)
