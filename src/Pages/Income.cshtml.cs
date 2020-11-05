@@ -1,7 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Globalization;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
