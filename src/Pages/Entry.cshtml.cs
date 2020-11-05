@@ -1,5 +1,8 @@
+using System;
+using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ePiggyWeb.Pages
@@ -18,7 +21,7 @@ namespace ePiggyWeb.Pages
             //var decimal1 = 100M;
             //var decimal2 = 150M;
             //ViewData["EntryList"] = goal2.Equals(decimal1);
-            //var dataManager = new DataManager();
+            var dataManager = new DataManager();
             //ViewData["EntryList"] = dataManager.Income.ToString();
 
             Entry entry1 = new Entry();
@@ -32,7 +35,8 @@ namespace ePiggyWeb.Pages
             IGoal goal2 = new Goal();
             //IEntry goal3 = new Goal(); -- thats illegla
 
-            ViewData["EntryList"] = entry1.ToString();
+            //This should be ill eagle, don't know why I didn't think of this before
+            ViewData["EntryList"] = dataManager.Income.EntryList.GetBy(Importance.Low).GetBy(DateTime.Today).GetSum();
         }
     }
 }
