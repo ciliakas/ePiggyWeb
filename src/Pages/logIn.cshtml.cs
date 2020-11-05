@@ -23,7 +23,7 @@ namespace ePiggyWeb.Pages
         public string Password { get; set; }
 
         public string ErrorMessage = "";
-        public async Task<IActionResult> OnPost()
+        public async Task<IActionResult> OnPost(string ReturnUrl)
         {
             if (UserAuth.Login(Email, Password))
             {
@@ -35,8 +35,9 @@ namespace ePiggyWeb.Pages
                 var claimsIdentity = new ClaimsIdentity(claims, "Login");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
-                    
-                return Redirect("/Index");
+
+                return Redirect(ReturnUrl ?? "/Index");
+                
 
             };
 
