@@ -13,16 +13,16 @@ namespace ePiggyWeb.Pages
     {
         public IEntryList Expenses { get; set; }
 
-        [Required(ErrorMessage = "Title is required")]
+        [Required(ErrorMessage = "Required")]
         [BindProperty]
         public string Title { get; set; }
-        [Required(ErrorMessage = "Amount is required")]
+        [Required(ErrorMessage = "Required")]
         [BindProperty]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
         [BindProperty]
-        [Required(ErrorMessage = "Importance is required")]
+        [Required(ErrorMessage = "Required")]
         public int Importance { get; set; }
         [BindProperty]
         public bool Recurring { get; set; }
@@ -55,6 +55,7 @@ namespace ePiggyWeb.Pages
             EntryDbUpdater.Remove(id, EntryType.Expense);
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
+            Response.Redirect("/Expenses");
         }
     }
 }

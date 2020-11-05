@@ -5,7 +5,7 @@
 @model ePiggyWeb.Pages.ExpensesModel
 
 <br />
-<div class="container p-0 mt-3 mb-4">
+<div class="container p-0 mt-3">
     <h2 class="text-info">Expenses</h2>
 </div>
 
@@ -16,7 +16,6 @@
     <input asp-for="Amount" type="text" placeholder="Amount" value="" />
     <span asp-validation-for="Amount" class="text-danger"></span>
     <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
-    <!-- <label class="text-light ml-3">Importance</label>-->
     <select asp-for="Importance" class="ml-3">
         <option hidden disabled selected value="">Importance</option>
         <option value="1">Necessary</option>

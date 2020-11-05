@@ -13,21 +13,26 @@ namespace ePiggyWeb.Pages
     {
         public IEntryList Income { get; set; }
 
-        [Required(ErrorMessage = "Title is required")]
+        [Required(ErrorMessage = "Required")]
         [BindProperty]
         public string Title { get; set; }
-        [Required(ErrorMessage = "Amount is required")]
+        [Required(ErrorMessage = "Required")]
         [BindProperty]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
         [BindProperty]
-        [Required(ErrorMessage = "Importance is required")]
+        [Required(ErrorMessage = "Required")]
         public int Importance { get; set; }
         [BindProperty]
         public bool Recurring { get; set; }
 
         public void OnGet()
+        {
+            LoadData();
+        }
+
+        private void LoadData()
         {
             var dataManager = new DataManager();
             Income = dataManager.Income.EntryList;
@@ -54,6 +59,7 @@ namespace ePiggyWeb.Pages
             EntryDbUpdater.Remove(id, EntryType.Income);
             var dataManager = new DataManager();
             Income = dataManager.Income.EntryList;
+            Response.Redirect("/Income");
         }
     }
 }

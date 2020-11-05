@@ -61,10 +61,10 @@ namespace ePiggyWeb.Pages
         /*If cancel pressed return to previous page*/
         public void OnPostCancel()
         {
-            Debug.WriteLine("\n\n\n\n"  + EntryTypeInt);
             if (EntryTypeInt == 1)
             {
                 Response.Redirect("/Income");
+                return;
             }
             Response.Redirect("/Expenses");
         }
