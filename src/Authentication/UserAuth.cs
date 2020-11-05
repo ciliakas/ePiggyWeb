@@ -19,13 +19,14 @@ namespace ePiggyWeb.Authentication
         private const int SaltSize = 20;
 
 
-        public static bool Registration(string email, string pass)
+        public static int Registration(string email, string pass)
         {
             using var db = new DatabaseContext();
             var userInfo = db.Users.FirstOrDefault(a => a.Email == email); //Find if email is in db
             if (userInfo != null)
             {
-                return false;
+                //This email is already in use
+                return -1;
             }
             var salt = HashingProcessor.CreateSalt(SaltSize);
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
@@ -34,34 +35,50 @@ namespace ePiggyWeb.Authentication
             db.Add(user);
             db.SaveChanges();
 
-            //Handler.UserId = user.Id;
-            return true;
+            return user.Id;
         }
 
-        public static bool Login(string email, string pass)
+        public static int Login(string email, string pass)
         {
             using var db = new DatabaseContext();
-            var userInfo = db.Users.FirstOrDefault(a => a.Email == email); //Find user and pass in db and check if matches
+            var user = db.Users.FirstOrDefault(a => a.Email == email); //Find user and pass in db and check if matches
 
-            if (userInfo == null)
+            if (user == null)
             {
-                return false;
+                //User couldn't be found
+                return -1;
             }
 
-            if (!HashingProcessor.AreEqual(pass, userInfo.Password, userInfo.Salt))
+            if (!HashingProcessor.AreEqual(pass, user.Password, user.Salt))
             {
-                return false;
+                //Password is wrong
+                return -2;
             }
-            //Handler.UserId = userInfo.Id;
-            return true;
+            return user.Id;
         }
+
+        public static int GetUserIdByEmail(string email)
+        {
+            if (email is null)
+            {
+                return -1;
+            }
+            using var db = new DatabaseContext();
+            var user = db.Users.FirstOrDefault(a => a.Email == email);
+            if (user == null)
+            {
+                return -1;
+            }
+            return user.Id;
+        }
+
 
         public static bool ChangePassword(string email, string pass)
         {
             using var db = new DatabaseContext();
-            var userInfo = db.Users.FirstOrDefault(a => a.Email == email);
+            var user = db.Users.FirstOrDefault(a => a.Email == email);
 
-            if (userInfo == null)
+            if (user == null)
             {
                 return false;
             }
@@ -69,8 +86,8 @@ namespace ePiggyWeb.Authentication
             var salt = HashingProcessor.CreateSalt(SaltSize);
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
 
-            userInfo.Password = passwordHash;
-            userInfo.Salt = salt;
+            user.Password = passwordHash;
+            user.Salt = salt;
             db.SaveChanges();
 
             return true;
@@ -79,9 +96,9 @@ namespace ePiggyWeb.Authentication
         public static int SendCode(string email)
         {
             using var db = new DatabaseContext();
-            var userInfo = db.Users.FirstOrDefault(a => a.Email == email);
+            var user = db.Users.FirstOrDefault(a => a.Email == email);
 
-            if (userInfo == null)
+            if (user == null)
             {
                 return 0;
             }
