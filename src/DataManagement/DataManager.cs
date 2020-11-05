@@ -20,20 +20,5 @@ namespace ePiggyWeb.DataManagement
 
         public IGoalManager Goals { get; } = new GoalManager(new GoalList());
 
-        public static int GetUserIdByEmail(string email)
-        {
-            if (email is null)
-            {
-                return -1;
-            }
-            using var db = new DatabaseContext();
-            var userInfo = db.Users.FirstOrDefault(a => a.Email == email);
-            if (userInfo == null)
-            {
-                return -1;
-            }
-            return userInfo.Id;
-        }
-
     }
 }
