@@ -1,15 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ePiggyWeb.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ePiggyWeb.Pages
 {
@@ -41,8 +39,8 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
-             if (UserAuth.Registration(Email, Password))
-             {
+            if (UserAuth.Registration(Email, Password))
+            {
                  var claims = new List<Claim>
                  {
                      new Claim(ClaimTypes.UserData, "0"),
@@ -53,13 +51,11 @@ namespace ePiggyWeb.Pages
                      new ClaimsPrincipal(claimsIdentity));
  
                  return Redirect("/Index");
+            };
  
  
-             };
- 
- 
-             ErrorMessage = "Invalid E-mail or Password!";
-             return Page();
+            ErrorMessage = "Failed to Register :( Try again";
+            return Page();
         }
     }
 }

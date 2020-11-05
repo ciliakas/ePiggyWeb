@@ -38,23 +38,40 @@ namespace ePiggyWeb.Authentication
             return true;
         }
 
-        public static bool Login(string email, string pass)
+        public static int Login(string email, string pass)
         {
             using var db = new DatabaseContext();
             var userInfo = db.Users.FirstOrDefault(a => a.Email == email); //Find user and pass in db and check if matches
 
             if (userInfo == null)
             {
-                return false;
+                //User couldn't be found
+                return -1;
             }
 
             if (!HashingProcessor.AreEqual(pass, userInfo.Password, userInfo.Salt))
             {
-                return false;
+                //Password is wrong
+                return -2;
             }
-            //Handler.UserId = userInfo.Id;
-            return true;
+            return userInfo.Id;
         }
+
+        public static int GetUserIdByEmail(string email)
+        {
+            if (email is null)
+            {
+                return -1;
+            }
+            using var db = new DatabaseContext();
+            var userInfo = db.Users.FirstOrDefault(a => a.Email == email);
+            if (userInfo == null)
+            {
+                return -1;
+            }
+            return userInfo.Id;
+        }
+
 
         public static bool ChangePassword(string email, string pass)
         {

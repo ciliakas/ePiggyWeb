@@ -1,4 +1,6 @@
-﻿using ePiggyWeb.DataManagement.Entries;
+﻿using System.Linq;
+using ePiggyWeb.DataBase;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 

@@ -25,11 +25,12 @@ namespace ePiggyWeb.Pages
         }
         public async Task<IActionResult> OnPost(string ReturnUrl)
         {
-            if (UserAuth.Login(Email, Password))
+            var Id = UserAuth.Login(Email, Password);
+            if (Id > -1)
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.UserData, "0"),
+                    new Claim(ClaimTypes.Name, Id.ToString()),
                     new Claim(ClaimTypes.Email, Email)
                 };
                 var claimsIdentity = new ClaimsIdentity(claims, "Login");

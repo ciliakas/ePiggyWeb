@@ -13,5 +13,15 @@ namespace ePiggyWeb.DataManagement.Entries
         And it also calls for the class that implements this interface to implement IList<IEntry>
         So basically a List<IEntry> with a property of EntryType would successfully implement this interface
          */
+        public IEntryList GetBy(Importance importance);
+        public IEntryList GetBy(DateTime dateTime);
+        public IEntryList GetFrom(DateTime dateTime);
+        public IEntryList GetTo(DateTime dateTime);
+        public IEntryList GetBy(bool recurring);
+        public IEntryList GetUntilToday();
+        public DateTime GetOldestEntryDate();
+        public DateTime GetNewestEntryDate();
+        public decimal GetSum();
+
     }
 }
