@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
@@ -54,7 +55,7 @@ namespace ePiggyWeb.DataManagement.Entries
         public bool Edit(IEntry oldEntry, IEntry newEntry)
         {
             //If something went wrong with database update return false
-            if (!EntryDbUpdater.Edit(oldEntry, newEntry, EntryList.EntryType))
+            if (!EntryDbUpdater.Edit(oldEntry.Id, newEntry, EntryList.EntryType))
             {
                 return false;
             }
@@ -69,9 +70,27 @@ namespace ePiggyWeb.DataManagement.Entries
             return true;
         }
 
+        public bool Edit(int id, IEntry newEntry)
+        {
+            //If something went wrong with database update return false
+            if (!EntryDbUpdater.Edit(id, newEntry, EntryList.EntryType))
+            {
+                return false;
+            }
+            var temp = EntryList.FirstOrDefault(x => x.Id == id);
+            //If couldn't find the entry return false
+            if (temp is null)
+            {
+                ExceptionHandler.Log("Edited entry id: " + id + " in database but couldn't find it locally");
+                return false;
+            }
+            temp.Edit(newEntry);
+            return true;
+        }
+
         public bool Remove(IEntry entry)
         {
-            if (!EntryDbUpdater.Remove(entry, EntryList.EntryType)) return false;
+            if (!EntryDbUpdater.Remove(entry.Id, EntryList.EntryType)) return false;
             var temp = EntryList.FirstOrDefault(x => x.Id == entry.Id);
             if (temp is null)
             {
@@ -81,15 +100,47 @@ namespace ePiggyWeb.DataManagement.Entries
             EntryList.Remove(temp);
             return true;
         }
+        public bool Remove(int id)
+        {
+            if (!EntryDbUpdater.Remove(id, EntryList.EntryType)) return false;
+            var temp = EntryList.FirstOrDefault(x => x.Id == id);
+            if (temp is null)
+            {
+                ExceptionHandler.Log("Removed entry id: " + id + " from database but couldn't find it locally");
+                return false;
+            }
+            EntryList.Remove(temp);
+            return true;
+        }
 
         public bool RemoveAll(IEntryList entryList)
         {
-            if (!EntryDbUpdater.RemoveAll(entryList))
+            var idList = entryList.Select(va => va.Id).ToArray();
+            if (!EntryDbUpdater.RemoveAll(idList, entryList.EntryType))
             {
                 return false;
             }
             var temp = new EntryList(EntryType.Income);
             EntryList.RemoveAll(entryList.Contains);
+            return true;
+        }
+
+        public bool RemoveAll(IEnumerable<int> idList)
+        {
+            var idArray = idList as int[] ?? idList.ToArray();
+            if (!EntryDbUpdater.RemoveAll(idArray, EntryList.EntryType))
+            {
+                return false;
+            }
+
+            var temp = new EntryList(EntryList.EntryType);
+            temp.AddRange(from entry in EntryList from id in idArray where entry.Id == id select entry);
+
+            foreach (var entry in temp)
+            {
+                EntryList.Remove(entry);
+            }
+
             return true;
         }
 
