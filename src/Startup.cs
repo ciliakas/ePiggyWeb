@@ -1,3 +1,5 @@
+using System;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +21,15 @@ namespace ePiggyWeb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Login";
+                    options.Cookie.Name = ".AspNetCore.Cookies";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+                    options.SlidingExpiration = true;
+
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,10 +52,14 @@ namespace ePiggyWeb
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });
         }

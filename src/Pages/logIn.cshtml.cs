@@ -1,6 +1,12 @@
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ePiggyWeb.Pages
 {
@@ -17,15 +23,26 @@ namespace ePiggyWeb.Pages
         public string Password { get; set; }
 
         public string ErrorMessage = "";
-        public void OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (UserAuth.Login(Email, Password))
             {
-                Response.Redirect("/Index");
-            }
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.UserData, "0"),
+                    new Claim(ClaimTypes.Email, Email)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, "Login");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+                    
+                return Redirect("/Index");
+
+            };
+
 
             ErrorMessage = "Invalid E-mail or Password!";
-            //  Debug.WriteLine("\n\n\n"+ Email + Password + UserAuth.Login(Email, Password));
+            return Redirect("/Index");
         }
     }
 }
