@@ -39,7 +39,8 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
-            if (UserAuth.Registration(Email, Password))
+            var Id = UserAuth.Registration(Email, Password);
+            if (Id > -1)
             {
                  var claims = new List<Claim>
                  {
@@ -54,7 +55,7 @@ namespace ePiggyWeb.Pages
             };
  
  
-            ErrorMessage = "Failed to Register :( Try again";
+            ErrorMessage = "Such User already exists";
             return Page();
         }
     }
