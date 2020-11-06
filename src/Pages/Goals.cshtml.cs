@@ -36,8 +36,21 @@ namespace ePiggyWeb.Pages
 
         public void OnPostNewGoal()
         {
+            DataManager dataManager;
+            if (!ModelState.IsValid)
+            {
+                dataManager = new DataManager();
+                Goals = dataManager.Goals.GoalList;
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                return;
+            }
+
             var temp = new Goal(Title, Amount);
-            GoalDbUpdater.Add(temp, UserId);
+            GoalDbUpdater.Add(temp, 0);
+
+            dataManager = new DataManager();
+            Goals = dataManager.Goals.GoalList;
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
         }
         public void OnPostDelete(int id)
         {
@@ -56,7 +69,7 @@ namespace ePiggyWeb.Pages
 
         private void DeleteGoalFromDb(int id)
         {
-            GoalDbUpdater.Remove(id, UserId);
+            GoalDbUpdater.Remove(id, 0);
         }
 
     }

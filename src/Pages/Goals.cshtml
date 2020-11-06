@@ -35,8 +35,7 @@ else
                 <div class="progress-bar bg-success" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
             </div>
             <h5 class="text-light">25.00/@item.Amount</h5>
-            <!--Code to move goal when purchased to expenses-->
-            <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary float-right" type="submit"><i class="far fa-trash-alt text-danger "></i></button>
+            <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary" type="submit"><i class="fas fa-shopping-cart fa-2x text-success"></i></button>
         </div>
         num++;
         if (num % 3 == 0)
