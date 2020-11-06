@@ -2,15 +2,16 @@
 @model ePiggyWeb.Pages.GoalsModel
 <br/>
 <h2 class="text-info">Goals</h2>
+
 <div class="container row p-0 mx-auto mt-3">
     <div class="col-sm border m-3 bg-primary">
         <a href="#"><i class="far fa-trash-alt float-right mt-3 text-light "></i></a>
         <div class="clearfix"></div>
-        <h3 class="text-light ">Goal Name</h3>
+        <h3 class="text-light ">@Model.Goals[0].Title</h3>
         <div class="progress mt-4 mb-2">
             <div class="progress-bar bg-success" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
         </div>
-        <h5 class="text-light">25.00/100.00</h5>
+        <h5 class="text-light">25.00/@Model.Goals[0].Amount</h5>
     </div>
     <div class="col-sm border m-3 bg-primary">
         <a href="#"><h3 class="text-light mt-5 mb-5">Add Goal</h3></a>
