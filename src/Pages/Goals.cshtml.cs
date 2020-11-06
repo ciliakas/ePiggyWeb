@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using ePiggyWeb.DataBase;
@@ -7,6 +8,7 @@ using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ePiggyWeb.Pages
@@ -17,6 +19,13 @@ namespace ePiggyWeb.Pages
         public IGoalList Goals { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        [BindProperty]
+        public string Title { get; set; }
+        [Required(ErrorMessage = "Required")]
+        [BindProperty]
+        public decimal Amount { get; set; }
         public void OnGet()
         {
             var dataManager = new DataManager();
@@ -25,7 +34,11 @@ namespace ePiggyWeb.Pages
         }
 
 
-
+        public void OnPostNewGoal()
+        {
+            var temp = new Goal(Title, Amount);
+            GoalDbUpdater.Add(temp, UserId);
+        }
         public void OnPostDelete(int id)
         {
             DeleteGoalFromDb(id);
