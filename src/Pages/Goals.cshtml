@@ -10,21 +10,23 @@
 else
 {
     var num = 0;
-    
-    @foreach(var item in Model.Goals)
+<form method="post">
+    @foreach (var item in Model.Goals)
     {
         if (num % 3 == 0)
         {
-         @Html.Raw("<div class=\"row p-0 mx-auto mt-3\">")
+            @Html.Raw("<div class=\"row p-0 mx-auto mt-3\">")
         }
         <div class="border m-3 bg-primary col-sm">
-            <a href="#"><i class="far fa-trash-alt float-right mt-3 text-light "></i></a>
+            <button asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-primary float-right" type="submit"><i class="far fa-trash-alt text-danger "></i></button>
             <div class="clearfix"></div>
-            <h3 class="text-light ">@item.Title</h3>
-            <div class="progress mt-4 mb-2">
+            <h3 class="text-light problematic-title">@item.Title</h3>
+            <div class="progress mt-4">
                 <div class="progress-bar bg-success" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
             </div>
             <h5 class="text-light">25.00/@item.Amount</h5>
+            <!--Code to move goal when purchased to expenses-->
+            <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary float-right" type="submit"><i class="far fa-trash-alt text-danger "></i></button>
         </div>
         num++;
         if (num % 3 == 0)
@@ -32,6 +34,7 @@ else
             @Html.Raw("</div>")
         }
     }
+</form>
     if (num % 3 != 0)
     {
         @Html.Raw("</div>")

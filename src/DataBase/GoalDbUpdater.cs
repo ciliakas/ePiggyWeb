@@ -35,6 +35,24 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
+        public static bool Remove(int id, int userId)
+        {
+            var db = new DatabaseContext();
+            try
+            {
+                var dbGoal = db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+                db.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
+                db.SaveChanges();
+            }
+            catch (InvalidOperationException ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                ExceptionHandler.Log("Couldn't find goal id: " + id + " in database");
+                return false;
+            }
+            return true;
+        }
+
         public static bool Edit(IGoal oldGoal, IGoal newGoal)
         {
             var db = new DatabaseContext();
