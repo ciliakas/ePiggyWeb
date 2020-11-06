@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -52,7 +53,17 @@
         <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" asp-page="/Login">Sign In</a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <form method="post" asp-controller="Logout" asp-action="LogoutTask">
+                            <label class="text-light">@User.FindFirst(ClaimTypes.Email).Value</label>
+                            <button class="btn btn-primary">Logout</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-page="/Login" class="btn btn-primary">Sign In</a>
+                    }
                 </li>
             </ul>
         </div>
