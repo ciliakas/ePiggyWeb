@@ -3,12 +3,14 @@ using System.ComponentModel.DataAnnotations;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
+using Microsoft.AspNetCore.Authorization;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ePiggyWeb.Pages
 {
+    [Authorize]
     public class ExpensesModel : PageModel
     {
         public IEntryList Expenses { get; set; }

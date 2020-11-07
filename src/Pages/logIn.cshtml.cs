@@ -1,4 +1,9 @@
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -6,26 +11,46 @@ namespace ePiggyWeb.Pages
 {
     public class LoginModel : PageModel
     {
-        public void OnGet()
-        {
-            ErrorMessage = "";
-        }
-
         [BindProperty] 
         public string Email { get; set; }
         [BindProperty]
         public string Password { get; set; }
 
         public string ErrorMessage = "";
-        public void OnPost()
+
+
+        public IActionResult OnGet()
         {
-            if (UserAuth.Login(Email, Password))
+            if (User.Identity.IsAuthenticated)
             {
-                Response.Redirect("/Index");
+                return RedirectToPage("/Index");
             }
 
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPost(string returnUrl)
+        {
+            var id = UserAuth.Login(Email, Password);
+            if (id > -1)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, id.ToString()),
+                    new Claim(ClaimTypes.Email, Email)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, "Login");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                return Redirect(returnUrl ?? "/Index");
+                
+
+            };
+
+
             ErrorMessage = "Invalid E-mail or Password!";
-            //  Debug.WriteLine("\n\n\n"+ Email + Password + UserAuth.Login(Email, Password));
+            return Page();
         }
     }
 }

@@ -6,15 +6,27 @@
 
 
 
-    <div class="jumbotron">
-        <img width="250px" src="images/mainLogo.PNG" alt="" class="title-image">
+<div class="jumbotron">
+    <img width="250px" src="images/mainLogo.PNG" alt="" class="title-image">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h1 class="display-4">Welcome Back!</h1>
+        <p class="lead">Hope You are having good time saving!</p>
+        <hr class="my-4">
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" asp-page="/Goals" role="button">Your Goals</a>
+        </p>
+    }
+    else
+    {
         <h1 class="display-4">Save more!</h1>
         <p class="lead">This is your saving partner that will allow to save more!</p>
         <hr class="my-4">
         <p class="lead">
             <a class="btn btn-primary btn-lg" asp-page="/Register" role="button">Get Started</a>
         </p>
-    </div>
+    }
+</div>
 
     <section class="white-section" id="features">
 
