@@ -52,7 +52,7 @@ namespace ePiggyWeb
                 await next();
                 if (context.Response.StatusCode == 404)
                 {
-                    context.Request.Path = "/Index";
+                    context.Request.Path = "/errorPages/page404";
                     await next();
                 }
             });
