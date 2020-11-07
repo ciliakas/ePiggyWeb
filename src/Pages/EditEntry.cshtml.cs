@@ -44,6 +44,7 @@ namespace ePiggyWeb.Pages
         public void OnPost()
         {
             if (!ModelState.IsValid) return;
+            Entry.Title = Title;
 
             if (EntryTypeInt == 1)
             {
