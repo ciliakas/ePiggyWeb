@@ -9,7 +9,7 @@ namespace ePiggyWeb.DataManagement
     {
         public static bool UpdateRecurring(IEntryManager entryManager)
         {
-            foreach (var entry in entryManager.EntryList.GetBy(true))
+            foreach (var entry in entryManager.EntryList.GetBy(recurring: true))
             {
                 var differenceInMonths = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: entry.Date);
                 if (differenceInMonths > 0)
