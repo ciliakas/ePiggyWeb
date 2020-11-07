@@ -18,25 +18,32 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        public void OnGet()
+
+        public IActionResult OnGet()
         {
-            ErrorMessage = "";
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Index");
+            }
+
+            return Page();
         }
-        public async Task<IActionResult> OnPost(string ReturnUrl)
+
+        public async Task<IActionResult> OnPost(string returnUrl)
         {
-            var Id = UserAuth.Login(Email, Password);
-            if (Id > -1)
+            var id = UserAuth.Login(Email, Password);
+            if (id > -1)
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, Id.ToString()),
+                    new Claim(ClaimTypes.Name, id.ToString()),
                     new Claim(ClaimTypes.Email, Email)
                 };
                 var claimsIdentity = new ClaimsIdentity(claims, "Login");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
 
-                return Redirect(ReturnUrl ?? "/Index");
+                return Redirect(returnUrl ?? "/Index");
                 
 
             };
