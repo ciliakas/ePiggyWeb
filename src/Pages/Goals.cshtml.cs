@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
@@ -34,41 +33,31 @@ namespace ePiggyWeb.Pages
         }
 
 
-        public void OnPostNewGoal()
-        {
-            DataManager dataManager;
+        public IActionResult OnPostNewGoal()
+        { 
             if (!ModelState.IsValid)
             {
-                dataManager = new DataManager();
-                Goals = dataManager.Goals.GoalList;
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                return;
+                OnGet();
+                return Page();
             }
-
             var temp = new Goal(Title, Amount);
             GoalDbUpdater.Add(temp, 0);
-
-            dataManager = new DataManager();
-            Goals = dataManager.Goals.GoalList;
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            return RedirectToPage("/Goals");
         }
-        public void OnPostDelete(int id)
+
+        public IActionResult OnPostDelete(int id)
         {
             DeleteGoalFromDb(id);
-            var dataManager = new DataManager();
-            Goals = dataManager.Goals.GoalList;
-            Response.Redirect("/Goals");
+            return RedirectToPage("/Goals");
         }
 
-        public void OnPostPurchased(int id, string title, string amount)
+        public IActionResult OnPostPurchased(int id, string title, string amount)
         {
             decimal.TryParse(amount, out var parsedAmount);
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
             EntryDbUpdater.Add(entry, 0, EntryType.Expense);
             DeleteGoalFromDb(id);
-            var dataManager = new DataManager();
-            Goals = dataManager.Goals.GoalList;
-            Response.Redirect("/Expenses");
+            return RedirectToPage("/Goals");
         }
 
         private void DeleteGoalFromDb(int id)
