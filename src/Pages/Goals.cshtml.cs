@@ -22,9 +22,11 @@ namespace ePiggyWeb.Pages
         [Required(ErrorMessage = "Required")]
         [BindProperty]
         public string Title { get; set; }
+
         [Required(ErrorMessage = "Required")]
         [BindProperty]
         public decimal Amount { get; set; }
+
         public void OnGet()
         {
             var dataManager = new DataManager();
