@@ -49,13 +49,13 @@ namespace ePiggyWeb.Pages
             }
             var temp = new Goal(Title, Amount);
             GoalDbUpdater.Add(temp, 0);
-            return RedirectToPage("/Goals");
+            return RedirectToPage("/goals");
         }
 
         public IActionResult OnPostDelete(int id)
         {
             DeleteGoalFromDb(id);
-            return RedirectToPage("/Goals");
+            return RedirectToPage("/goals");
         }
 
         public IActionResult OnPostPurchased(int id, string title, string amount)
@@ -64,7 +64,7 @@ namespace ePiggyWeb.Pages
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
             EntryDbUpdater.Add(entry, 0, EntryType.Expense);
             DeleteGoalFromDb(id);
-            return RedirectToPage("/Expenses");
+            return RedirectToPage("/expenses");
         }
 
         private void DeleteGoalFromDb(int id)
