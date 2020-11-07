@@ -32,6 +32,11 @@ namespace ePiggyWeb.Pages
             var dataManager = new DataManager();
             Goals = dataManager.Goals.GoalList;
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
+            if (Savings < 0)
+            {
+                Savings = 0;
+            }
         }
 
 
