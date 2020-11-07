@@ -60,11 +60,15 @@ namespace ePiggyWeb.Pages
             Response.Redirect("/Goals");
         }
 
-        public void OnPostPurchased(int id, string title, decimal amount)
+        public void OnPostPurchased(int id, string title, string amount)
         {
-            var entry = new Entry(title, amount, DateTime.Today, recurring:false, importance:1);
-            EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
+            decimal.TryParse(amount, out var parsedAmount);
+            var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
+            EntryDbUpdater.Add(entry, 0, EntryType.Expense);
             DeleteGoalFromDb(id);
+            var dataManager = new DataManager();
+            Goals = dataManager.Goals.GoalList;
+            Response.Redirect("/Expenses");
         }
 
         private void DeleteGoalFromDb(int id)
