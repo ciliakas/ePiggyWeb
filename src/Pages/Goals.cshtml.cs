@@ -21,6 +21,7 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [StringLength(30)]
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Required")]
