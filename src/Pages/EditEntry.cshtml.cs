@@ -37,37 +37,37 @@ namespace ePiggyWeb.Pages
                 Title = Entry.Title;
                 return;
             }
-            Response.Redirect(EntryTypeInt == 1 ? "/Income" : "/Expenses");
+
+            OnPostCancel(); //I entry is empty going back
         }
 
         /*Editing and redirecting according to EntryType*/
-        public void OnPost()
+        public IActionResult OnPost()
         {
-            if (!ModelState.IsValid) return;
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
             Entry.Title = Title;
 
             if (EntryTypeInt == 1)
             {
                 EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
-                Response.Redirect("/Income");
+                return RedirectToPage("/Income");
             }
             else
             {
                 EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
-                Response.Redirect("/Expenses");
+                return RedirectToPage("/Expenses");
             }
         }
 
         /*If cancel pressed return to previous page*/
-        public void OnPostCancel()
+        public IActionResult OnPostCancel()
         {
-            if (EntryTypeInt == 1)
-            {
-                Response.Redirect("/Income");
-                return;
-            }
-            Response.Redirect("/Expenses");
+            return RedirectToPage(EntryTypeInt == 1 ? "/Income" : "/Expenses");
         }
+
 
 
     }

@@ -59,7 +59,7 @@ namespace ePiggyWeb.Pages
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
             EntryDbUpdater.Add(entry, 0, EntryType.Expense);
             DeleteGoalFromDb(id);
-            return RedirectToPage("/Goals");
+            return RedirectToPage("/Expenses");
         }
 
         private void DeleteGoalFromDb(int id)
