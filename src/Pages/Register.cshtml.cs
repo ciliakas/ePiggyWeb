@@ -29,6 +29,15 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
+        public IActionResult OnGet()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Index");
+            }
+
+            return Page();
+        }
 
         public async Task<IActionResult> OnPost()
         {
@@ -38,12 +47,12 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
-            var Id = UserAuth.Registration(Email, Password);
-            if (Id > -1)
+            var id = UserAuth.Registration(Email, Password);
+            if (id > -1)
             {
                  var claims = new List<Claim>
                  {
-                     new Claim(ClaimTypes.UserData, Id.ToString()),
+                     new Claim(ClaimTypes.UserData, id.ToString()),
                      new Claim(ClaimTypes.Email, Email)
                  };
                  var claimsIdentity = new ClaimsIdentity(claims, "Login");
