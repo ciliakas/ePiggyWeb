@@ -47,6 +47,16 @@ namespace ePiggyWeb
                 app.UseHsts();
             }
 
+            app.Use(async (context, next) =>
+            {
+                await next();
+                if (context.Response.StatusCode == 404)
+                {
+                    context.Request.Path = "/Index";
+                    await next();
+                }
+            });
+
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
