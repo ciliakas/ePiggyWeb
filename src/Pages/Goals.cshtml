@@ -1,13 +1,20 @@
 ﻿@page
-@using System.Globalization
 @model ePiggyWeb.Pages.GoalsModel
 
 <br />
 <h2 class="text-info">Goals</h2>
-<button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">
-    Add Goal
-</button>
-
+<button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal</button>
+@if (!ModelState.IsValid)
+{
+<div class="container">
+    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+        <strong>Holy guacamole!</strong> Goal was not added, because wrong info was provided.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+}
 @if (!Model.Goals.Any())
 {
     <div class=" border container bg-primary mt-5 mb-5">
@@ -36,13 +43,14 @@ else
                     @{
                         var percent = decimal.Round(Model.Savings / item.Amount * 100);
                         percent = percent > 100 ? 100 : percent;
+                        var color = percent < 100 ? (percent < 30? "danger" : (percent < 85 ? "warning" : "info" )) : "success";
                     }
-                    <div class="progress-bar bg-success" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
+                    <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                 </div>
                 <h5 class="text-light" title="Saved/Required">@Model.Savings/@item.Amount</h5>
                 @if (percent == 100)
                 {
-                    <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-shopping-cart fa-2x text-success"></i></button>
+                    <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-shopping-cart fa-2x text-info"></i></button>
                 }
                 else
                 {
@@ -71,7 +79,7 @@ else
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="AddGoalModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="AddGoalModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <form method="post" asp-page-handler="NewGoal">
             <div class="modal-content">
@@ -83,10 +91,14 @@ else
                 </div>
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input asp-for="Title" type="text" placeholder="Title*" value="" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
-                    <input asp-for="Amount" type="text" placeholder="Amount*" value="" />
-                    <span asp-validation-for="Amount" class="text-danger"></span>
+                    <div class="form-group">
+                        <input asp-for="Title" type="text" placeholder="Title*" value="" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input asp-for="Amount" type="text" placeholder="Amount*" value="" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
