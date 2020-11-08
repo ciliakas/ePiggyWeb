@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
@@ -36,7 +35,6 @@ namespace ePiggyWeb.Pages
         public void OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            Debug.WriteLine("\n\n\n" + UserId);
             var dataManager = new DataManager(UserId);
             Income = dataManager.Income.EntryList;
         }
@@ -50,7 +48,6 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            Debug.WriteLine("\n\n\n" + UserId);
             var entry = new Entry(Title, Amount, Date, Recurring, Importance);
             EntryDbUpdater.Add(entry, UserId, EntryType.Income);
             return RedirectToPage("/Income");
@@ -59,7 +56,6 @@ namespace ePiggyWeb.Pages
         public IActionResult OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            Debug.WriteLine("\n\n\n" + UserId);
             EntryDbUpdater.Remove(id, UserId, EntryType.Income);
             return RedirectToPage("/Income");
         }
