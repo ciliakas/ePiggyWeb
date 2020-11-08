@@ -50,7 +50,7 @@ namespace ePiggyWeb.Pages
                 return;
             }
 
-            var entry = new Entry(Title, Amount, Date, Recurring, Importance);
+            var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
             EntryDbUpdater.Add(entry, 0, EntryType.Income);
             dataManager = new DataManager();
             Income = dataManager.Income.EntryList;

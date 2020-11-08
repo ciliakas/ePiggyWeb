@@ -32,13 +32,13 @@ namespace ePiggyWeb.DataManagement
             {
                 //Adding new entry for each month according to date difference
                 nextMonth = TimeManager.MoveToNextMonth(dateTime: nextMonth);
-                var newEntry = new Entry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
+                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
                 tempList.Add(newEntry);
             }
 
             /*Adding last entry, which has to keep isMonthly*/
             nextMonth = TimeManager.MoveToNextMonth(nextMonth);
-            var newestEntry = new Entry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
+            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
             tempList.Add(newestEntry);
             if (!entryManager.AddRange(tempList))
             {
@@ -67,13 +67,13 @@ namespace ePiggyWeb.DataManagement
             {
                 //Adding new entry for each month according to date difference
                 nextMonth = TimeManager.MoveToNextMonth(dateTime: nextMonth);
-                var newEntry = new Entry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
+                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
                 tempList.Add(newEntry);
             }
 
             /*Adding last entry, which has to keep isMonthly*/
             nextMonth = TimeManager.MoveToNextMonth(nextMonth);
-            var newestEntry = new Entry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
+            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
             tempList.Add(newestEntry);
             if (!EntryDbUpdater.AddRange(tempList, userId))
             {
@@ -104,11 +104,11 @@ namespace ePiggyWeb.DataManagement
             {
                 //Adding new entry for each month according to date difference
                 nextMonth = TimeManager.MoveToNextMonth(dateTime: nextMonth);
-                var newEntry = new Entry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
+                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
                 tempList.Add(newEntry);
             }
             nextMonth = TimeManager.MoveToNextMonth(nextMonth);
-            var newestEntry = new Entry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
+            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
             tempList.Add(newestEntry);
             var editedOriginalEntry = new Entry(entry.Id, entry.UserId, entry.Title, entry.Amount, entry.Date, false, entry.Importance);
             tempList.Add(editedOriginalEntry);
