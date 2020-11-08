@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Goals;
@@ -6,9 +7,9 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataBase
 {
-    public static class GoalDbUpdater
+    public static class GoalDatabase
     {
-        public static int Add(IGoal goal, int userid)
+        public static int Create(IGoal goal, int userid)
         {
             var db = new DatabaseContext();
             var dbGoal = new GoalModel (goal, userid);
@@ -17,7 +18,7 @@ namespace ePiggyWeb.DataBase
             return dbGoal.Id;
         }
 
-        public static bool Remove(IGoal goal)
+        public static bool Delete(IGoal goal)
         {
             var db = new DatabaseContext();
             try
@@ -35,7 +36,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool Remove(int id, int userId)
+        public static bool Delete(int id, int userId)
         {
             var db = new DatabaseContext();
             try
@@ -53,7 +54,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool Edit(IGoal oldGoal, IGoal newGoal)
+        public static bool Update(IGoal oldGoal, IGoal newGoal)
         {
             var db = new DatabaseContext();
             var dbGoal = db.Goals.FirstOrDefault(x => x.Id == oldGoal.Id);
@@ -65,6 +66,38 @@ namespace ePiggyWeb.DataBase
             dbGoal.Edit(newGoal);
             db.SaveChanges();
             return true;
+        }
+
+        public static bool Update(int id, int userId, IGoal newGoal)
+        {
+            var db = new DatabaseContext();
+            var dbGoal = db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+            if (dbGoal == null)
+            {
+                ExceptionHandler.Log("Couldn't find goal id: " + id + " in database");
+                return false;
+            }
+            dbGoal.Edit(newGoal);
+            db.SaveChanges();
+            return true;
+        }
+
+        public static IGoal Read(int id, int userId)
+        {
+            using var db = new DatabaseContext();
+            var dbGoal = db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+            return new Goal(dbGoal);
+        }
+
+        public static IEnumerable<IGoal> Read(int userId)
+        {
+            return Read(x => x.UserId == userId);
+        }
+
+        public static IEnumerable<IGoal> Read(Func<GoalModel, bool> filter)
+        {
+            using var db = new DatabaseContext();
+            return db.Goals.Where(filter).Select(dbGoal => new Goal(dbGoal)).Cast<IGoal>().ToList();
         }
     }
 }

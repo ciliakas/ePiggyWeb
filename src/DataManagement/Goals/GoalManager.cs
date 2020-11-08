@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
+using IListExtension;
 
 namespace ePiggyWeb.DataManagement.Goals
 {
@@ -19,7 +20,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool Add(IGoal goal)
         {
-            var id = GoalDbUpdater.Add(goal, UserId);
+            var id = GoalDatabase.Create(goal, UserId);
             //Check if id is correct, return false if something is wrong
 
             goal.Id = id;
@@ -30,7 +31,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool Edit(IGoal oldGoal, IGoal newGoal)
         {
-            if (!GoalDbUpdater.Edit(oldGoal, newGoal))
+            if (!GoalDatabase.Update(oldGoal, newGoal))
             {
                 return false;
             }
@@ -46,7 +47,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool Remove(IGoal goal)
         {
-            if (!GoalDbUpdater.Remove(goal))
+            if (!GoalDatabase.Delete(goal))
             {
                 return false;
             }
@@ -63,14 +64,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool ReadFromDb()
         {
-            using var db = new DatabaseContext();
-
-            foreach (var dbGoal in db.Goals.Where(x => x.UserId == UserId)) // query executed and data obtained from database
-            {
-                var newEntry = new Goal(dbGoal);
-                GoalList.Add(newEntry);
-            }
-
+            GoalList.AddRange(GoalDatabase.Read(UserId));
             return true;
         }
     }
