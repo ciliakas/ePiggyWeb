@@ -65,7 +65,7 @@ namespace ePiggyWeb.DataBase
 
             if (entryType == EntryType.Income)
             {
-                var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == id);
+                var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == updatedEntry.UserId);
                 if (dbEntry == null)
                 {
                     ExceptionHandler.Log("Couldn't find entry id: " + id + " in database");
@@ -75,7 +75,7 @@ namespace ePiggyWeb.DataBase
             }
             else
             {
-                var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == id);
+                var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == updatedEntry.UserId);
                 if (dbEntry == null)
                 {
                     ExceptionHandler.Log("Couldn't find entry id: " + id + " in database");
