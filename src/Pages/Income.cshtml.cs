@@ -60,7 +60,7 @@ namespace ePiggyWeb.Pages
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             Debug.WriteLine("\n\n\n" + UserId);
-            EntryDbUpdater.Remove(id, UserId, EntryType.Expense);
+            EntryDbUpdater.Remove(id, UserId, EntryType.Income);
             return RedirectToPage("/Income");
         }
     }
