@@ -47,7 +47,7 @@ namespace ePiggyWeb.Pages
                OnGet();
                return Page();
             }
-
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = new Entry(Title, Amount, Date, Recurring, Importance);
             EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
             return RedirectToPage("/Expenses");
@@ -55,6 +55,7 @@ namespace ePiggyWeb.Pages
 
         public IActionResult OnPostDelete(int id)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             EntryDbUpdater.Remove(id, UserId, EntryType.Expense);
             return RedirectToPage("/Expenses");
         }

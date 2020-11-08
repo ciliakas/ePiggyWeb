@@ -48,6 +48,7 @@ namespace ePiggyWeb.Pages
                 OnGet();
                 return Page();
             }
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = new Goal(Title, Amount);
             GoalDbUpdater.Add(temp, UserId);
             return RedirectToPage("/goals");
@@ -55,12 +56,14 @@ namespace ePiggyWeb.Pages
 
         public IActionResult OnPostDelete(int id)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             DeleteGoalFromDb(id);
             return RedirectToPage("/goals");
         }
 
         public IActionResult OnPostPurchased(int id, string title, string amount)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             decimal.TryParse(amount, out var parsedAmount);
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
             EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
@@ -70,6 +73,7 @@ namespace ePiggyWeb.Pages
 
         private void DeleteGoalFromDb(int id)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             GoalDbUpdater.Remove(id, UserId);
         }
 
