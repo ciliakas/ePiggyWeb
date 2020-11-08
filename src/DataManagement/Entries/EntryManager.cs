@@ -90,7 +90,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool Remove(IEntry entry)
         {
-            if (!EntryDbUpdater.Remove(entry.Id, EntryList.EntryType)) return false;
+            if (!EntryDbUpdater.Remove(entry.Id, UserId, EntryList.EntryType)) return false;
             var temp = EntryList.FirstOrDefault(x => x.Id == entry.Id);
             if (temp is null)
             {
@@ -102,7 +102,7 @@ namespace ePiggyWeb.DataManagement.Entries
         }
         public bool Remove(int id)
         {
-            if (!EntryDbUpdater.Remove(id, EntryList.EntryType)) return false;
+            if (!EntryDbUpdater.Remove(id, UserId, EntryList.EntryType)) return false;
             var temp = EntryList.FirstOrDefault(x => x.Id == id);
             if (temp is null)
             {
