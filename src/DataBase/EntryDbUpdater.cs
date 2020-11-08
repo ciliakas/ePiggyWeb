@@ -32,19 +32,19 @@ namespace ePiggyWeb.DataBase
             }
         }
 
-        public static bool Remove(int id, EntryType entryType)
+        public static bool Remove(int id, int userId, EntryType entryType)
         {
             var db = new DatabaseContext();
             try
             {
                 if (entryType == EntryType.Income)
                 {
-                    var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == id);
+                    var dbEntry = db.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == userId);
                     db.Incomes.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 else
                 {
-                    var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == id);
+                    var dbEntry = db.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == userId);
                     db.Expenses.Remove(dbEntry ?? throw new InvalidOperationException());
                 }
                 db.SaveChanges();
