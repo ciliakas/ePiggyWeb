@@ -1,0 +1,113 @@
+﻿@page
+@using System.Globalization
+@using System.Linq
+@using ePiggyWeb.Utilities
+@model ePiggyWeb.Pages.IncomesModel
+
+
+<br />
+<div class="container p-0 mt-3">
+    <h2 class="text-info">Income</h2>
+</div>
+
+<form method="post" asp-page-handler="NewEntry">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Title" type="text" placeholder="Title" value="" />
+    <span asp-validation-for="Title" class="text-danger"></span>
+    <input asp-for="Amount" type="text" placeholder="Amount" value="" />
+    <span asp-validation-for="Amount" class="text-danger"></span>
+    <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
+    <!-- <label class="text-light ml-3">Importance</label>-->
+    <select asp-for="Importance" class="ml-3">
+        <option hidden disabled selected value="">Importance</option>
+        <option value="1">Necessary</option>
+        <option value="2">High</option>
+        <option value="3">Medium</option>
+        <option value="4">Low</option>
+        <option value="5">Unnecessary</option>
+    </select>
+    <span asp-validation-for="Importance" class="text-danger"></span>
+    <label class="text-light ml-3">Is Monthly?</label>
+    <input asp-for="Recurring" type="checkbox" placeholder="" />
+    <input type="submit" value="Add" class="btn btn-primary ml-5" />
+    <input class="btn btn-danger ml-2" type="reset" value="Reset">
+</form>
+
+@if (!ModelState.IsValid)
+{
+    <div class="container">
+        <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+            <strong>Holy guacamole!</strong> Income was not added, because wrong info was provided.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+}
+
+<div class="col-12 border p-3 mt-3 mb-3">
+    <form method="post">
+        @if (Model.Income.Any())
+        {
+            <table class="table table-hover border-primary table-bordered">
+                <tr class="table-primary">
+                    <th>
+                        <label asp-for="Income.FirstOrDefault().Title"></label>
+                    </th>
+                    <th style="width: 20%">
+                        <label asp-for="Income.FirstOrDefault().Amount"></label>
+                    </th>
+                    <th style="width: 8.5%">
+                        <label asp-for="Income.FirstOrDefault().Date"></label>
+                    </th>
+                    <th style="width: 15%">
+                        <label asp-for="Income.FirstOrDefault().Importance"></label>
+                    </th>
+                    <th style="width: 5%">
+                        <label asp-for="Income.FirstOrDefault().Recurring"></label>
+                    </th>
+                    <th style="width: 10%">
+
+                    </th>
+                </tr>
+                @foreach (var item in Model.Income.Reverse())
+                {
+                    <tr class="table-light border-primary">
+                        <td class="border-primary">
+                            @Html.DisplayFor(m => item.Title)
+                        </td>
+                        <td class="border-primary">
+                            @item.Amount.ToString(CultureInfo.CurrentCulture)
+                        </td>
+                        <td class="border-primary">
+                            @item.Date.ToShortDateString()
+                        </td>
+                        <td class="border-primary">
+                            @((Importance)item.Importance)
+                        </td>
+                        <td class="border-primary">
+                            @if (item.Recurring)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                        </td>
+                        <td class="border-primary">
+                            <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
+                            <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <p>No income available</p>
+        }
+
+    </form>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+

@@ -1,0 +1,32 @@
+﻿@page
+@model ePiggyWeb.Pages.LoginModel
+
+<div class="container login-container">
+    <div class="login-form-2">
+        <h3>Sign In</h3>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="Email" type="text" class="form-control" placeholder="Your Email *" value="" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="Password" type="password" class="form-control" placeholder="Your Password *" value="" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <p class="text-danger">@Model.ErrorMessage</p>
+            }
+            <div class="form-group">
+                <input type="submit" class="btnSubmit" value="Login" />
+            </div>
+            <div class="form-group">
+                <a href="#" class="ForgetPwd" value="Login">Forget Password?</a>
+            </div>
+            <div class="form-group">
+                <a asp-page="/Register" class="ForgetPwd" value="Login">New User?</a>
+            </div>
+        </form>
+    </div>
+</div>
