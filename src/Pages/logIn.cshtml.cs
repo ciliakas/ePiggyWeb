@@ -31,7 +31,7 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost(string returnUrl)
         {
-            var id = UserDatabase.Login(Email, Password);
+            var id = UserDatabase.Authenticate(Email, Password);
             if (id > -1)
             {
                 var claims = new List<Claim>
