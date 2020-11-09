@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
@@ -34,17 +33,20 @@ namespace ePiggyWeb.DataManagement.Entries
             {
                 return false;
             }
+
             if (entry.Recurring)
             {
                 return AddRange(RecurringUpdater.CreateRecurringList(entry, EntryList.EntryType));
             }
 
             var id = EntryDatabase.CreateSingle(entry, UserId, EntryList.EntryType);
+
             if (id <= 0)
             {
                 ExceptionHandler.Log("Invalid id of entry");
                 return false;
             }
+
             EntryList.Add(new Entry(id, UserId, entry));
             return true;
         }
@@ -55,6 +57,7 @@ namespace ePiggyWeb.DataManagement.Entries
             {
                 return false;
             }
+
             EntryList.AddRange(entryList);
             return true;
         }
@@ -77,7 +80,6 @@ namespace ePiggyWeb.DataManagement.Entries
                 EntryDatabase.CreateList(list, UserId);
                 updatedEntry.Recurring = false;
             }
-
             //If something went wrong with database update return false
             if (!EntryDatabase.UpdateSingle(id, UserId, updatedEntry, EntryList.EntryType))
             {
@@ -105,12 +107,15 @@ namespace ePiggyWeb.DataManagement.Entries
             {
                 return false;
             }
+
             var temp = EntryList.FirstOrDefault(x => x.Id == id);
+
             if (temp is null)
             {
                 ExceptionHandler.Log("Removed entry id: " + id + " from database but couldn't find it locally");
                 return false;
             }
+
             EntryList.Remove(temp);
             return true;
         }
@@ -118,10 +123,12 @@ namespace ePiggyWeb.DataManagement.Entries
         public bool RemoveAll(IEntryList entryList)
         {
             var idList = entryList.Select(va => va.Id).ToArray();
+
             if (!EntryDatabase.DeleteList(idList, entryList.EntryType))
             {
                 return false;
             }
+
             var temp = new EntryList(EntryType.Income);
             EntryList.RemoveAll(entryList.Contains);
             return true;
@@ -130,6 +137,7 @@ namespace ePiggyWeb.DataManagement.Entries
         public bool RemoveAll(IEnumerable<int> idList)
         {
             var idArray = idList as int[] ?? idList.ToArray();
+
             if (!EntryDatabase.DeleteList(idArray, EntryList.EntryType))
             {
                 return false;

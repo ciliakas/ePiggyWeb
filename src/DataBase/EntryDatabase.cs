@@ -57,7 +57,7 @@ namespace ePiggyWeb.DataBase
                 };
                 dictionary.Add(entry, dbEntry);
             }
-
+            // Setting all of the ID's to local Entries, just so this method remains usable both with local and only database usage
             db.AddRange(dictionary.Values);
             db.SaveChanges();
             entryList.Clear();
@@ -94,6 +94,7 @@ namespace ePiggyWeb.DataBase
                 EntryType.Income => db.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == userId),
                 _ => db.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == userId)
             };
+
             if (temp is null)
             {
                 ExceptionHandler.Log("Couldn't find entry id: " + id + " in database");
