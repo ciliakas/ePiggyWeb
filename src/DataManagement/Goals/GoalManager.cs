@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using IListExtension;
 
@@ -121,6 +122,16 @@ namespace ePiggyWeb.DataManagement.Goals
         {
             GoalList.AddRange(GoalDatabase.ReadList(UserId));
             return true;
+        }
+
+        public bool MoveGoalToExpenses(IGoal goal, IEntry expense, IEntryManager entryManager)
+        {
+            return Remove(goal.Id) && entryManager.Add(expense);
+        }
+
+        public bool MoveGoalToExpenses(int goalId, IEntry expense, IEntryManager entryManager)
+        {
+            return Remove(goalId) && entryManager.Add(expense);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataManagement.Goals
 {
@@ -14,5 +15,7 @@ namespace ePiggyWeb.DataManagement.Goals
         public bool Remove(int id);
         public bool RemoveAll(IGoalList entryList);
         public bool RemoveAll(IEnumerable<int> idList);
+        public bool MoveGoalToExpenses(IGoal goal, IEntry expense, IEntryManager entryManager);
+        public bool MoveGoalToExpenses(int goalId, IEntry expense, IEntryManager entryManager);
     }
 }
