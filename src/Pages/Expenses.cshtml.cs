@@ -32,32 +32,52 @@ namespace ePiggyWeb.Pages
 
         private int UserId { get; set; }
 
+        [BindProperty]
+        public DateTime StartDate { get; set; }
+        [BindProperty]
+        public DateTime EndDate { get; set; }
 
         public void OnGet()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Expenses = dataManager.Expenses.EntryList;
+            var today = DateTime.Now;
+            StartDate = new DateTime(today.Year, today.Month, 1);
+            EndDate = DateTime.Today;
+            SetData();
+        }
+
+        public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
+            SetData();
+            return Page();
         }
 
         public IActionResult OnPostNewEntry()
         {
             if (!ModelState.IsValid)
             {
-               OnGet();
+               OnGetFilter(StartDate, EndDate);
                return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
             EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
-            return RedirectToPage("/Expenses");
+            return RedirectToPage("/expenses");
         }
 
         public IActionResult OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             EntryDbUpdater.Remove(id, UserId, EntryType.Expense);
-            return RedirectToPage("/Expenses");
+            return RedirectToPage("/expenses");
+        }
+
+        private void SetData()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
+            Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate);
         }
     }
 }

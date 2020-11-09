@@ -6,6 +6,7 @@ using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
+using IListExtension;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -43,9 +44,7 @@ namespace ePiggyWeb.Pages
             var today = DateTime.Now;
             StartDate = new DateTime(today.Year, today.Month, 1);
             EndDate = DateTime.Today;
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Income = dataManager.Income.EntryList.GetFrom(StartDate).GetTo(EndDate);
+            SetData();
         }
 
 
@@ -53,9 +52,7 @@ namespace ePiggyWeb.Pages
         {
             StartDate = startDate;
             EndDate = endDate;
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Income = dataManager.Income.EntryList.GetFrom(startDate).GetTo(endDate);
+            SetData();
             return Page();
         }
 
@@ -64,7 +61,7 @@ namespace ePiggyWeb.Pages
         {
             if (!ModelState.IsValid)
             {
-                OnGet();
+                OnGetFilter(StartDate, EndDate);
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
@@ -78,6 +75,13 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             EntryDbUpdater.Remove(id, UserId, EntryType.Income);
             return RedirectToPage("/income");
+        }
+
+        private void SetData()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
+            Income = dataManager.Income.EntryList.GetFrom(StartDate).GetTo(EndDate);
         }
     }
 }

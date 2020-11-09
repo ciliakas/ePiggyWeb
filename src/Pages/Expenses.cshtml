@@ -31,6 +31,13 @@
     <input class="btn btn-danger ml-2" type="reset" value="Reset">
 </form>
 
+<form method="get" class="mt-5">
+    <input type="hidden" name="handler" value="Filter" />
+    <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+    <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+    <input type="submit" value="Filter" class="btn btn-warning ml-5" />
+</form>
+
 @if (!ModelState.IsValid)
 {
     <div class="container">
@@ -70,7 +77,7 @@
                     </th>
                 </tr>
 
-                @foreach (var item in Model.Expenses.Reverse())
+                @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
                 {
                     <tr class="table-light border-primary">
                         <td class="border-primary">
