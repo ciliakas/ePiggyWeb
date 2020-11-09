@@ -14,7 +14,12 @@ namespace ePiggyWeb.DataManagement.Goals
         public string Title { get; set; }
         public decimal Amount { get; set; }
 
-        public Goal(string title, decimal amount)
+        public static Goal CreateLocalGoal(string title, decimal amount)
+        {
+            return new Goal(title, amount);
+        }
+
+        private Goal(string title, decimal amount)
         {
             Title = title;
             Amount = amount;
