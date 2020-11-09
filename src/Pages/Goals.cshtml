@@ -43,7 +43,21 @@ else
                     @{
                         var percent = item.Amount == 0 ? 0 : decimal.Round(Model.Savings / item.Amount * 100);
                         percent = percent > 100 ? 100 : percent;
-                        var color = percent < 100 ? (percent < 30? "danger" : (percent < 85 ? "warning" : "info" )) : "success";
+                        string color;
+                        if (percent < 30)
+                        {
+                            color = "danger";
+                        }else if (percent < 85)
+                        {
+                            color = "warning";
+                        }else if (percent < 100)
+                        {
+                            color = "info";
+                        }
+                        else
+                        {
+                            color = "success";
+                        }
                     }
                     <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                 </div>
