@@ -19,12 +19,24 @@ namespace ePiggyWeb.DataBase
             return dbGoal.Id;
         }
 
-        public static bool CreateList(IEnumerable<IGoal> goalList, int userid)
+        public static bool CreateList(IGoalList goalList, int userid)
         {
             using var db = new DatabaseContext();
-            var dbGoalList = goalList.Select(goal => new GoalModel(goal, userid)).ToList();
-            db.AddRange(dbGoalList);
+            var dictionary = new Dictionary<IGoal, IGoalModel>();
+            foreach (var goal in goalList)
+            {
+                var dbGoal = new GoalModel(goal, userid);
+                dictionary.Add(goal, dbGoal);
+            }
+            // Setting all of the ID's to local Entries, just so this method remains usable both with local and only database usage
+            db.AddRange(dictionary.Values);
             db.SaveChanges();
+            goalList.Clear();
+            foreach (var (key, value) in dictionary)
+            {
+                key.Id = value.Id;
+                goalList.Add(key);
+            }
             return true;
         }
 

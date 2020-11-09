@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using IListExtension;
@@ -24,6 +25,17 @@ namespace ePiggyWeb.DataManagement.Goals
             //Check if id is correct, return false if something is wrong
             goal.Id = id;
             GoalList.Add(goal);
+            return true;
+        }
+
+        public bool AddRange(IGoalList goalList)
+        {
+            if (!GoalDatabase.CreateList(goalList, UserId))
+            {
+                return false;
+            }
+
+            GoalList.AddRange(goalList);
             return true;
         }
 
@@ -69,6 +81,41 @@ namespace ePiggyWeb.DataManagement.Goals
             GoalList.Remove(localGoal);
             return true;
         }
+
+        public bool RemoveAll(IGoalList entryList)
+        {
+            var idList = entryList.Select(va => va.Id).ToArray();
+
+            if (!GoalDatabase.DeleteList(idList, UserId))
+            {
+                return false;
+            }
+
+            var temp = new GoalList();
+            GoalList.RemoveAll(entryList.Contains);
+            return true;
+        }
+
+        public bool RemoveAll(IEnumerable<int> idList)
+        {
+            var idArray = idList as int[] ?? idList.ToArray();
+
+            if (!GoalDatabase.DeleteList(idArray, UserId))
+            {
+                return false;
+            }
+
+            var temp = new GoalList();
+            temp.AddRange(from entry in GoalList from id in idArray where entry.Id == id select entry);
+
+            foreach (var entry in temp)
+            {
+                GoalList.Remove(entry);
+            }
+
+            return true;
+        }
+
 
         public bool ReadFromDb()
         {
