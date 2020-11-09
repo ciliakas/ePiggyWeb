@@ -30,9 +30,9 @@ namespace ePiggyWeb.Pages
 
         public void OnGet()
         {
-            var dataManager = new DataManager();
-            Goals = dataManager.Goals.GoalList;
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
+            Goals = dataManager.Goals.GoalList;
             Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
             if (Savings < 0)
             {
@@ -48,29 +48,33 @@ namespace ePiggyWeb.Pages
                 OnGet();
                 return Page();
             }
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = new Goal(Title, Amount);
-            GoalDbUpdater.Add(temp, 0);
+            GoalDbUpdater.Add(temp, UserId);
             return RedirectToPage("/goals");
         }
 
         public IActionResult OnPostDelete(int id)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             DeleteGoalFromDb(id);
             return RedirectToPage("/goals");
         }
 
         public IActionResult OnPostPurchased(int id, string title, string amount)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             decimal.TryParse(amount, out var parsedAmount);
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            EntryDbUpdater.Add(entry, 0, EntryType.Expense);
+            EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
             DeleteGoalFromDb(id);
             return RedirectToPage("/expenses");
         }
 
         private void DeleteGoalFromDb(int id)
         {
-            GoalDbUpdater.Remove(id, 0);
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            GoalDbUpdater.Remove(id, UserId);
         }
 
     }

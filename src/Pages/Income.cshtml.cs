@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -29,39 +30,34 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public bool Recurring { get; set; }
 
+        private int UserId { get; set; }
+
         public void OnGet()
         {
-            LoadData();
-        }
-
-        private void LoadData()
-        {
-            var dataManager = new DataManager();
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
             Income = dataManager.Income.EntryList;
         }
 
-        public void OnPostNewEntry()
+
+        public IActionResult OnPostNewEntry()
         {
-            DataManager dataManager;
             if (!ModelState.IsValid)
             {
-                dataManager = new DataManager();
-                Income = dataManager.Income.EntryList;
-                return;
+                OnGet();
+                return Page();
             }
-
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = new Entry(Title, Amount, Date, Recurring, Importance);
-            EntryDbUpdater.Add(entry, 0, EntryType.Income);
-            dataManager = new DataManager();
-            Income = dataManager.Income.EntryList;
+            EntryDbUpdater.Add(entry, UserId, EntryType.Income);
+            return RedirectToPage("/Income");
         }
 
-        public void OnPostDelete(int id)
+        public IActionResult OnPostDelete(int id)
         {
-            EntryDbUpdater.Remove(id, EntryType.Income);
-            var dataManager = new DataManager();
-            Income = dataManager.Income.EntryList;
-            Response.Redirect("/Income");
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            EntryDbUpdater.Remove(id, UserId, EntryType.Income);
+            return RedirectToPage("/Income");
         }
     }
 }
