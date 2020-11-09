@@ -5,7 +5,6 @@ using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
-using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -30,9 +29,9 @@ namespace ePiggyWeb.Pages
 
         public void OnGet()
         {
-            var dataManager = new DataManager();
-            Goals = dataManager.Goals.GoalList;
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
+            Goals = dataManager.Goals.GoalList;
             Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
             if (Savings < 0)
             {
@@ -48,19 +47,22 @@ namespace ePiggyWeb.Pages
                 OnGet();
                 return Page();
             }
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = new Goal(Title, Amount);
-            GoalDatabase.Create(temp, 0);
+            GoalDatabase.Create(temp, UserId);
             return RedirectToPage("/goals");
         }
 
         public IActionResult OnPostDelete(int id)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             DeleteGoalFromDb(id);
             return RedirectToPage("/goals");
         }
 
         public IActionResult OnPostPurchased(int id, string title, string amount)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             decimal.TryParse(amount, out var parsedAmount);
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
             GoalDatabase.MoveGoalToExpenses(id, UserId, entry);
@@ -69,7 +71,8 @@ namespace ePiggyWeb.Pages
 
         private void DeleteGoalFromDb(int id)
         {
-            GoalDatabase.Delete(id, 0);
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            GoalDatabase.Delete(id, UserId);
         }
     }
 }
