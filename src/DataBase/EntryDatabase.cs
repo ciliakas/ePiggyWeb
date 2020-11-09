@@ -107,15 +107,25 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
+        public static bool Delete(IEntry entry, EntryType entryType)
+        {
+            return Delete(x => x.Id == entry.Id && x.UserId == entry.UserId, entryType);
+        }
+
         public static bool Delete(int id, int userId, EntryType entryType)
+        {
+            return Delete(x => x.Id == id && x.UserId == userId, entryType);
+        }
+
+        public static bool Delete(Func<IEntryModel, bool> filter, EntryType entryType)
         {
             using var db = new DatabaseContext();
             try
             {
-                IEntryModel dbEntry = entryType switch
+                var dbEntry = entryType switch
                 {
-                    EntryType.Income => db.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == userId),
-                    _ => db.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == userId)
+                    EntryType.Income => db.Incomes.FirstOrDefault(filter),
+                    _ => db.Expenses.FirstOrDefault(filter)
                 };
                 db.Remove(dbEntry ?? throw new InvalidOperationException());
                 db.SaveChanges();
@@ -123,10 +133,28 @@ namespace ePiggyWeb.DataBase
             catch (InvalidOperationException ex)
             {
                 ExceptionHandler.Log(ex.ToString());
-                ExceptionHandler.Log("Couldn't find entry id: " + id + " in database");
                 return false;
             }
 
+            return true;
+        }
+
+        public static bool DeleteList(Func<IEntryModel, bool> filter, EntryType entryType)
+        {
+            var db = new DatabaseContext();
+
+            if (entryType == EntryType.Income)
+            {
+                var entriesToRemove = db.Incomes.Where(filter).Cast<IncomeModel>().ToList();
+                db.Incomes.RemoveRange(entriesToRemove);
+            }
+            else
+            {
+                var entriesToRemove = db.Expenses.Where(filter).Cast<ExpenseModel>().ToList();
+                db.Expenses.RemoveRange(entriesToRemove);
+            }
+
+            db.SaveChanges();
             return true;
         }
 
