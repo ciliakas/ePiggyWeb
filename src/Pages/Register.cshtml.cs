@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using ePiggyWeb.Authentication;
+using ePiggyWeb.DataBase;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +47,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
-            var id = UserAuth.Registration(Email, Password);
+            var id = UserDatabase.Register(Email, Password);
             if (id > -1)
             {
                  var claims = new List<Claim>

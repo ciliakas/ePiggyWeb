@@ -17,7 +17,17 @@ namespace ePiggyWeb.DataManagement.Entries
         public int Importance { get; set; }
 
 
-        public Entry(string title, decimal amount,  DateTime date, bool recurring, int importance)
+        public static Entry CreateLocalEntry(string title, decimal amount, DateTime date, bool recurring, int importance)
+        {
+            return new Entry(title, amount, date, recurring, importance);
+        }
+
+        public static Entry CreateLocalEntry(IGoal goal, DateTime date, bool recurring, int importance)
+        {
+            return new Entry(goal.Title, goal.Amount, date, recurring, importance);
+        }
+
+        private Entry(string title, decimal amount, DateTime date, bool recurring, int importance)
         {
             Title = title;
             Amount = amount;
@@ -41,6 +51,9 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public Entry(int id, IGoal goal, DateTime date, bool recurring, int importance) 
             : this(id, goal.UserId, goal.Title, goal.Amount, date, recurring, importance) { }
+
+        public Entry(int id, IGoalModel dbGoal, DateTime date, bool recurring, int importance)
+            : this(id, dbGoal.UserId, dbGoal.Title, dbGoal.Price, date, recurring, importance) { }
 
         public Entry()
 		{
