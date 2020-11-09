@@ -2,18 +2,19 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ePiggyWeb.Authentication
+namespace ePiggyWeb.Utilities
 {
     public static class HashingProcessor
     {
-        public static string CreateSalt(int size)
+        private const int DefaultSaltSize = 20;
+
+        public static string CreateSalt(int size = DefaultSaltSize)
         {
             var rng = new RNGCryptoServiceProvider();
             var buff = new byte[size];
             rng.GetBytes(buff);
             return Convert.ToBase64String(buff);
         }
-
 
         public static string GenerateHash(string input, string salt)
         {

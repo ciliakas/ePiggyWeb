@@ -48,7 +48,7 @@ namespace ePiggyWeb.Pages
                return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entry = new Entry(Title, Amount, Date, Recurring, Importance);
+            var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
             EntryDatabase.Create(entry, UserId, EntryType.Expense);
             return RedirectToPage("/Expenses");
         }
