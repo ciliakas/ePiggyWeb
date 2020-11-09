@@ -107,15 +107,15 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool Delete(int id, EntryType entryType)
+        public static bool Delete(int id, int userId, EntryType entryType)
         {
             using var db = new DatabaseContext();
             try
             {
                 IEntryModel dbEntry = entryType switch
                 {
-                    EntryType.Income => db.Incomes.FirstOrDefault(x => x.Id == id),
-                    _ => db.Expenses.FirstOrDefault(x => x.Id == id)
+                    EntryType.Income => db.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == userId),
+                    _ => db.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == userId)
                 };
                 db.Remove(dbEntry ?? throw new InvalidOperationException());
                 db.SaveChanges();
@@ -130,18 +130,18 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool DeleteList(IEnumerable<int> idArray, EntryType entryType)
+        public static bool DeleteList(IEnumerable<int> idArray, int userId, EntryType entryType)
         {
             var db = new DatabaseContext();
 
             if (entryType == EntryType.Income)
             {
-                var entriesToRemove = idArray.Select(id => db.Incomes.FirstOrDefault(x => x.Id == id)).ToList();
+                var entriesToRemove = idArray.Select(id => db.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == userId)).ToList();
                 db.Incomes.RemoveRange(entriesToRemove);
             }
             else
             {
-                var entriesToRemove = idArray.Select(id => db.Expenses.FirstOrDefault(x => x.Id == id)).ToList();
+                var entriesToRemove = idArray.Select(id => db.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == userId)).ToList();
                 db.Expenses.RemoveRange(entriesToRemove);
             }
 

@@ -103,7 +103,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool Remove(int id)
         {
-            if (!EntryDatabase.Delete(id, EntryList.EntryType))
+            if (!EntryDatabase.Delete(id, UserId, EntryList.EntryType))
             {
                 return false;
             }
@@ -122,9 +122,9 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool RemoveAll(IEntryList entryList)
         {
-            var idList = entryList.Select(va => va.Id).ToArray();
+            var idArray = entryList.Select(va => va.Id).ToArray();
 
-            if (!EntryDatabase.DeleteList(idList, entryList.EntryType))
+            if (!EntryDatabase.DeleteList(idArray, UserId, entryList.EntryType))
             {
                 return false;
             }
@@ -138,7 +138,7 @@ namespace ePiggyWeb.DataManagement.Entries
         {
             var idArray = idList as int[] ?? idList.ToArray();
 
-            if (!EntryDatabase.DeleteList(idArray, EntryList.EntryType))
+            if (!EntryDatabase.DeleteList(idArray, UserId, EntryList.EntryType))
             {
                 return false;
             }
@@ -156,7 +156,6 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool ReadFromDb()
         {
-            using var db = new DatabaseContext();
             EntryList.AddRange(EntryDatabase.ReadList(UserId, EntryList.EntryType));
             return true;
         }
