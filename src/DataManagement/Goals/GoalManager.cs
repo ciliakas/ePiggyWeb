@@ -22,39 +22,47 @@ namespace ePiggyWeb.DataManagement.Goals
         {
             var id = GoalDatabase.Create(goal, UserId);
             //Check if id is correct, return false if something is wrong
-
             goal.Id = id;
-            goal.UserId = UserId;
             GoalList.Add(goal);
-            return false;
+            return true;
         }
 
-        public bool Edit(IGoal oldGoal, IGoal newGoal)
+        public bool Edit(IGoal oldGoal, IGoal updatedGoal)
         {
-            if (!GoalDatabase.Update(oldGoal, newGoal))
+            return Edit(oldGoal.Id, updatedGoal);
+        }
+
+        public bool Edit(int id, IGoal updatedGoal)
+        {
+            if (!GoalDatabase.Update(id, UserId, updatedGoal))
             {
                 return false;
             }
-            var localGoal = GoalList.FirstOrDefault(x => x.Id == oldGoal.Id);
+            var localGoal = GoalList.FirstOrDefault(x => x.Id == id);
             if (localGoal is null)
             {
-                ExceptionHandler.Log("Edited goal id: " + oldGoal.Id + " in database but couldn't find it locally");
+                ExceptionHandler.Log("Edited goal id: " + id + " in database but couldn't find it locally");
                 return false;
             }
-            localGoal.Edit(newGoal);
+            localGoal.Edit(updatedGoal);
             return true;
         }
 
         public bool Remove(IGoal goal)
         {
-            if (!GoalDatabase.Delete(goal))
+            return Remove(goal.Id);
+        }
+
+        public bool Remove(int id)
+        {
+            if (!GoalDatabase.Delete(id, UserId))
             {
                 return false;
             }
-            var localGoal = GoalList.FirstOrDefault(x => x.Id == goal.Id);
+            var localGoal = GoalList.FirstOrDefault(x => x.Id == id);
             if (localGoal is null)
             {
-                ExceptionHandler.Log("Removed goal id: " + goal.Id  + " from database but couldn't find it locally" );
+                ExceptionHandler.Log("Removed goal id: " + id + " from database but couldn't find it locally");
                 return false;
             }
 

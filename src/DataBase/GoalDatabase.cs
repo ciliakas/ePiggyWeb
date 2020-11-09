@@ -28,6 +28,25 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
+        public static bool Update(IGoal oldGoal, IGoal newGoal)
+        {
+            return Update(oldGoal.Id, oldGoal.UserId, newGoal);
+        }
+
+        public static bool Update(int id, int userId, IGoal newGoal)
+        {
+            using var db = new DatabaseContext();
+            var dbGoal = db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+            if (dbGoal == null)
+            {
+                ExceptionHandler.Log("Couldn't find goal id: " + id + " in database");
+                return false;
+            }
+            dbGoal.Edit(newGoal);
+            db.SaveChanges();
+            return true;
+        }
+
         public static bool Delete(IGoal goal)
         {
             return Delete(goal.Id, goal.UserId);
@@ -55,7 +74,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool DeleteRange(IEnumerable<IGoal> goalList)
+        public static bool DeleteList(IEnumerable<IGoal> goalList)
         {
             var enumerable = goalList as IGoal[] ?? goalList.ToArray();
             if (!enumerable.Any())
@@ -64,10 +83,10 @@ namespace ePiggyWeb.DataBase
             }
             var userId = enumerable.First().UserId;
             var idList = enumerable.Select(goal => goal.Id).ToList();
-            return DeleteRange(idList, userId);
+            return DeleteList(idList, userId);
         }
 
-        public static bool DeleteRange(IEnumerable<int> idArray, int userId)
+        public static bool DeleteList(IEnumerable<int> idArray, int userId)
         {
             using var db = new DatabaseContext();
             var goalsToRemove = idArray.Select(id => db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId)).ToList();
@@ -76,30 +95,11 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool DeleteRange(Func<GoalModel, bool> filter)
+        public static bool DeleteList(Func<GoalModel, bool> filter)
         {
             using var db = new DatabaseContext();
             var goalsToRemove =  db.Goals.Where(filter).ToList();
             db.Goals.RemoveRange(goalsToRemove);
-            db.SaveChanges();
-            return true;
-        }
-
-        public static bool Update(IGoal oldGoal, IGoal newGoal)
-        {
-            return Update(oldGoal.Id, oldGoal.UserId, newGoal);
-        }
-
-        public static bool Update(int id, int userId, IGoal newGoal)
-        {
-            using var db = new DatabaseContext();
-            var dbGoal = db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId);
-            if (dbGoal == null)
-            {
-                ExceptionHandler.Log("Couldn't find goal id: " + id + " in database");
-                return false;
-            }
-            dbGoal.Edit(newGoal);
             db.SaveChanges();
             return true;
         }
