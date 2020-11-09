@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -29,35 +30,34 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public bool Recurring { get; set; }
 
+        private int UserId { get; set; }
+
 
         public void OnGet()
         {
-            var dataManager = new DataManager();
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
             Expenses = dataManager.Expenses.EntryList;
         }
 
-        public void OnPostNewEntry()
+        public IActionResult OnPostNewEntry()
         {
-            DataManager dataManager;
             if (!ModelState.IsValid)
             {
-                dataManager = new DataManager();
-                Expenses = dataManager.Expenses.EntryList;
-                return;
+               OnGet();
+               return Page();
             }
-
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = new Entry(Title, Amount, Date, Recurring, Importance);
-            EntryDatabase.Create(entry, 0, EntryType.Expense);
-            dataManager = new DataManager();
-            Expenses = dataManager.Expenses.EntryList;
+            EntryDatabase.Create(entry, UserId, EntryType.Expense);
+            return RedirectToPage("/Expenses");
         }
 
-        public void OnPostDelete(int id, int userId)
+        public IActionResult OnPostDelete(int id)
         {
-            EntryDatabase.Delete(id, userId, EntryType.Expense);
-            var dataManager = new DataManager();
-            Expenses = dataManager.Expenses.EntryList;
-            Response.Redirect("/Expenses");
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            EntryDatabase.Delete(id, UserId, EntryType.Expense);
+            return RedirectToPage("/Expenses");
         }
     }
 }

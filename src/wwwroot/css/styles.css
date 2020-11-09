@@ -155,4 +155,24 @@ body {
     font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
 }
 
+.container404 {
+    background-image: url("/images/LostPig.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding-bottom: 25%;
+    font-size: 3rem;
+}
+.h1_404 {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #ffffff;
+    font-family: Oswald;
+}
+
+.h2_404 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #faf3dd;
+}
+
 

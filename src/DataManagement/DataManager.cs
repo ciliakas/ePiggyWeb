@@ -12,11 +12,20 @@ namespace ePiggyWeb.DataManagement
         and after that we won't ever need to pass another parameter to this class
         Basically I've tried to make this as class as self contained as possible, without any dependencies on the class which might call it
          */
-        public IEntryManager Income { get; } = new EntryManager(new EntryList(EntryType.Income));
 
-        public IEntryManager Expenses { get; } = new EntryManager(new EntryList(EntryType.Expense));
+        public IEntryManager Income { get; }
+        public IEntryManager Expenses { get; }
+        public IGoalManager Goals { get; }
+        public int UserId { get; set; }
 
-        public IGoalManager Goals { get; } = new GoalManager(new GoalList());
-
+        public DataManager(int userId = 0)
+        {
+            UserId = userId;
+            Income = new EntryManager(new EntryList(EntryType.Income), UserId);
+            Expenses = new EntryManager(new EntryList(EntryType.Expense), UserId);
+            Goals = new GoalManager(new GoalList(), UserId);
+            RecurringUpdater.UpdateRecurring(Income);
+            RecurringUpdater.UpdateRecurring(Expenses);
+        }
     }
 }

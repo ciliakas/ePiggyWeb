@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -24,7 +25,8 @@ namespace ePiggyWeb.Pages
         
         public void OnGet(int id, int entryType)
         {
-            var dataManager = new DataManager();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(userId);
             EntryTypeInt = entryType;
 
             Entry = entryType == 1
