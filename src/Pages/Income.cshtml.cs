@@ -56,9 +56,9 @@ namespace ePiggyWeb.Pages
             Income = dataManager.Income.EntryList;
         }
 
-        public void OnPostDelete(int id)
+        public void OnPostDelete(int id, int userId)
         {
-            EntryDatabase.Delete(id, EntryType.Income);
+            EntryDatabase.Delete(id, userId, EntryType.Income);
             var dataManager = new DataManager();
             Income = dataManager.Income.EntryList;
             Response.Redirect("/Income");

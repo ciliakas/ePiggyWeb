@@ -52,9 +52,9 @@ namespace ePiggyWeb.Pages
             Expenses = dataManager.Expenses.EntryList;
         }
 
-        public void OnPostDelete(int id)
+        public void OnPostDelete(int id, int userId)
         {
-            EntryDatabase.Delete(id, EntryType.Expense);
+            EntryDatabase.Delete(id, userId, EntryType.Expense);
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
             Response.Redirect("/Expenses");
