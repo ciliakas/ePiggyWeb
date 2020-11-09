@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
@@ -32,11 +33,30 @@ namespace ePiggyWeb.Pages
 
         private int UserId { get; set; }
 
+        [BindProperty]
+        public DateTime StartDate { get; set; }
+        [BindProperty]
+        public DateTime EndDate { get; set; }
+
         public void OnGet()
         {
+            var today = DateTime.Now;
+            StartDate = new DateTime(today.Year, today.Month, 1);
+            EndDate = DateTime.Today;
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var dataManager = new DataManager(UserId);
-            Income = dataManager.Income.EntryList;
+            Income = dataManager.Income.EntryList.GetFrom(StartDate).GetTo(EndDate);
+        }
+
+
+        public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
+            Income = dataManager.Income.EntryList.GetFrom(startDate).GetTo(endDate);
+            return Page();
         }
 
 
@@ -50,14 +70,14 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
             EntryDbUpdater.Add(entry, UserId, EntryType.Income);
-            return RedirectToPage("/Income");
+            return RedirectToPage("/income");
         }
 
         public IActionResult OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             EntryDbUpdater.Remove(id, UserId, EntryType.Income);
-            return RedirectToPage("/Income");
+            return RedirectToPage("/income");
         }
     }
 }
