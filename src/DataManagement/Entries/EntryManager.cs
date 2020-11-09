@@ -122,7 +122,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool RemoveAll(IEntryList entryList)
         {
-            var idArray = entryList.Select(va => va.Id).ToArray();
+            var idArray = entryList.Select(entry => entry.Id).ToArray();
 
             if (!EntryDatabase.DeleteList(idArray, UserId, entryList.EntryType))
             {
