@@ -64,7 +64,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool ReadFromDb()
         {
-            GoalList.AddRange(GoalDatabase.Read(UserId));
+            GoalList.AddRange(GoalDatabase.ReadList(UserId));
             return true;
         }
     }

@@ -49,7 +49,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             var temp = new Goal(Title, Amount);
-            GoalDbUpdater.Add(temp, 0);
+            GoalDatabase.Create(temp, 0);
             return RedirectToPage("/goals");
         }
 
@@ -63,15 +63,13 @@ namespace ePiggyWeb.Pages
         {
             decimal.TryParse(amount, out var parsedAmount);
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            EntryDbUpdater.Add(entry, 0, EntryType.Expense);
-            DeleteGoalFromDb(id);
+            GoalDatabase.MoveGoalToExpenses(id, UserId, entry);
             return RedirectToPage("/expenses");
         }
 
         private void DeleteGoalFromDb(int id)
         {
-            GoalDbUpdater.Remove(id, 0);
+            GoalDatabase.Delete(id, 0);
         }
-
     }
 }
