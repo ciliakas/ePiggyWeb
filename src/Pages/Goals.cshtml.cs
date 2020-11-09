@@ -63,7 +63,7 @@ namespace ePiggyWeb.Pages
         {
             decimal.TryParse(amount, out var parsedAmount);
             var entry = new Entry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            EntryDbUpdater.Add(entry, 0, EntryType.Expense);
+            EntryDatabase.Create(entry, 0, EntryType.Expense);
             DeleteGoalFromDb(id);
             return RedirectToPage("/expenses");
         }

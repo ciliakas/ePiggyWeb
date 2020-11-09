@@ -10,8 +10,8 @@ namespace ePiggyWeb.DataManagement.Entries
         public IEntryList EntryList { get; }
         public int UserId { get; }
         public bool Add(IEntry entry);
-        public bool AddRange(IEntryEnumerable entryList);
-        public bool Edit(IEntry oldEntry, IEntry newEntry);
+        public bool AddRange(IEntryList entryList);
+        public bool Edit(IEntry oldEntry, IEntry updatedEntry);
         public bool Remove(IEntry entry);
         public bool RemoveAll(IEntryList entryList);
     }

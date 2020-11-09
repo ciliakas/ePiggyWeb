@@ -47,14 +47,14 @@ namespace ePiggyWeb.Pages
             }
 
             var entry = new Entry(Title, Amount, Date, Recurring, Importance);
-            EntryDbUpdater.Add(entry, 0, EntryType.Expense);
+            EntryDatabase.Create(entry, 0, EntryType.Expense);
             dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
         }
 
         public void OnPostDelete(int id)
         {
-            EntryDbUpdater.Remove(id, EntryType.Expense);
+            EntryDatabase.Delete(id, EntryType.Expense);
             var dataManager = new DataManager();
             Expenses = dataManager.Expenses.EntryList;
             Response.Redirect("/Expenses");
