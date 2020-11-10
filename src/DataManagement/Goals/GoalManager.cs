@@ -57,7 +57,9 @@ namespace ePiggyWeb.DataManagement.Goals
             {
                 return false;
             }
+
             var localGoal = GoalList.FirstOrDefault(x => x.Id == id);
+
             if (localGoal is null)
             {
                 ExceptionHandler.Log("Edited goal id: " + id + " in database but couldn't find it locally");
@@ -78,7 +80,9 @@ namespace ePiggyWeb.DataManagement.Goals
             {
                 return false;
             }
+
             var localGoal = GoalList.FirstOrDefault(x => x.Id == id);
+
             if (localGoal is null)
             {
                 ExceptionHandler.Log("Removed goal id: " + id + " from database but couldn't find it locally");
@@ -98,7 +102,6 @@ namespace ePiggyWeb.DataManagement.Goals
                 return false;
             }
 
-            var temp = new GoalList();
             GoalList.RemoveAll(entryList.Contains);
             return true;
         }
@@ -113,7 +116,11 @@ namespace ePiggyWeb.DataManagement.Goals
             }
 
             var temp = new GoalList();
-            temp.AddRange(from entry in GoalList from id in idArray where entry.Id == id select entry);
+            temp.AddRange(
+                from goal in GoalList 
+                from id in idArray 
+                where goal.Id == id 
+                select goal);
 
             foreach (var entry in temp)
             {
