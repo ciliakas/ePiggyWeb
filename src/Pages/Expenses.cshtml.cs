@@ -18,9 +18,11 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [StringLength(30)]
         public string Title { get; set; }
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
@@ -31,6 +33,8 @@ namespace ePiggyWeb.Pages
         public bool Recurring { get; set; }
 
         private int UserId { get; set; }
+
+        public decimal AllExpenses { get; set; }
 
         [BindProperty]
         public DateTime StartDate { get; set; }
@@ -78,6 +82,7 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var dataManager = new DataManager(UserId);
             Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate);
+            AllExpenses = dataManager.Expenses.EntryList.GetSum();
         }
     }
 }

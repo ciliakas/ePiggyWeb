@@ -63,10 +63,10 @@
                         <th>
                             <label asp-for="Income.FirstOrDefault().Title"></label>
                         </th>
-                        <th style="width: 20%">
+                        <th style="width: 18%">
                             <label asp-for="Income.FirstOrDefault().Amount"></label>
                         </th>
-                        <th style="width: 8.5%">
+                        <th style="width: 10%">
                             <label asp-for="Income.FirstOrDefault().Date"></label>
                         </th>
                         <th style="width: 15%">
@@ -117,7 +117,7 @@
     </div>
     <div class="col-2 border p-3 mt-3 mb-3">
         <p class="text-light">Saved this period: @Model.Income.GetSum()</p>
-        <p class="text-light">Saved this month: @Model.Income.GetSum()</p>
+        <p class="text-light">All income: @Model.AllIncome</p>
     </div>
 </div>
 
