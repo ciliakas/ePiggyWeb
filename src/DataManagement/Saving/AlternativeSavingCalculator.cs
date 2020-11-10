@@ -15,7 +15,7 @@ namespace ePiggyWeb.DataManagement.Saving
         private static decimal MinimalSavingValue { get; } = 0.1M;
 
         public static bool GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList<ISavingSuggestion> entrySuggestions,
-            decimal startingBalance, SavingType savingType = SavingType.Regular)
+            List<SavingSuggestionByMonth> monthlySuggestions, decimal startingBalance, SavingType savingType = SavingType.Regular)
         {
             entrySuggestions ??= new List<ISavingSuggestion>();
 
@@ -25,6 +25,12 @@ namespace ePiggyWeb.DataManagement.Saving
             }
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
+
+            decimal[] sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
+            decimal[] sumsOfAmountByImportanceDefault = new decimal[enumCount];
+            decimal[] averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
+            decimal[] averagesOfAmountByImportanceDefault = new decimal[enumCount];
+            int[] entryAmounts = new int[enumCount];
 
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
@@ -41,14 +47,34 @@ namespace ePiggyWeb.DataManagement.Saving
                     };
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
 
+                    sumsOfAmountByImportanceAdjusted[i] += amountAfterSaving;
+                    sumsOfAmountByImportanceDefault[i] += entry.Amount;
+                    entryAmounts[i]++;
+
+                    // Commented as the logic with returns is still WIP
+                    /*
                     startingBalance += entry.Amount - amountAfterSaving;
                     if (goal.Amount <= startingBalance)
                     {
-                        return true; //Saved enough
+                        return true;
                     }
+                    */
                 }
             }
-            return false; //Didn't save enough
+            var savedByGuessing = 0M;
+            while (goal.Amount > savedByGuessing)
+            {
+                for (var i = enumCount; i > (int)Importance.Necessary; i--)
+                {
+                    averagesOfAmountByImportanceAdjusted[i] = sumsOfAmountByImportanceAdjusted[i] / entryAmounts[i];
+                    averagesOfAmountByImportanceDefault[i] = sumsOfAmountByImportanceDefault[i] / entryAmounts[i];
+
+                    savedByGuessing += averagesOfAmountByImportanceAdjusted[i];
+
+                    monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i], averagesOfAmountByImportanceDefault[i], (Importance)i));
+                }                              
+            }
+            return true;
         }
     }
 }
