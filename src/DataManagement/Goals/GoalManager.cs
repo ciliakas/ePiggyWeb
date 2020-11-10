@@ -23,7 +23,13 @@ namespace ePiggyWeb.DataManagement.Goals
         public bool Add(IGoal goal)
         {
             var id = GoalDatabase.Create(goal, UserId);
-            //Check if id is correct, return false if something is wrong
+
+            if (id <= 0)
+            {
+                ExceptionHandler.Log("Invalid id of goal");
+                return false;
+            }
+
             goal.Id = id;
             GoalList.Add(goal);
             return true;
@@ -118,10 +124,9 @@ namespace ePiggyWeb.DataManagement.Goals
         }
 
 
-        public bool ReadFromDb()
+        public void ReadFromDb()
         {
             GoalList.AddRange(GoalDatabase.ReadList(UserId));
-            return true;
         }
 
         public bool MoveGoalToExpenses(IGoal goal, IEntry expense, IEntryManager entryManager)
