@@ -1,7 +1,6 @@
 using System;
 using System.Security.Claims;
 using ePiggyWeb.DataManagement;
-using ePiggyWeb.DataManagement.Entries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

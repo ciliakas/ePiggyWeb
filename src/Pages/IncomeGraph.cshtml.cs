@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace ePiggyWeb.Pages
 {
     [Authorize]
-    public class ExpensesGraphModel : PageModel
+    public class IncomeGraphModel : PageModel
     {
-        public IEntryList Expenses { get; set; }
+        public IEntryList Income { get; set; }
         private int UserId { get; set; }
         [BindProperty]
         public DateTime StartDate { get; set; }
@@ -37,7 +37,7 @@ namespace ePiggyWeb.Pages
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var dataManager = new DataManager(UserId);
-            Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate);
+            Income = dataManager.Income.EntryList.GetFrom(StartDate).GetTo(EndDate);
         }
     }
 }
