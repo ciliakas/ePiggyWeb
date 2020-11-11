@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using ePiggyWeb.DataBase;
@@ -54,12 +53,12 @@ namespace ePiggyWeb.Pages
 
             if (EntryTypeInt == 1)
             {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
+                EntryDatabase.Update(Entry.Id, Entry.UserId, Entry, EntryType.Income);
                 return RedirectToPage("/Income");
             }
             else
             {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
+                EntryDatabase.Update(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
                 return RedirectToPage("/Expenses");
             }
         }

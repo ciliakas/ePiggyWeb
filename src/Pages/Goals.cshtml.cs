@@ -66,7 +66,7 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             decimal.TryParse(amount, out var parsedAmount);
             var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
+            EntryDatabase.Create(entry, UserId, EntryType.Expense);
             DeleteGoalFromDb(id);
             return RedirectToPage("/expenses");
         }

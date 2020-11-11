@@ -49,14 +49,14 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-            EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
+            EntryDatabase.Create(entry, UserId, EntryType.Expense);
             return RedirectToPage("/Expenses");
         }
 
         public IActionResult OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            EntryDbUpdater.Remove(id, UserId, EntryType.Expense);
+            EntryDatabase.Delete(id, UserId, EntryType.Expense);
             return RedirectToPage("/Expenses");
         }
     }

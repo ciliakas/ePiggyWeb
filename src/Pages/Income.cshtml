@@ -93,7 +93,7 @@
                         </td>
                         <td class="border-primary">
                             <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
-                            <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
+                            <input asp-page-handler="Delete" asp-route-id="@item.Id" asp-route-userId="@item.UserId"  type="submit" class="btn btn-sm btn-danger" value="Delete" />
                         </td>
                     </tr>
                 }
