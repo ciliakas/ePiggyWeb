@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
@@ -10,9 +7,12 @@ namespace ePiggyWeb.DataManagement.Entries
         public IEntryList EntryList { get; }
         public int UserId { get; }
         public bool Add(IEntry entry);
-        public bool AddRange(IEntryEnumerable entryList);
-        public bool Edit(IEntry oldEntry, IEntry newEntry);
+        public bool AddRange(IEntryList entryList);
+        public bool Edit(IEntry oldEntry, IEntry updatedEntry);
+        public bool Edit(int id, IEntry updatedEntry);
         public bool Remove(IEntry entry);
+        public bool Remove(int id);
         public bool RemoveAll(IEntryList entryList);
+        public bool RemoveAll(IEnumerable<int> idList);
     }
 }

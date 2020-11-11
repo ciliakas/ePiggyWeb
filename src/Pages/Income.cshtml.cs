@@ -1,12 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
-using IListExtension;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -70,14 +68,15 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-            EntryDbUpdater.Add(entry, UserId, EntryType.Income);
+
+            EntryDatabase.Create(entry, UserId, EntryType.Income);
             return RedirectToPage("/income");
         }
 
         public IActionResult OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            EntryDbUpdater.Remove(id, UserId, EntryType.Income);
+            EntryDatabase.Delete(id, UserId, EntryType.Income);
             return RedirectToPage("/income");
         }
 

@@ -52,7 +52,7 @@ namespace ePiggyWeb.Pages
             {
                  var claims = new List<Claim>
                  {
-                     new Claim(ClaimTypes.UserData, id.ToString()),
+                     new Claim(ClaimTypes.Name, id.ToString()),
                      new Claim(ClaimTypes.Email, Email)
                  };
                  var claimsIdentity = new ClaimsIdentity(claims, "Login");
