@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -32,17 +31,18 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
 
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            if (!Request.Cookies.ContainsKey("Email"))
+            if (!Request.Cookies.ContainsKey("Email") || User.Identity.IsAuthenticated)
             {
-                RedirectToPage("/index");
+                return RedirectToPage("/index");
             }
             Email = Request.Cookies["Email"];
             var recoveryCode = EmailSender.SendRecoveryCode(Email).ToString();
 
             var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
             Response.Cookies.Append("recoveryCode", recoveryCode, option);
+            return Page();
         }
 
         public IActionResult OnPost()
