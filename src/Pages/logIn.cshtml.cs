@@ -56,8 +56,8 @@ namespace ePiggyWeb.Pages
         public IActionResult OnPostForgotPassword()
         {
             if (!ModelState.IsValid) return Page();
-
-            Response.Cookies.Append("Email", Email);
+            var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
+            Response.Cookies.Append("Email", Email, option);
             return RedirectToPage("/forgotPassword");
         }
     }
