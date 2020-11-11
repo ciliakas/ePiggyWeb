@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -13,12 +14,18 @@ namespace ePiggyWeb.Pages
 {
     public class LoginModel : PageModel
     {
-        [BindProperty] 
+        [BindProperty]
         public string Email { get; set; }
         [BindProperty]
         public string Password { get; set; }
 
+        [Required, EmailAddress(ErrorMessage = "Incorrect e-mail")]
+        [BindProperty]
+        public string EmailRecovery { get; set; }
+
         public string ErrorMessage = "";
+
+        public bool FailedToSendEmail;
 
 
         public IActionResult OnGet()
@@ -54,9 +61,13 @@ namespace ePiggyWeb.Pages
 
         public IActionResult OnPostForgotPassword()
         {
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid)
+            {
+                FailedToSendEmail = true;
+                return Page();
+            }
             var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
-            Response.Cookies.Append("Email", Email, option);
+            Response.Cookies.Append("Email", EmailRecovery, option);
             return RedirectToPage("/forgotPassword");
         }
     }

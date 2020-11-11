@@ -30,6 +30,8 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
+        public bool CodeSent = false;
+
 
         public IActionResult OnGet()
         {
@@ -37,11 +39,18 @@ namespace ePiggyWeb.Pages
             {
                 return RedirectToPage("/index");
             }
+
+            if (Request.Cookies.ContainsKey("recoveryCode"))
+            {
+                return Page();
+            }
             Email = Request.Cookies["Email"];
             var recoveryCode = EmailSender.SendRecoveryCode(Email).ToString();
 
             var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
             Response.Cookies.Append("recoveryCode", recoveryCode, option);
+            CodeSent = true;
+
             return Page();
         }
 
@@ -72,6 +81,13 @@ namespace ePiggyWeb.Pages
             }
 
             return Page();
+        }
+
+        public IActionResult OnPostCancel()
+        {
+            Response.Cookies.Delete("recoveryCode");
+            Response.Cookies.Delete("Email");
+            return RedirectToPage("/login");
         }
 
     }

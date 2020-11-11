@@ -1,6 +1,17 @@
 ﻿@page
 @model ePiggyWeb.Pages.LoginModel
 
+@if (Model.FailedToSendEmail)
+{
+    <div class="container">
+        <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+            <strong>Incorrect Email!</strong>Confirmation code was not sent.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+}
 <div class="container login-container">
     <div class="login-form-2">
         <h3>Sign In</h3>
@@ -44,8 +55,8 @@
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
-                        <input asp-for="Email" type="text" placeholder="Email *" value="" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                        <input asp-for="EmailRecovery" type="text" placeholder="Email *" value="" />
+                        <span asp-validation-for="EmailRecovery" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
