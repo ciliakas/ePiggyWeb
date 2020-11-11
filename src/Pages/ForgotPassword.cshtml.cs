@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Security.Claims;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -35,10 +34,15 @@ namespace ePiggyWeb.Pages
 
         public void OnGet()
         {
+            if (!Request.Cookies.ContainsKey("Email"))
+            {
+                RedirectToPage("/index");
+            }
             Email = Request.Cookies["Email"];
             var recoveryCode = EmailSender.SendRecoveryCode(Email).ToString();
 
-            Response.Cookies.Append("recoveryCode", recoveryCode);
+            var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
+            Response.Cookies.Append("recoveryCode", recoveryCode, option);
         }
 
         public IActionResult OnPost()
@@ -48,12 +52,10 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             var value = Request.Cookies["recoveryCode"];
-            Debug.WriteLine("\n\n\n\n\n1." + EnteredCode + " 2." + value);
             if (string.Equals(EnteredCode, value ))
             {
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    Debug.WriteLine("\n\n\n\n\n" + Email + " " + Password);
                     UserDatabase.ChangePassword(Email, Password);
                     Response.Cookies.Delete("recoveryCode");
                     Response.Cookies.Delete("Email");
