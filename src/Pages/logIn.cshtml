@@ -22,10 +22,36 @@
                 <input type="submit" class="btnSubmit" value="Login" />
             </div>
             <div class="form-group">
-                <a href="#" class="ForgetPwd" value="Login">Forget Password?</a>
+                <a href="#" data-toggle="modal" data-target="#AddGoalModal" class="ForgetPwd" value="Login">Forget Password?</a>
             </div>
             <div class="form-group">
                 <a asp-page="/Register" class="ForgetPwd" value="Login">New User?</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="AddGoalModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" asp-page-handler="ForgotPassword">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Forgot Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <input asp-for="Email" type="text" placeholder="Email *" value="" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" value="Send" class="btn btn-primary" />
+                </div>
             </div>
         </form>
     </div>

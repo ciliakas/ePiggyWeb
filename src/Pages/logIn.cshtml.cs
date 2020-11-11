@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -44,13 +47,18 @@ namespace ePiggyWeb.Pages
                     new ClaimsPrincipal(claimsIdentity));
 
                 return Redirect(returnUrl ?? "/Index");
-                
-
             };
-
 
             ErrorMessage = "Invalid E-mail or Password!";
             return Page();
+        }
+
+        public IActionResult OnPostForgotPassword()
+        {
+            if (!ModelState.IsValid) return Page();
+
+            Response.Cookies.Append("Email", Email);
+            return RedirectToPage("/forgotPassword");
         }
     }
 }
