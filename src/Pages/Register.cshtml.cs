@@ -58,8 +58,10 @@ namespace ePiggyWeb.Pages
                  var claimsIdentity = new ClaimsIdentity(claims, "Login");
                  await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                      new ClaimsPrincipal(claimsIdentity));
- 
-                 return Redirect("/Index");
+
+                 Response.Cookies.Delete("recoveryCode");
+                 Response.Cookies.Delete("Email");
+                return Redirect("/Index");
             };
  
  
