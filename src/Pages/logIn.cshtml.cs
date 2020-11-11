@@ -52,12 +52,12 @@ namespace ePiggyWeb.Pages
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
 
+                Response.Cookies.Delete("recoveryCode");
+                Response.Cookies.Delete("Email");
                 return Redirect(returnUrl ?? "/Index");
             };
 
             ErrorMessage = "Invalid E-mail or Password!";
-            Response.Cookies.Delete("recoveryCode");
-            Response.Cookies.Delete("Email");
             return Page();
         }
 
