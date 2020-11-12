@@ -6,9 +6,12 @@
 
 <form method="get" class="mt-5">
     <input type="hidden" name="handler" value="Filter" />
+    <label class="text-light">Period:</label>
     <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+    <label class="text-light"> - </label>
     <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
     <input type="submit" value="Filter" class="btn btn-warning ml-5" />
+    <p class="text-warning">@Model.ErrorMessage</p>
 </form>
 
 

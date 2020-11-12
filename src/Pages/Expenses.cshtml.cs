@@ -41,6 +41,8 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public DateTime EndDate { get; set; }
 
+        public string ErrorMessage = "";
+
         public void OnGet()
         {
             var today = DateTime.Now;
@@ -51,8 +53,18 @@ namespace ePiggyWeb.Pages
 
         public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            StartDate = startDate;
-            EndDate = endDate > startDate ? startDate : endDate;
+            if (startDate > endDate)
+            {
+                ErrorMessage = "Start date is bigger than end date!";
+                var today = DateTime.Now;
+                StartDate = new DateTime(today.Year, today.Month, 1);
+                EndDate = DateTime.Today;
+            }
+            else
+            {
+                StartDate = startDate;
+                EndDate = endDate;
+            }
             SetData();
             return Page();
         }
