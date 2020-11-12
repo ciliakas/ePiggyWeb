@@ -52,7 +52,7 @@ namespace ePiggyWeb.Pages
         public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
         {
             StartDate = startDate;
-            EndDate = endDate;
+            EndDate = endDate > startDate ? startDate : endDate;
             SetData();
             return Page();
         }
