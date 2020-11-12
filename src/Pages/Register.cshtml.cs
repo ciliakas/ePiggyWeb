@@ -36,6 +36,11 @@ namespace ePiggyWeb.Pages
                 return RedirectToPage("/Index");
             }
 
+            if (Request.Cookies.ContainsKey("recoveryCode"))
+            {
+                return RedirectToPage("/forgotPassword");
+            }
+
             return Page();
         }
 

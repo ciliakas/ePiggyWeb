@@ -31,6 +31,7 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
 
         public bool CodeSent;
+        public bool Expired;
 
 
         public IActionResult OnGet()
