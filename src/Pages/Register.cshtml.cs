@@ -46,6 +46,10 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
             if (!Password.Equals(PasswordConfirm))
             {
                 ErrorMessage = "Passwords did not match!";
