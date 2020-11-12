@@ -14,9 +14,11 @@ namespace ePiggyWeb.Pages
 {
     public class LoginModel : PageModel
     {
+        [Required]
         [BindProperty]
         public string Email { get; set; }
         [BindProperty]
+        [Required]
         public string Password { get; set; }
 
         [Required, EmailAddress(ErrorMessage = "Incorrect e-mail")]
@@ -45,6 +47,10 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost(string returnUrl)
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
             var id = UserDatabase.Authenticate(Email, Password);
             if (id > -1)
             {
