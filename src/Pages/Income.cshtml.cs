@@ -75,7 +75,10 @@ namespace ePiggyWeb.Pages
         {
             if (!ModelState.IsValid)
             {
-                OnGetFilter(StartDate, EndDate);
+                var today = DateTime.Now;
+                StartDate = new DateTime(today.Year, today.Month, 1);
+                EndDate = DateTime.Today;
+                SetData();
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
