@@ -13,12 +13,11 @@
             </div>
             <div class="form-group">
                 <input asp-for="Password" type="password" class="form-control" placeholder="Your Password *" value="" />
-                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input asp-for="PasswordConfirm" type="password" class="form-control" placeholder="Confirm Password *" value="" />
-                <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
             </div>
+            <span asp-validation-for="Password" class="text-warning"></span>
             @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
                 <p class="text-danger">@Model.ErrorMessage</p>

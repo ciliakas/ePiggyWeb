@@ -14,7 +14,7 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public string EnteredCode { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "All fields required!")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", ErrorMessage = "Password must contain at least one uppercase letter, at least one number, special character and be longer than six characters.")]
         [BindProperty]
         [DataType(DataType.Password)]
@@ -30,7 +30,7 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        public bool CodeSent = false;
+        public bool CodeSent;
 
 
         public IActionResult OnGet()

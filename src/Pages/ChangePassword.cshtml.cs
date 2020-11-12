@@ -8,7 +8,7 @@ namespace ePiggyWeb.Pages
 {
     public class ChangePasswordModel : PageModel
     {
-        [Required]
+        [Required(ErrorMessage = "All fields required!")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", ErrorMessage = "Password must contain at least one uppercase letter, at least one number, special character and be longer than six characters.")]
         [BindProperty]
         [DataType(DataType.Password)]

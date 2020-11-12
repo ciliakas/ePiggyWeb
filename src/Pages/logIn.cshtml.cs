@@ -55,7 +55,7 @@ namespace ePiggyWeb.Pages
                 Response.Cookies.Delete("recoveryCode");
                 Response.Cookies.Delete("Email");
                 return Redirect(returnUrl ?? "/Index");
-            };
+            }
 
             ErrorMessage = "Invalid E-mail or Password!";
             return Page();
