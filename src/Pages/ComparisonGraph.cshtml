@@ -12,6 +12,12 @@
     <p class="text-warning">@Model.ErrorMessage</p>
 </form>
 
+@if (Model.Expenses == 0 && Model.Income == 0)
+{
+    <div class="alert alert-warning" role="alert">
+        Graph is empty, since no data found! Try a <strong>different period.</strong>
+    </div>
+}
 <div class="container p-0 mt-3 mb-5">
     <div class="col-12" id="graph"> <div class="spinner-border text-warning loader" role="status">
         <span class="sr-only">Loading...</span>

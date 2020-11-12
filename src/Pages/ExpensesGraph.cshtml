@@ -13,21 +13,30 @@
     <input type="submit" value="Filter" class="btn btn-warning ml-5" />
     <p class="text-warning">@Model.ErrorMessage</p>
 </form>
-
+@if (!Model.Expenses.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        Graphs are empty, since no data found! Try a <strong>different period.</strong>
+    </div>
+}
 
 <div class="row ml-2 mr-2 mt-3 mb-5">
-    <div class="col-sm" id="graphPie"><div class="spinner-border text-warning loader" role="status">
-        <span class="sr-only">Loading...</span>
-    </div></div>
-    <div class="col-sm" id="graphColumn"><div class="spinner-border text-danger loader" role="status">
-        <span class="sr-only">Loading...</span>
-    </div></div>
+    <div class="col-sm" id="graphPie">
+        <div class="spinner-border text-warning loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <div class="col-sm" id="graphColumn">
+        <div class="spinner-border text-danger loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
 </div>
 
 
 
 
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
     // Load google charts
     google.charts.load('current', { 'packages': ['corechart'] });
