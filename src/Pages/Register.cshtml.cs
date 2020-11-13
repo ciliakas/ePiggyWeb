@@ -16,7 +16,7 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "All fields required!")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", ErrorMessage = "Password must contain at least one uppercase letter, at least one number, special character and be longer than six characters.")]
         [BindProperty]
         [DataType(DataType.Password)]
@@ -42,11 +42,20 @@ namespace ePiggyWeb.Pages
                 return RedirectToPage("/Index");
             }
 
+            if (Request.Cookies.ContainsKey("recoveryCode"))
+            {
+                return RedirectToPage("/forgotPassword");
+            }
+
             return Page();
         }
 
         public async Task<IActionResult> OnPost()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
             if (!Password.Equals(PasswordConfirm))
             {
                 ErrorMessage = "Passwords did not match!";
@@ -64,8 +73,10 @@ namespace ePiggyWeb.Pages
                  var claimsIdentity = new ClaimsIdentity(claims, "Login");
                  await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                      new ClaimsPrincipal(claimsIdentity));
- 
-                 return Redirect("/Index");
+
+                 Response.Cookies.Delete("recoveryCode");
+                 Response.Cookies.Delete("Email");
+                return Redirect("/Index");
             };
  
  
