@@ -2,6 +2,7 @@
 @using System.Globalization
 @using System.Linq
 @using ePiggyWeb.Utilities
+@using IListExtension
 @model ePiggyWeb.Pages.IncomesModel
 
 
@@ -33,6 +34,16 @@
     <input class="btn btn-danger ml-2" type="reset" value="Reset">
 </form>
 
+<form method="get" class="mt-5">
+    <input type="hidden" name="handler" value="Filter" />
+    <label class="text-light">Period:</label>
+    <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+    <label class="text-light"> - </label>
+    <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+    <input type="submit" value="Filter" class="btn btn-warning ml-5" />
+    <p class="text-warning">@Model.ErrorMessage</p>
+</form>
+
 @if (!ModelState.IsValid)
 {
     <div class="container">
@@ -45,69 +56,76 @@
     </div>
 }
 
-<div class="col-12 border p-3 mt-3 mb-3">
-    <form method="post">
-        @if (Model.Income.Any())
-        {
-            <table class="table table-hover border-primary table-bordered">
-                <tr class="table-primary">
-                    <th>
-                        <label asp-for="Income.FirstOrDefault().Title"></label>
-                    </th>
-                    <th style="width: 20%">
-                        <label asp-for="Income.FirstOrDefault().Amount"></label>
-                    </th>
-                    <th style="width: 8.5%">
-                        <label asp-for="Income.FirstOrDefault().Date"></label>
-                    </th>
-                    <th style="width: 15%">
-                        <label asp-for="Income.FirstOrDefault().Importance"></label>
-                    </th>
-                    <th style="width: 5%">
-                        <label asp-for="Income.FirstOrDefault().Recurring"></label>
-                    </th>
-                    <th style="width: 10%">
+<div class="row">
+    <div class="col-10 border mt-3 mb-3">
+        <form method="post">
+            @if (Model.Income.Any())
+            {
+                <table class="table table-hover border-primary table-bordered">
+                    <tr class="table-primary">
+                        <th>
+                            <label asp-for="Income.FirstOrDefault().Title"></label>
+                        </th>
+                        <th style="width: 18%">
+                            <label asp-for="Income.FirstOrDefault().Amount"></label>
+                        </th>
+                        <th style="width: 10%">
+                            <label asp-for="Income.FirstOrDefault().Date"></label>
+                        </th>
+                        <th style="width: 15%">
+                            <label asp-for="Income.FirstOrDefault().Importance"></label>
+                        </th>
+                        <th style="width: 5%">
+                            <label asp-for="Income.FirstOrDefault().Recurring"></label>
+                        </th>
+                        <th style="width: 15%">
 
-                    </th>
-                </tr>
-                @foreach (var item in Model.Income.Reverse())
-                {
-                    <tr class="table-light border-primary">
-                        <td class="border-primary">
-                            @Html.DisplayFor(m => item.Title)
-                        </td>
-                        <td class="border-primary">
-                            @item.Amount.ToString(CultureInfo.CurrentCulture)
-                        </td>
-                        <td class="border-primary">
-                            @item.Date.ToShortDateString()
-                        </td>
-                        <td class="border-primary">
-                            @((Importance)item.Importance)
-                        </td>
-                        <td class="border-primary">
-                            @if (item.Recurring)
-                            {
-                                <i class="fas fa-check text-success"></i>
-                            }
-                        </td>
-                        <td class="border-primary">
-                            <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
-                            <input asp-page-handler="Delete" asp-route-id="@item.Id" asp-route-userId="@item.UserId"  type="submit" class="btn btn-sm btn-danger" value="Delete" />
-                        </td>
+                        </th>
+
                     </tr>
-                }
-            </table>
-        }
-        else
-        {
-            <p>No income available</p>
-        }
+                    @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
+                    {
+                        <tr class="table-light border-primary">
+                            <td class="border-primary">
+                                @Html.DisplayFor(m => item.Title)
+                            </td>
+                            <td class="border-primary">
+                                @item.Amount.ToString(CultureInfo.CurrentCulture)
+                            </td>
+                            <td class="border-primary">
+                                @item.Date.ToShortDateString()
+                            </td>
+                            <td class="border-primary">
+                                @((Importance)item.Importance)
+                            </td>
+                            <td class="border-primary">
+                                @if (item.Recurring)
+                                {
+                                    <i class="fas fa-check text-success"></i>
+                                }
+                            </td>
+                            <td class="border-primary">
+                                <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
+                                <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+            else
+            {
+                <p>No income available</p>
+            }
 
-    </form>
+        </form>
+    </div>
+    <div class="col-2 border p-3 mt-3 mb-3">
+        <p class="text-light">Earned this period: @Model.Income.GetSum()</p>
+        <p class="text-light">All income: @Model.AllIncome</p>
+    </div>
 </div>
 
-@section Scripts{
-    <partial name="_ValidationScriptsPartial" />
-}
+    @section Scripts{
+        <partial name="_ValidationScriptsPartial" />
+    }
 
