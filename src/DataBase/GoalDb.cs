@@ -19,7 +19,7 @@ namespace ePiggyWeb.DataBase
             Database = database;
         }
 
-        public async Task<int> Create(IGoal goal, int userid)
+        public async Task<int> CreateAsync(IGoal goal, int userid)
         {
             var dbGoal = new GoalModel(goal, userid);
             await Database.AddAsync(dbGoal);
@@ -27,7 +27,7 @@ namespace ePiggyWeb.DataBase
             return dbGoal.Id;
         }
 
-        public async Task<bool> CreateList(IGoalList goalList, int userid)
+        public async Task<bool> CreateListAsync(IGoalList goalList, int userid)
         {
             var dictionary = new Dictionary<IGoal, IGoalModel>();
             foreach (var goal in goalList)
@@ -47,12 +47,12 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> Update(IGoal oldGoal, IGoal newGoal)
+        public async Task<bool> UpdateAsync(IGoal oldGoal, IGoal newGoal)
         {
-            return await Update(oldGoal.Id, oldGoal.UserId, newGoal);
+            return await UpdateAsync(oldGoal.Id, oldGoal.UserId, newGoal);
         }
 
-        public async Task<bool> Update(int id, int userId, IGoal newGoal)
+        public async Task<bool> UpdateAsync(int id, int userId, IGoal newGoal)
         {
             var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (dbGoal == null)
@@ -65,17 +65,17 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> Delete(IGoal goal)
+        public async Task<bool> DeleteAsync(IGoal goal)
         {
-            return await Delete(goal.Id, goal.UserId);
+            return await DeleteAsync(goal.Id, goal.UserId);
         }
 
-        public async Task<bool> Delete(int id, int userId)
+        public async Task<bool> DeleteAsync(int id, int userId)
         {
-            return await Delete(x => x.Id == id && x.UserId == userId);
+            return await DeleteAsync(x => x.Id == id && x.UserId == userId);
         }
 
-        public async Task<bool> Delete(Expression<Func<GoalModel, bool>> filter)
+        public async Task<bool> DeleteAsync(Expression<Func<GoalModel, bool>> filter)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> DeleteList(IEnumerable<IGoal> goalList)
+        public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList)
         {
             var enumerable = goalList as IGoal[] ?? goalList.ToArray();
             if (!enumerable.Any())
@@ -100,10 +100,10 @@ namespace ePiggyWeb.DataBase
             }
             var userId = enumerable.First().UserId;
             var idList = enumerable.Select(goal => goal.Id).ToList();
-            return await DeleteList(idList, userId);
+            return await DeleteListAsync(idList, userId);
         }
 
-        public async Task<bool> DeleteList(IEnumerable<int> idArray, int userId)
+        public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
         {
             var list = new List<GoalModel>();
             foreach (var id in idArray)
@@ -117,7 +117,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> DeleteList(Expression<Func<GoalModel, bool>> filter)
+        public async Task<bool> DeleteListAsync(Expression<Func<GoalModel, bool>> filter)
         {
             var goalsToRemove = await Database.Goals.Where(filter).ToListAsync();
             Database.Goals.RemoveRange(goalsToRemove);
@@ -125,12 +125,12 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<int> MoveGoalToExpenses(IGoal goal, IEntry expense)
+        public async Task<int> MoveGoalToExpensesAsync(IGoal goal, IEntry expense)
         {
-            return await MoveGoalToExpenses(goal.Id, goal.UserId, expense);
+            return await MoveGoalToExpensesAsync(goal.Id, goal.UserId, expense);
         }
 
-        public async Task<int> MoveGoalToExpenses(int goalId, int userId, IEntry expense)
+        public async Task<int> MoveGoalToExpensesAsync(int goalId, int userId, IEntry expense)
         {
             try
             {
@@ -160,14 +160,17 @@ namespace ePiggyWeb.DataBase
             return new Goal(dbGoal);
         }
 
-        public async Task<IEnumerable<IGoal>> ReadListAsync(int userId)
+        public async Task<IGoalList> ReadListAsync(int userId)
         {
             return await ReadListAsync(x => x.UserId == userId);
         }
 
-        public async Task<IEnumerable<IGoal>> ReadListAsync(Expression<Func<IGoalModel, bool>> filter)
+        public async Task<IGoalList> ReadListAsync(Expression<Func<IGoalModel, bool>> filter)
         {
-            return await Database.Goals.Where(filter).Select(dbGoal => new Goal(dbGoal)).Cast<IGoal>().ToListAsync();
+            var list = await Database.Goals.Where(filter).Select(dbGoal => new Goal(dbGoal)).Cast<IGoal>().ToListAsync();
+            var goalList = new GoalList();
+            goalList.AddRange(list);
+            return goalList;
         }
     }
 }
