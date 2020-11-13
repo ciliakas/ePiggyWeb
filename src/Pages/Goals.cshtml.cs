@@ -27,6 +27,12 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public decimal Amount { get; set; }
 
+        private GoalDb GoalDb { get; }
+        public GoalsModel(GoalDb goalDb)
+        {
+            GoalDb = goalDb;
+        }
+
         public void OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
