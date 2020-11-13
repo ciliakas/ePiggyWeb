@@ -39,7 +39,7 @@ namespace ePiggyWeb
             services.AddScoped(provider =>
             {
                 var db = provider.GetService<PiggyDbContext>();
-                return new UserDb(db);
+                return new UserDatabase(db);
             });
         }
 

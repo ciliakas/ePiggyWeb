@@ -29,10 +29,10 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private UserDb UserDb { get; }
-        public RegisterModel(UserDb userDb)
+        private UserDatabase UserDatabase { get; }
+        public RegisterModel(UserDatabase userDatabase)
         {
-            UserDb = userDb;
+            UserDatabase = userDatabase;
         }
 
         public IActionResult OnGet()
@@ -62,7 +62,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
-            var id = await UserDb.RegisterAsync(Email, Password);
+            var id = await UserDatabase.RegisterAsync(Email, Password);
             if (id > -1)
             {
                  var claims = new List<Claim>

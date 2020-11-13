@@ -35,10 +35,10 @@ namespace ePiggyWeb.Pages
         public bool Expired;
 
 
-        private UserDb UserDb { get; }
-        public ForgotPasswordModel(UserDb userDb)
+        private UserDatabase UserDatabase { get; }
+        public ForgotPasswordModel(UserDatabase userDatabase)
         {
-            UserDb = userDb;
+            UserDatabase = userDatabase;
         }
 
         public IActionResult OnGet()
@@ -73,7 +73,7 @@ namespace ePiggyWeb.Pages
             {
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    await UserDb.ChangePasswordAsync(Email, Password);
+                    await UserDatabase.ChangePasswordAsync(Email, Password);
                     Response.Cookies.Delete("recoveryCode");
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");

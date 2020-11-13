@@ -26,10 +26,10 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
         public bool FailedToSendEmail;
 
-        private UserDb UserDb { get; }
-        public LoginModel(UserDb userDb)
+        private UserDatabase UserDatabase { get; }
+        public LoginModel(UserDatabase userDatabase)
         {
-            UserDb = userDb;
+            UserDatabase = userDatabase;
         }
 
         public IActionResult OnGet()
@@ -49,7 +49,7 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost(string returnUrl)
         {
-            var id = await UserDb.AuthenticateAsync(Email, Password);
+            var id = await UserDatabase.AuthenticateAsync(Email, Password);
             if (id > -1)
             {
                 var claims = new List<Claim>

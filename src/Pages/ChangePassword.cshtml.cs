@@ -22,10 +22,10 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private UserDb UserDb { get; }
-        public ChangePasswordModel(UserDb userDb)
+        private UserDatabase UserDatabase { get; }
+        public ChangePasswordModel(UserDatabase userDatabase)
         {
-            UserDb = userDb;
+            UserDatabase = userDatabase;
         }
 
         public IActionResult OnGet()
@@ -46,7 +46,7 @@ namespace ePiggyWeb.Pages
 
             if (string.Equals(Password, PasswordConfirm))
             {
-                await UserDb.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
+                await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                 return RedirectToPage("/index");
             }
             else
