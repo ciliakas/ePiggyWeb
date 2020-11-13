@@ -13,6 +13,7 @@ namespace ePiggyWeb.DataBase
         public DbSet<ExpenseModel> Expenses { get; set; }
         public DbSet<IncomeModel> Incomes { get; set; }
         public DbSet<GoalModel> Goals { get; set; }
-        public PiggyDbContext(DbContextOptions<DatabaseContext> dbContextOptions) : base(dbContextOptions) { }
+        public PiggyDbContext(DbContextOptions<PiggyDbContext> options) : base(options) {}
+
     }
 }

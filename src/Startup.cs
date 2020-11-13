@@ -33,8 +33,14 @@ namespace ePiggyWeb
                     options.SlidingExpiration = true;
 
                 });
+
             services.AddDbContext<PiggyDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped(provider =>
+            {
+                var db = provider.GetService<PiggyDbContext>();
+                return new UserDb(db);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -18,6 +18,11 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
+        private UserDb UserDb { get; }
+        public LoginModel(UserDb userDb)
+        {
+            UserDb = userDb;
+        }
 
         public IActionResult OnGet()
         {
@@ -31,7 +36,7 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost(string returnUrl)
         {
-            var id = UserDatabase.Authenticate(Email, Password);
+            var id = await UserDb.AuthenticateAsync(Email, Password);
             if (id > -1)
             {
                 var claims = new List<Claim>

@@ -29,6 +29,12 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
+        private UserDb UserDb { get; }
+        public RegisterModel(UserDb userDb)
+        {
+            UserDb = userDb;
+        }
+
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
@@ -47,7 +53,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
-            var id = UserDatabase.Register(Email, Password);
+            var id = await UserDb.RegisterAsync(Email, Password);
             if (id > -1)
             {
                  var claims = new List<Claim>
