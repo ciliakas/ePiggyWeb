@@ -34,6 +34,11 @@ namespace ePiggyWeb.Pages
         public bool CodeSent;
         public bool Expired;
 
+        private EmailSender EmailSender { get; }
+        public ForgotPasswordModel(EmailSender emailSender)
+        {
+            EmailSender = emailSender;
+        }
 
         public async Task<IActionResult> OnGet()
         {
@@ -47,8 +52,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             Email = Request.Cookies["Email"];
-            var emailSender = new EmailSender();
-            var recoveryCode = (await emailSender.SendRecoveryCodeAsync(Email)).ToString();
+            var recoveryCode = (await EmailSender.SendRecoveryCodeAsync(Email)).ToString();
 
             var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
             Response.Cookies.Append("recoveryCode", recoveryCode, option);

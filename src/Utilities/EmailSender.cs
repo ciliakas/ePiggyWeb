@@ -31,7 +31,7 @@ namespace ePiggyWeb.Utilities
         {
             var rand = new Random();
             var randomCode = rand.Next(MaxRandValue);
-            var message = new MailMessage(OurEmail, email, RecoveryMessageBody + randomCode, RecoveryMessageSubject);
+            var message = new MailMessage(OurEmail, email, RecoveryMessageSubject, RecoveryMessageBody + randomCode);
             await SendAsync(message);
             return randomCode;
         }
@@ -45,13 +45,13 @@ namespace ePiggyWeb.Utilities
 
         public async Task SendFarewellEmailAsync(string email)
         {
-            var message = new MailMessage(OurEmail, email, FarewellMessageBody, FarewellMessageSubject);
+            var message = new MailMessage(OurEmail, email, FarewellMessageSubject, FarewellMessageBody);
             await SendAsync(message);
         }
 
         public async Task SendGreetingEmailAsync(string email)
         {
-            var message = new MailMessage(OurEmail, email, GreetingMessageBody, GreetingMessageSubject);
+            var message = new MailMessage(OurEmail, email, GreetingMessageSubject, GreetingMessageBody);
             await SendAsync(message);
         }
 
