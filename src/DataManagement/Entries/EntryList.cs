@@ -34,12 +34,12 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public IEntryList GetFrom(DateTime dateTime)
         {
-            return new EntryList(EntryType, this.Where(x => x.Date >= TimeManager.GetBeginningOfTheMonth(dateTime)).ToList());
+            return new EntryList(EntryType, this.Where(x => x.Date >= dateTime).ToList());
         }
 
         public IEntryList GetTo(DateTime dateTime)
         {
-            return new EntryList(EntryType, this.Where(x => x.Date <= TimeManager.GetEndOfTheMonth(dateTime)).ToList());
+            return new EntryList(EntryType, this.Where(x => x.Date <= dateTime).ToList());
         }
 
         public IEntryList GetBy(bool recurring)
