@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -34,6 +35,12 @@ namespace ePiggyWeb.Pages
         public bool Expired;
 
 
+        private UserDb UserDb { get; }
+        public ForgotPasswordModel(UserDb userDb)
+        {
+            UserDb = userDb;
+        }
+
         public IActionResult OnGet()
         {
             if (!Request.Cookies.ContainsKey("Email") || User.Identity.IsAuthenticated)
@@ -55,7 +62,7 @@ namespace ePiggyWeb.Pages
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
@@ -66,7 +73,7 @@ namespace ePiggyWeb.Pages
             {
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    UserDatabase.ChangePassword(Email, Password);
+                    await UserDb.ChangePasswordAsync(Email, Password);
                     Response.Cookies.Delete("recoveryCode");
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");
