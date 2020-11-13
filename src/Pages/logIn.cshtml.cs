@@ -47,10 +47,6 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost(string returnUrl)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
             var id = UserDatabase.Authenticate(Email, Password);
             if (id > -1)
             {
