@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,7 @@ namespace ePiggyWeb.Pages
         public bool Expired;
 
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
             if (!Request.Cookies.ContainsKey("Email") || User.Identity.IsAuthenticated)
             {
@@ -46,7 +47,8 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             Email = Request.Cookies["Email"];
-            var recoveryCode = EmailSender.SendRecoveryCode(Email).ToString();
+            var emailSender = new EmailSender();
+            var recoveryCode = (await emailSender.SendRecoveryCodeAsync(Email)).ToString();
 
             var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
             Response.Cookies.Append("recoveryCode", recoveryCode, option);
