@@ -4,7 +4,7 @@
 @model ePiggyWeb.Pages.SavingSuggestionsModel
 
 <div class="row p-3">
-    <button class="btn btn-sm btn-outline-light" asp-page="/goals"><i class="fas fa-arrow-left"></i> Back to Goals</button>
+    <a class="btn btn-sm btn-outline-light" asp-page="/goals"><i class="fas fa-arrow-left"></i> Back to Goals</a>
 </div>
 <h2 class="text-light">@Model.Goal.Title</h2>
 <h3 class="text-light mt-3 mb-4">@Model.Savings/@Model.Goal.Amount</h3>
