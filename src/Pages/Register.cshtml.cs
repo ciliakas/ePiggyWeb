@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -30,9 +31,11 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
 
         private UserDatabase UserDatabase { get; }
-        public RegisterModel(UserDatabase userDatabase)
+        private EmailSender EmailSender { get; }
+        public RegisterModel(UserDatabase userDatabase, EmailSender emailSender)
         {
             UserDatabase = userDatabase;
+            EmailSender = emailSender;
         }
 
         public IActionResult OnGet()
@@ -65,21 +68,23 @@ namespace ePiggyWeb.Pages
             var id = await UserDatabase.RegisterAsync(Email, Password);
             if (id > -1)
             {
-                 var claims = new List<Claim>
-                 {
-                     new Claim(ClaimTypes.Name, id.ToString()),
-                     new Claim(ClaimTypes.Email, Email)
-                 };
-                 var claimsIdentity = new ClaimsIdentity(claims, "Login");
-                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                     new ClaimsPrincipal(claimsIdentity));
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, id.ToString()),
+                    new Claim(ClaimTypes.Email, Email)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, "Login");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
 
-                 Response.Cookies.Delete("recoveryCode");
-                 Response.Cookies.Delete("Email");
+                Response.Cookies.Delete("recoveryCode");
+                Response.Cookies.Delete("Email");
+
+                await EmailSender.SendGreetingEmailAsync(Email);
+
                 return Redirect("/Index");
-            };
- 
- 
+            }
+
             ErrorMessage = "Such User already exists";
             return Page();
         }

@@ -1,50 +1,69 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 
 namespace ePiggyWeb.Utilities
 {
     public class EmailSender
     {
-        private static string EmailAddress { get; } = "smartsaverrecovery@gmail.com";
-        private static string EmailPassword { get; } = "Smartsaver123456";
-        private static string RecoveryMessageSubject { get; } = "Password Recovery";
-        private static string RecoveryMessageBody { get; } = "Your password recovery code is: ";
-        private static int MaxRandValue { get; } = 999999;
-        private static string SmtpEmail { get; } = "smtp.gmail.com";
-        private static int PortConst { get; } = 587;
+        private string OurEmail { get; } = "smartsaverrecovery@gmail.com";
+        private string EmailPassword { get; } = "Smartsaver123456";
+        private string RecoveryMessageSubject { get; } = "Password Recovery";
+        private string RecoveryMessageBody { get; } = "Your password recovery code is: ";
+        private string GreetingMessageSubject { get; } = "Welcome to ePiggy!";
+        private string GreetingMessageBody { get; } = "Thank you for joining ePiggy! Your wallet thanks you as well!";
+        private string FarewellMessageSubject { get; } = "Farewell from the ePiggy team";
+        private string FarewellMessageBody { get; } = "We're sorry to see you go, please leave your feedback of our app.";
+        private int MaxRandValue { get; }
+        private string SmtpEmail { get; }
+        private int Port { get; }
 
-        public static int SendRecoveryCode(string email)
+        public EmailSender(int maxRandValue = 999999, string smtpEmail = "smtp.gmail.com", int port = 587)
         {
-            using var db = new DatabaseContext();
-            var user = db.Users.FirstOrDefault(a => a.Email == email);
+            MaxRandValue = maxRandValue;
+            SmtpEmail = smtpEmail;
+            Port = port;
+        }
 
-            if (user == null)
-            {
-                return 0;
-            }
-
+        public async Task<int> SendRecoveryCodeAsync(string email)
+        {
             var rand = new Random();
             var randomCode = rand.Next(MaxRandValue);
+            var message = new MailMessage(OurEmail, email, RecoveryMessageSubject, RecoveryMessageBody + randomCode);
+            await SendAsync(message);
+            return randomCode;
+        }
 
-            var message = new MailMessage();
-            message.To.Add(email);
-            message.From = new MailAddress(EmailAddress);
-            message.Body = RecoveryMessageBody + randomCode;
-            message.Subject = RecoveryMessageSubject;
+        public async Task SendFarewellEmailAsync(object sender, int id, UserDatabase userDatabase)
+        {
+            var user = await userDatabase.GetUserAsync(id);
+            if (user is null) return;
+            await SendFarewellEmailAsync(user.Email);
+        }
 
-            var smtp = new SmtpClient(SmtpEmail)
+        public async Task SendFarewellEmailAsync(string email)
+        {
+            var message = new MailMessage(OurEmail, email, FarewellMessageSubject, FarewellMessageBody);
+            await SendAsync(message);
+        }
+
+        public async Task SendGreetingEmailAsync(string email)
+        {
+            var message = new MailMessage(OurEmail, email, GreetingMessageSubject, GreetingMessageBody);
+            await SendAsync(message);
+        }
+
+        private async Task SendAsync(MailMessage message)
+        {
+            var smtp = new SmtpClient(SmtpEmail, Port)
             {
                 EnableSsl = true,
-                Port = PortConst,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(EmailAddress, EmailPassword)
+                Credentials = new NetworkCredential(OurEmail, EmailPassword)
             };
-            smtp.Send(message);
-
-            return randomCode;
+            await smtp.SendMailAsync(message);
         }
     }
 }
