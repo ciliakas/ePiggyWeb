@@ -28,17 +28,17 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public decimal Amount { get; set; }
 
-        private GoalDb GoalDb { get; }
-        public GoalsModel(GoalDb goalDb)
+        private GoalDatabase GoalDatabase { get; }
+        public GoalsModel(GoalDatabase goalDatabase)
         {
-            GoalDb = goalDb;
+            GoalDatabase = goalDatabase;
         }
 
         public async Task OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var dataManager = new DataManager(UserId);
-            Goals = await GoalDb.ReadListAsync(UserId);
+            Goals = await GoalDatabase.ReadListAsync(UserId);
             Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
             if (Savings < 0)
             {
@@ -55,7 +55,7 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = Goal.CreateLocalGoal(Title, Amount);
-            await GoalDb.CreateAsync(temp, UserId);
+            await GoalDatabase.CreateAsync(temp, UserId);
             return RedirectToPage("/goals");
         }
 
@@ -71,14 +71,14 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             decimal.TryParse(amount, out var parsedAmount);
             var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            await GoalDb.MoveGoalToExpensesAsync(id, UserId, entry);
+            await GoalDatabase.MoveGoalToExpensesAsync(id, UserId, entry);
             return RedirectToPage("/expenses");
         }
 
         private async Task DeleteGoalFromDb(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            await GoalDb.DeleteAsync(id, UserId);
+            await GoalDatabase.DeleteAsync(id, UserId);
         }
     }
 }

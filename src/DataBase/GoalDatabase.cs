@@ -1,27 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ePiggyWeb.DataBase
 {
-    public static class GoalDatabase
+    public class GoalDatabase
     {
-        public static int Create(IGoal goal, int userid)
+        private PiggyDbContext Database { get; }
+        public GoalDatabase(PiggyDbContext database)
         {
-            using var db = new DatabaseContext();
-            var dbGoal = new GoalModel (goal, userid);
-            db.Add(dbGoal);
-            db.SaveChanges();
+            Database = database;
+        }
+
+        public async Task<int> CreateAsync(IGoal goal, int userid)
+        {
+            var dbGoal = new GoalModel(goal, userid);
+            await Database.AddAsync(dbGoal);
+            await Database.SaveChangesAsync();
             return dbGoal.Id;
         }
 
-        public static bool CreateList(IGoalList goalList, int userid)
+        public async Task<bool> CreateListAsync(IGoalList goalList, int userid)
         {
-            using var db = new DatabaseContext();
             var dictionary = new Dictionary<IGoal, IGoalModel>();
             foreach (var goal in goalList)
             {
@@ -29,8 +36,8 @@ namespace ePiggyWeb.DataBase
                 dictionary.Add(goal, dbGoal);
             }
             // Setting all of the ID's to local Entries, just so this method remains usable both with local and only database usage
-            db.AddRange(dictionary.Values);
-            db.SaveChanges();
+            await Database.AddRangeAsync(dictionary.Values);
+            await Database.SaveChangesAsync();
             goalList.Clear();
             foreach (var (key, value) in dictionary)
             {
@@ -40,43 +47,41 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool Update(IGoal oldGoal, IGoal newGoal)
+        public async Task<bool> UpdateAsync(IGoal oldGoal, IGoal newGoal)
         {
-            return Update(oldGoal.Id, oldGoal.UserId, newGoal);
+            return await UpdateAsync(oldGoal.Id, oldGoal.UserId, newGoal);
         }
 
-        public static bool Update(int id, int userId, IGoal newGoal)
+        public async Task<bool> UpdateAsync(int id, int userId, IGoal newGoal)
         {
-            using var db = new DatabaseContext();
-            var dbGoal = db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+            var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (dbGoal == null)
             {
                 ExceptionHandler.Log("Couldn't find goal id: " + id + " in database");
                 return false;
             }
             dbGoal.Edit(newGoal);
-            db.SaveChanges();
+            await Database.SaveChangesAsync();
             return true;
         }
 
-        public static bool Delete(IGoal goal)
+        public async Task<bool> DeleteAsync(IGoal goal)
         {
-            return Delete(goal.Id, goal.UserId);
+            return await DeleteAsync(goal.Id, goal.UserId);
         }
 
-        public static bool Delete(int id, int userId)
+        public async Task<bool> DeleteAsync(int id, int userId)
         {
-            return Delete(x => x.Id == id && x.UserId == userId);
+            return await DeleteAsync(x => x.Id == id && x.UserId == userId);
         }
 
-        public static bool Delete(Func<GoalModel, bool> filter)
+        public async Task<bool> DeleteAsync(Expression<Func<GoalModel, bool>> filter)
         {
-            using var db = new DatabaseContext();
             try
             {
-                var dbGoal = db.Goals.FirstOrDefault(filter);
-                db.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
-                db.SaveChanges();
+                var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
+                Database.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
+                await Database.SaveChangesAsync();
             }
             catch (InvalidOperationException ex)
             {
@@ -86,7 +91,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public static bool DeleteList(IEnumerable<IGoal> goalList)
+        public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList)
         {
             var enumerable = goalList as IGoal[] ?? goalList.ToArray();
             if (!enumerable.Any())
@@ -95,42 +100,45 @@ namespace ePiggyWeb.DataBase
             }
             var userId = enumerable.First().UserId;
             var idList = enumerable.Select(goal => goal.Id).ToList();
-            return DeleteList(idList, userId);
+            return await DeleteListAsync(idList, userId);
         }
 
-        public static bool DeleteList(IEnumerable<int> idArray, int userId)
+        public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
         {
-            using var db = new DatabaseContext();
-            var goalsToRemove = idArray.Select(id => db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId)).ToList();
-            db.Goals.RemoveRange(goalsToRemove);
-            db.SaveChanges();
+            var list = new List<GoalModel>();
+            foreach (var id in idArray)
+            {
+                var temp = await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+                list.Add(temp);
+            }
+            
+            Database.Goals.RemoveRange(list);
+            await Database.SaveChangesAsync();
             return true;
         }
 
-        public static bool DeleteList(Func<GoalModel, bool> filter)
+        public async Task<bool> DeleteListAsync(Expression<Func<GoalModel, bool>> filter)
         {
-            using var db = new DatabaseContext();
-            var goalsToRemove =  db.Goals.Where(filter).ToList();
-            db.Goals.RemoveRange(goalsToRemove);
-            db.SaveChanges();
+            var goalsToRemove = await Database.Goals.Where(filter).ToListAsync();
+            Database.Goals.RemoveRange(goalsToRemove);
+            await Database.SaveChangesAsync();
             return true;
         }
 
-        public static int MoveGoalToExpenses(IGoal goal, IEntry expense)
+        public async Task<int> MoveGoalToExpensesAsync(IGoal goal, IEntry expense)
         {
-            return MoveGoalToExpenses(goal.Id, goal.UserId, expense);
+            return await MoveGoalToExpensesAsync(goal.Id, goal.UserId, expense);
         }
 
-        public static int MoveGoalToExpenses(int goalId, int userId, IEntry expense)
+        public async Task<int> MoveGoalToExpensesAsync(int goalId, int userId, IEntry expense)
         {
-            using var db = new DatabaseContext();
             try
             {
-                var dbGoal = db.Goals.FirstOrDefault(x => x.Id == goalId && x.UserId == userId);
-                db.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
+                var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == goalId && x.UserId == userId);
+                Database.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
                 var dbExpense = new ExpenseModel(expense, userId);
-                db.Expenses.Add(dbExpense);
-                db.SaveChanges();
+                await Database.Expenses.AddAsync(dbExpense);
+                await Database.SaveChangesAsync();
                 return dbExpense.Id;
             }
             catch (InvalidOperationException ex)
@@ -141,22 +149,28 @@ namespace ePiggyWeb.DataBase
             }
         }
 
-        public static IGoal Read(int id, int userId)
+        public async Task<IGoal> ReadAsync(int id, int userId)
         {
-            using var db = new DatabaseContext();
-            var dbGoal = db.Goals.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+            return await ReadAsync(x => x.Id == id && x.UserId == userId);
+        }
+
+        public async Task<IGoal> ReadAsync(Expression<Func<IGoalModel, bool>> filter)
+        {
+            var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
             return new Goal(dbGoal);
         }
 
-        public static IEnumerable<IGoal> ReadList(int userId)
+        public async Task<IGoalList> ReadListAsync(int userId)
         {
-            return ReadList(x => x.UserId == userId);
+            return await ReadListAsync(x => x.UserId == userId);
         }
 
-        public static IEnumerable<IGoal> ReadList(Func<GoalModel, bool> filter)
+        public async Task<IGoalList> ReadListAsync(Expression<Func<IGoalModel, bool>> filter)
         {
-            using var db = new DatabaseContext();
-            return db.Goals.Where(filter).Select(dbGoal => new Goal(dbGoal)).Cast<IGoal>().ToList();
+            var list = await Database.Goals.Where(filter).Select(dbGoal => new Goal(dbGoal)).Cast<IGoal>().ToListAsync();
+            var goalList = new GoalList();
+            goalList.AddRange(list);
+            return goalList;
         }
     }
 }
