@@ -6,6 +6,7 @@ using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -29,17 +30,20 @@ namespace ePiggyWeb.Pages
         public decimal Amount { get; set; }
 
         private GoalDatabase GoalDatabase { get; }
-        public GoalsModel(GoalDatabase goalDatabase)
+        private EntryDatabase EntryDatabase { get; }
+        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase)
         {
             GoalDatabase = goalDatabase;
+            EntryDatabase = entryDatabase;
         }
 
         public async Task OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
             Goals = await GoalDatabase.ReadListAsync(UserId);
-            Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
+            var incomes = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+            var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+            Savings = incomes.GetSum() - expenses.GetSum();
             if (Savings < 0)
             {
                 Savings = 0;
