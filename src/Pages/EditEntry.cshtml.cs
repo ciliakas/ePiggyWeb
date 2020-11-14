@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -22,16 +23,20 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public int EntryTypeInt { get; set; }
-        
-        public void OnGet(int id, int entryType)
+        private EntryDb EntryDb { get; }
+        public EditEntryModel(EntryDb entryDb)
+        {
+            EntryDb = entryDb;
+        }
+
+        public async Task OnGet(int id, int entryType)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(userId);
             EntryTypeInt = entryType;
 
             Entry = entryType == 1
-                ? (Entry)dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
-                : (Entry)dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
+                ? (Entry) await EntryDb.ReadAsync(id, userId, EntryType.Income)
+                : (Entry) await EntryDb.ReadAsync(id, userId, EntryType.Expense);
 
             if (Entry != null)
             {
@@ -43,7 +48,7 @@ namespace ePiggyWeb.Pages
         }
 
         /*Editing and redirecting according to EntryType*/
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
@@ -53,12 +58,12 @@ namespace ePiggyWeb.Pages
 
             if (EntryTypeInt == 1)
             {
-                EntryDatabase.Update(Entry.Id, Entry.UserId, Entry, EntryType.Income);
+                await EntryDb.UpdateAsync(Entry.Id, Entry.UserId, Entry, EntryType.Income);
                 return RedirectToPage("/Income");
             }
             else
             {
-                EntryDatabase.Update(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
+                await EntryDb.UpdateAsync(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
                 return RedirectToPage("/Expenses");
             }
         }

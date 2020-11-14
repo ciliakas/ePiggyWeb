@@ -19,7 +19,7 @@ namespace ePiggyWeb.DataBase
             Database = database;
         }
 
-        public async Task<int> Create(IEntry localEntry, int userId, EntryType entryType)
+        public async Task<int> CreateAsync(IEntry localEntry, int userId, EntryType entryType)
         {
             if (localEntry is null)
             {
@@ -28,14 +28,14 @@ namespace ePiggyWeb.DataBase
 
             if (!localEntry.Recurring)
             {
-                return await CreateSingle(localEntry, userId, entryType);
+                return await CreateSingleAsync(localEntry, userId, entryType);
             }
 
-            await CreateList(RecurringUpdater.CreateRecurringList(localEntry, entryType), userId);
+            await CreateListAsync(RecurringUpdater.CreateRecurringList(localEntry, entryType), userId);
             return -2;
         }
 
-        public async Task<int> CreateSingle(IEntry localEntry, int userId, EntryType entryType)
+        public async Task<int> CreateSingleAsync(IEntry localEntry, int userId, EntryType entryType)
         {
             IEntryModel dbEntry = entryType switch
             {
@@ -47,7 +47,7 @@ namespace ePiggyWeb.DataBase
             return dbEntry.Id;
         }
 
-        public async Task<bool> CreateList(IEntryList entryList, int userId)
+        public async Task<bool> CreateListAsync(IEntryList entryList, int userId)
         {
             var dictionary = new Dictionary<IEntry, IEntryModel>();
             foreach (var entry in entryList)
@@ -73,7 +73,7 @@ namespace ePiggyWeb.DataBase
         }
 
 
-        public async Task<bool> Update(int id, int userId, IEntry updatedEntry, EntryType entryType)
+        public async Task<bool> UpdateAsync(int id, int userId, IEntry updatedEntry, EntryType entryType)
         {
             if (updatedEntry is null)
             {
@@ -82,14 +82,14 @@ namespace ePiggyWeb.DataBase
 
             if (updatedEntry.Recurring)
             {
-                CreateList(RecurringUpdater.CreateRecurringListWithoutOriginalEntry(updatedEntry, entryType), userId);
+                await CreateListAsync(RecurringUpdater.CreateRecurringListWithoutOriginalEntry(updatedEntry, entryType), userId);
                 updatedEntry.Recurring = false;
             }
 
-            return await UpdateSingle(id, userId, updatedEntry, entryType);
+            return await UpdateSingleAsync(id, userId, updatedEntry, entryType);
         }
 
-        public async Task<bool> UpdateSingle(int id, int userId, IEntry updatedEntry, EntryType entryType)
+        public async Task<bool> UpdateSingleAsync(int id, int userId, IEntry updatedEntry, EntryType entryType)
         {
             IEntryModel temp = entryType switch
             {
@@ -108,20 +108,18 @@ namespace ePiggyWeb.DataBase
             await Database.SaveChangesAsync();
             return true;
         }
-
-
-
-        public async Task<bool> Delete(IEntry entry, EntryType entryType)
+        
+        public async Task<bool> DeleteAsync(IEntry entry, EntryType entryType)
         {
-            return await Delete(x => x.Id == entry.Id && x.UserId == entry.UserId, entryType);
+            return await DeleteAsync(x => x.Id == entry.Id && x.UserId == entry.UserId, entryType);
         }
 
-        public async Task<bool> Delete(int id, int userId, EntryType entryType)
+        public async Task<bool> DeleteAsync(int id, int userId, EntryType entryType)
         {
-            return await Delete(x => x.Id == id && x.UserId == userId, entryType);
+            return await DeleteAsync(x => x.Id == id && x.UserId == userId, entryType);
         }
 
-        public async Task<bool> Delete(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+        public async Task<bool> DeleteAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
         {
             try
             {
@@ -142,7 +140,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> DeleteList(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+        public async Task<bool> DeleteListAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
         {
             if (entryType == EntryType.Income)
             {
@@ -159,7 +157,7 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> DeleteList(IEnumerable<int> idArray, int userId, EntryType entryType)
+        public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId, EntryType entryType)
         {
             if (entryType == EntryType.Income)
             {
@@ -207,19 +205,21 @@ namespace ePiggyWeb.DataBase
             return new Entry(dbEntry);
         }
 
-        public async Task<IEnumerable<IEntry>> ReadList(int userId, EntryType entryType)
+        public async Task<IEntryList> ReadListAsync(int userId, EntryType entryType)
         {
-            return await ReadList(x => x.UserId == userId, entryType);
+            return await ReadListAsync(x => x.UserId == userId, entryType);
         }
 
-        public async Task<IEnumerable<IEntry>> ReadList(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+        public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
         {
+            var list = new EntryList(entryType);
             IEnumerable<IEntry> temp = entryType switch
             {
                 EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry)).Cast<IEntry>().ToListAsync(),
                 _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry)).Cast<IEntry>().ToListAsync()
             };
-            return temp;
+            list.AddRange(temp);
+            return list;
         }
     }
 }

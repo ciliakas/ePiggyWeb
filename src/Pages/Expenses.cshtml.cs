@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -43,15 +44,21 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        public void OnGet()
+        private EntryDb EntryDb { get; }
+        public ExpensesModel(EntryDb entryDb)
+        {
+            EntryDb = entryDb;
+        }
+
+        public async Task OnGet()
         {
             var today = DateTime.Now;
             StartDate = new DateTime(today.Year, today.Month, 1);
             EndDate = DateTime.Today;
-            SetData();
+            await SetData();
         }
 
-        public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
             if (startDate > endDate)
             {
@@ -65,39 +72,39 @@ namespace ePiggyWeb.Pages
                 StartDate = startDate;
                 EndDate = endDate;
             }
-            SetData();
+            await SetData();
             return Page();
         }
 
-        public IActionResult OnPostNewEntry()
+        public async Task<IActionResult> OnPostNewEntry()
         {
             if (!ModelState.IsValid)
             {
                 var today = DateTime.Now;
                 StartDate = new DateTime(today.Year, today.Month, 1);
                 EndDate = DateTime.Today;
-                SetData();
+                await SetData();
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-            EntryDatabase.Create(entry, UserId, EntryType.Expense);
+            await EntryDb.CreateAsync(entry, UserId, EntryType.Expense);
             return RedirectToPage("/expenses");
         }
 
-        public IActionResult OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            EntryDatabase.Delete(id, UserId, EntryType.Expense);
+            await EntryDb.DeleteAsync(id, UserId, EntryType.Expense);
             return RedirectToPage("/expenses");
         }
 
-        private void SetData()
+        private async Task SetData()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate);
-            AllExpenses = dataManager.Expenses.EntryList.GetSum();
+            var entryList = await EntryDb.ReadListAsync(UserId, EntryType.Expense);
+            Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+            AllExpenses = entryList.GetSum();
         }
     }
 }
