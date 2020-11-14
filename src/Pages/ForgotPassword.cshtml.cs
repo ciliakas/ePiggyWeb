@@ -35,9 +35,11 @@ namespace ePiggyWeb.Pages
         public bool Expired;
 
         private EmailSender EmailSender { get; }
-        public ForgotPasswordModel(EmailSender emailSender)
+        private UserDatabase UserDatabase { get; }
+        public ForgotPasswordModel(EmailSender emailSender, UserDatabase userDatabase)
         {
             EmailSender = emailSender;
+            UserDatabase = userDatabase;
         }
 
         public async Task<IActionResult> OnGet()
@@ -61,7 +63,7 @@ namespace ePiggyWeb.Pages
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
@@ -72,7 +74,7 @@ namespace ePiggyWeb.Pages
             {
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    UserDatabase.ChangePassword(Email, Password);
+                    await UserDatabase.ChangePasswordAsync(Email, Password);
                     Response.Cookies.Delete("recoveryCode");
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");

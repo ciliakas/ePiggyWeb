@@ -1,8 +1,10 @@
 using System;
+using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,6 +34,14 @@ namespace ePiggyWeb
                     options.SlidingExpiration = true;
 
                 });
+
+            services.AddDbContext<PiggyDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped(provider =>
+            {
+                var db = provider.GetService<PiggyDbContext>();
+                return new UserDatabase(db);
+            });
             services.AddScoped<EmailSender>();
         }
 

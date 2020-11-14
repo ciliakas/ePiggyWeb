@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -21,6 +22,12 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
+        private UserDatabase UserDatabase { get; }
+        public ChangePasswordModel(UserDatabase userDatabase)
+        {
+            UserDatabase = userDatabase;
+        }
+
         public IActionResult OnGet()
         {
             if (!User.Identity.IsAuthenticated)
@@ -30,7 +37,7 @@ namespace ePiggyWeb.Pages
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
@@ -39,7 +46,7 @@ namespace ePiggyWeb.Pages
 
             if (string.Equals(Password, PasswordConfirm))
             {
-                UserDatabase.ChangePassword(User.FindFirst(ClaimTypes.Email).Value, Password);
+                await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                 return RedirectToPage("/index");
             }
             else

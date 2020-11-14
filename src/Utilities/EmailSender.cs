@@ -36,9 +36,9 @@ namespace ePiggyWeb.Utilities
             return randomCode;
         }
 
-        public async Task SendFarewellEmailAsync(object sender, int id)
+        public async Task SendFarewellEmailAsync(object sender, int id, UserDatabase userDatabase)
         {
-            var user = UserDatabase.GetUser(id);
+            var user = await userDatabase.GetUserAsync(id);
             if (user is null) return;
             await SendFarewellEmailAsync(user.Email);
         }

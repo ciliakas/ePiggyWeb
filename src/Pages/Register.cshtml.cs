@@ -30,9 +30,11 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
+        private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        public RegisterModel(EmailSender emailSender)
+        public RegisterModel(UserDatabase userDatabase, EmailSender emailSender)
         {
+            UserDatabase = userDatabase;
             EmailSender = emailSender;
         }
 
@@ -63,7 +65,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
-            var id = UserDatabase.Register(Email, Password);
+            var id = await UserDatabase.RegisterAsync(Email, Password);
             if (id > -1)
             {
                 var claims = new List<Claim>
