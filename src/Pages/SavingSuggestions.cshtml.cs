@@ -31,8 +31,11 @@ namespace ePiggyWeb.Pages
             {
                 Savings = 0;
             }
-           // AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses, Goal, EntrySuggestions,
-              //  MonthlySuggestions, Savings);
+            AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses,
+                Goal,
+                EntrySuggestions,
+                MonthlySuggestions,
+                Savings);
         }
     }
 }
