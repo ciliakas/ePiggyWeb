@@ -14,22 +14,23 @@ namespace ePiggyWeb.DataManagement.Saving
         private static decimal MaximalSavingValue { get; } = 0.5M;
         private static decimal MinimalSavingValue { get; } = 0.1M;
 
-        public static bool GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList<ISavingSuggestion> entrySuggestions,
+        public static void GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList<ISavingSuggestion> entrySuggestions,
             List<SavingSuggestionByMonth> monthlySuggestions, decimal startingBalance, SavingType savingType = SavingType.Regular)
         {
             entrySuggestions ??= new List<ISavingSuggestion>();
 
             if (entryList is null)
             {
-                return false;
+                return;
             }
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
 
-            decimal[] sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
-            decimal[] sumsOfAmountByImportanceDefault = new decimal[enumCount];
-            decimal[] averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
-            decimal[] averagesOfAmountByImportanceDefault = new decimal[enumCount];
+            decimal[] arrayTemplate = new decimal[enumCount];
+            decimal[] sumsOfAmountByImportanceAdjusted = arrayTemplate;
+            decimal[] sumsOfAmountByImportanceDefault = arrayTemplate;
+            decimal[] averagesOfAmountByImportanceAdjusted = arrayTemplate;
+            decimal[] averagesOfAmountByImportanceDefault = arrayTemplate;
             int[] entryAmounts = new int[enumCount];
 
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
@@ -47,34 +48,25 @@ namespace ePiggyWeb.DataManagement.Saving
                     };
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
 
-                    sumsOfAmountByImportanceAdjusted[i] += amountAfterSaving;
-                    sumsOfAmountByImportanceDefault[i] += entry.Amount;
-                    entryAmounts[i]++;
+                    sumsOfAmountByImportanceAdjusted[i - 1] += amountAfterSaving;
+                    sumsOfAmountByImportanceDefault[i - 1] += entry.Amount;
+                    entryAmounts[i - 1]++;
 
-                    // Commented as the logic with returns is still WIP
-                    /*
-                    startingBalance += entry.Amount - amountAfterSaving;
-                    if (goal.Amount <= startingBalance)
-                    {
-                        return true;
-                    }
-                    */
                 }
             }
-            var savedByGuessing = 0M;
-            while (goal.Amount > savedByGuessing)
+            var approximateSavedAmount = 0M;
+            while (goal.Amount > approximateSavedAmount)
             {
                 for (var i = enumCount; i > (int)Importance.Necessary; i--)
                 {
-                    averagesOfAmountByImportanceAdjusted[i] = sumsOfAmountByImportanceAdjusted[i] / entryAmounts[i];
-                    averagesOfAmountByImportanceDefault[i] = sumsOfAmountByImportanceDefault[i] / entryAmounts[i];
+                    averagesOfAmountByImportanceAdjusted[i - 1] = sumsOfAmountByImportanceAdjusted[i - 1] / entryAmounts[i - 1];
+                    averagesOfAmountByImportanceDefault[i - 1] = sumsOfAmountByImportanceDefault[i - 1] / entryAmounts[i - 1];
 
-                    savedByGuessing += averagesOfAmountByImportanceAdjusted[i];
+                    approximateSavedAmount += averagesOfAmountByImportanceDefault[i - 1] - averagesOfAmountByImportanceAdjusted[i - 1];
 
-                    monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i], averagesOfAmountByImportanceDefault[i], (Importance)i));
+                    monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
                 }                              
             }
-            return true;
         }
     }
 }
