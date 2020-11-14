@@ -18,10 +18,16 @@
         Graph is empty, since no data found! Try a <strong>different period.</strong>
     </div>
 }
+else
+{
+    <h4 class="text-light">This period: Income: @Model.Income.ToString(CultureInfo.InvariantCulture) / Expenses: @Model.Expenses.ToString(CultureInfo.InvariantCulture)</h4>
+}
 <div class="container p-0 mt-3 mb-5">
-    <div class="col-12" id="graph"> <div class="spinner-border text-warning loader" role="status">
-        <span class="sr-only">Loading...</span>
-    </div></div>
+    <div class="col-12" id="graph">
+        <div class="spinner-border text-warning loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
 </div>
 
 

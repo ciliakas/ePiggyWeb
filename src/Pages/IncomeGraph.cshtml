@@ -18,6 +18,10 @@
         Graphs are empty, since no data found! Try a <strong>different period.</strong>
     </div>
 }
+else
+{
+    <h4 class="text-light">Total Income of this period: @Model.Income.GetSum().ToString(CultureInfo.InvariantCulture)</h4>
+}
 <div class="row ml-2 mr-2 mt-3 mb-5">
     <div class="col-sm" id="graphPie">
         <div class="spinner-border text-warning loader" role="status">
