@@ -42,12 +42,13 @@ namespace ePiggyWeb.Pages
             EntrySuggestions = new List<ISavingSuggestion>();
             MonthlySuggestions = new List<SavingSuggestionByMonth>();
             Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
-            AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses, Goals[0], EntrySuggestions,
-                MonthlySuggestions, Savings);
             if (Savings < 0)
             {
                 Savings = 0;
             }
+            AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses, Goals[0], EntrySuggestions,
+                MonthlySuggestions, Savings);
+           
         }
 
 
