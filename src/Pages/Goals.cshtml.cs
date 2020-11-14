@@ -39,6 +39,8 @@ namespace ePiggyWeb.Pages
             var dataManager = new DataManager(UserId);
             Expenses = dataManager.Expenses.EntryList;
             Goals = dataManager.Goals.GoalList;
+            EntrySuggestions = new List<ISavingSuggestion>();
+            MonthlySuggestions = new List<SavingSuggestionByMonth>();
             AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses, Goals[0], EntrySuggestions,
                 MonthlySuggestions, Savings);
             Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();

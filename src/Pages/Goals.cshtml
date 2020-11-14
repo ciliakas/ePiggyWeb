@@ -178,18 +178,6 @@ else
                     @item.NewAverage.ToString(CultureInfo.CurrentCulture)
                     <!--Html.DisplayFor(m => item.Date)-->
                 </td>
-                <td class="border-primary">
-                    @((Importance)item.Entry.Importance)
-                </td>
-                <td class="border-primary">
-                    @if (item.Entry.Recurring)
-                    {
-                        <i class="fas fa-check text-success"></i>
-                    }
-                </td>
-                <td class="border-primary">
-                    @item.Amount
-                </td>
             </tr>
         }
     </table>
