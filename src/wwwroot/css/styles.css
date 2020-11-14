@@ -1,7 +1,9 @@
 .navbar {
     text-align: center;
 }
-
+a:hover {
+    text-decoration: none;
+}
 .container-fluid {
     padding: 1% 15%;
     background-color: #f9f7f7;
