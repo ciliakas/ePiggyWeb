@@ -1,4 +1,7 @@
 ﻿@page
+@using System.Globalization
+@using System.Linq
+@using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.GoalsModel
 
 <br />
@@ -6,14 +9,14 @@
 <button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal</button>
 @if (!ModelState.IsValid)
 {
-<div class="container">
-    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-        <strong>Holy guacamole!</strong> Goal was not added, because wrong info was provided.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="container">
+        <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+            <strong>Holy guacamole!</strong> Goal was not added, because wrong info was provided.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     </div>
-</div>
 }
 @if (!Model.Goals.Any())
 {
@@ -47,10 +50,12 @@ else
                         if (percent < 30)
                         {
                             color = "danger";
-                        }else if (percent < 85)
+                        }
+                        else if (percent < 85)
                         {
                             color = "warning";
-                        }else if (percent < 100)
+                        }
+                        else if (percent < 100)
                         {
                             color = "info";
                         }
@@ -86,11 +91,110 @@ else
 }
 
 
+@if (!Model.Expenses.Any())
+{
+    <div class="container bg-primary border p-0 mx-auto mt-3 mb-5">
+        <h2 class="text-light mt-5 mb-5">Click on Goal to get suggestions.</h2>
+        <!--Table here somewhere-->
+    </div>
+}
+else
+{
+    <table class="table table-hover border-primary table-bordered">
+        <tr class="table-primary">
+            <th>
+                <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Title"></label>
+            </th>
+            <th style="width: 18%">
+                <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
+            </th>
+            <th style="width: 10%">
+                <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Date"></label>
+            </th>
+            <th style="width: 15%">
+                <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
+            </th>
+            <th style="width: 5%">
+                <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Recurring"></label>
+            </th>
+            <th style="width: 15%">
+                <label>Suggested</label>
+            </th>
 
-<div class="container bg-primary border p-0 mx-auto mt-3 mb-5">
-    <h2 class="text-light mt-5 mb-5">Click on Goal to get suggestions.</h2>
-    <!--Table here somewhere-->
-</div>
+        </tr>
+
+        @foreach (var item in Model.EntrySuggestions)
+        {
+            <tr class="table-light border-primary">
+                <td class="border-primary">
+                    @Html.DisplayFor(m => item.Entry.Title)
+                </td>
+                <td class="border-primary">
+                    @item.Entry.Amount.ToString(CultureInfo.CurrentCulture)
+                </td>
+                <td class="border-primary">
+                    @item.Entry.Date.ToShortDateString()
+                    <!--Html.DisplayFor(m => item.Date)-->
+                </td>
+                <td class="border-primary">
+                    @((Importance)item.Entry.Importance)
+                </td>
+                <td class="border-primary">
+                    @if (item.Entry.Recurring)
+                    {
+                        <i class="fas fa-check text-success"></i>
+                    }
+                </td>
+                <td class="border-primary">
+                    @item.Amount
+                </td>
+            </tr>
+        }
+    </table>
+
+    <table class="table table-hover border-primary table-bordered">
+        <tr class="table-primary">
+            <th>
+                <label asp-for="MonthlySuggestions.FirstOrDefault().Importance"></label>
+            </th>
+            <th>
+                <label asp-for="MonthlySuggestions.FirstOrDefault().OldAverage"></label>
+            </th>
+            <th>
+                <label asp-for="MonthlySuggestions.FirstOrDefault().NewAverage"></label>
+            </th>
+        </tr>
+
+        @foreach (var item in Model.MonthlySuggestions)
+        {
+            <tr class="table-light border-primary">
+                <td class="border-primary">
+                    @Html.DisplayFor(m => item.Importance)
+                </td>
+                <td class="border-primary">
+                    @item.OldAverage.ToString(CultureInfo.CurrentCulture)
+                </td>
+                <td class="border-primary">
+                    @item.NewAverage.ToString(CultureInfo.CurrentCulture)
+                    <!--Html.DisplayFor(m => item.Date)-->
+                </td>
+                <td class="border-primary">
+                    @((Importance)item.Entry.Importance)
+                </td>
+                <td class="border-primary">
+                    @if (item.Entry.Recurring)
+                    {
+                        <i class="fas fa-check text-success"></i>
+                    }
+                </td>
+                <td class="border-primary">
+                    @item.Amount
+                </td>
+            </tr>
+        }
+    </table>
+}
+
 
 <!-- Modal -->
 <div class="modal fade" id="AddGoalModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -124,7 +228,7 @@ else
 </div>
 
 @section Scripts{
-    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
 }
 
 
