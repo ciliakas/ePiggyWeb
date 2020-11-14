@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
@@ -57,6 +58,7 @@ namespace ePiggyWeb.DataManagement.Saving
             var approximateSavedAmount = 0M;
             while (goal.Amount > approximateSavedAmount)
             {
+                Debug.WriteLine("While");
                 for (var i = enumCount; i > (int)Importance.Necessary; i--)
                 {
                     if (entryAmounts[i - 1] != 0)
