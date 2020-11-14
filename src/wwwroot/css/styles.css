@@ -73,13 +73,13 @@ body {
     }
 
 #testimonials {
-    background-color: #276dc1;
+    background-color: transparent;
     color: #f9f7f7;
 }
 
 .carousel-item {
     padding: 7% 15%;
-    background-color: #276dc1;
+    background-color: transparent;
 }
 
 .testimonial-image {
