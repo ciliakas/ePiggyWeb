@@ -45,7 +45,7 @@ namespace ePiggyWeb
             services.AddScoped(provider =>
             {
                 var db = provider.GetService<PiggyDbContext>();
-                return new EntryDb(db);
+                return new EntryDatabase(db);
             });
             services.AddScoped<EmailSender>();
         }

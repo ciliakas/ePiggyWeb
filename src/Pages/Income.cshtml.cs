@@ -43,10 +43,10 @@ namespace ePiggyWeb.Pages
         public DateTime EndDate { get; set; }
 
         public string ErrorMessage = "";
-        private EntryDb EntryDb { get; }
-        public IncomesModel(EntryDb entryDb)
+        private EntryDatabase EntryDatabase { get; }
+        public IncomesModel(EntryDatabase entryDatabase)
         {
-            EntryDb = entryDb;
+            EntryDatabase = entryDatabase;
         }
 
         public async Task OnGet()
@@ -89,21 +89,21 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-            await EntryDb.CreateAsync(entry, UserId, EntryType.Income);
+            await EntryDatabase.CreateAsync(entry, UserId, EntryType.Income);
             return RedirectToPage("/income");
         }
 
         public async Task<IActionResult> OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            await EntryDb.DeleteAsync(id, UserId, EntryType.Income);
+            await EntryDatabase.DeleteAsync(id, UserId, EntryType.Income);
             return RedirectToPage("/income");
         }
 
         private async Task SetData()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entryList = await EntryDb.ReadListAsync(UserId, EntryType.Income);
+            var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
             Income = entryList.GetFrom(StartDate).GetTo(EndDate);
             AllIncome = entryList.GetSum();
         }

@@ -44,10 +44,10 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private EntryDb EntryDb { get; }
-        public ExpensesModel(EntryDb entryDb)
+        private EntryDatabase EntryDatabase { get; }
+        public ExpensesModel(EntryDatabase entryDatabase)
         {
-            EntryDb = entryDb;
+            EntryDatabase = entryDatabase;
         }
 
         public async Task OnGet()
@@ -88,21 +88,21 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-            await EntryDb.CreateAsync(entry, UserId, EntryType.Expense);
+            await EntryDatabase.CreateAsync(entry, UserId, EntryType.Expense);
             return RedirectToPage("/expenses");
         }
 
         public async Task<IActionResult> OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            await EntryDb.DeleteAsync(id, UserId, EntryType.Expense);
+            await EntryDatabase.DeleteAsync(id, UserId, EntryType.Expense);
             return RedirectToPage("/expenses");
         }
 
         private async Task SetData()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entryList = await EntryDb.ReadListAsync(UserId, EntryType.Expense);
+            var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
             Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
             AllExpenses = entryList.GetSum();
         }

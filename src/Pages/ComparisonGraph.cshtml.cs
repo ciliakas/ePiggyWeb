@@ -22,10 +22,10 @@ namespace ePiggyWeb.Pages
         public DateTime EndDate { get; set; }
 
         public string ErrorMessage = "";
-        private EntryDb EntryDb { get; }
-        public ComparisonGraphModel(EntryDb entryDb)
+        private EntryDatabase EntryDatabase { get; }
+        public ComparisonGraphModel(EntryDatabase entryDatabase)
         {
-            EntryDb = entryDb;
+            EntryDatabase = entryDatabase;
         }
 
         public async Task OnGet()
@@ -57,8 +57,8 @@ namespace ePiggyWeb.Pages
         private async Task SetData()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            Expenses = (await EntryDb.ReadListAsync(UserId, EntryType.Expense)).GetFrom(StartDate).GetTo(EndDate).GetSum();
-            Income = (await EntryDb.ReadListAsync(UserId, EntryType.Income)).GetFrom(StartDate).GetTo(EndDate).GetSum();
+            Expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetFrom(StartDate).GetTo(EndDate).GetSum();
+            Income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetFrom(StartDate).GetTo(EndDate).GetSum();
         }
     }
 }

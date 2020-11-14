@@ -23,10 +23,10 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public int EntryTypeInt { get; set; }
-        private EntryDb EntryDb { get; }
-        public EditEntryModel(EntryDb entryDb)
+        private EntryDatabase EntryDatabase { get; }
+        public EditEntryModel(EntryDatabase entryDatabase)
         {
-            EntryDb = entryDb;
+            EntryDatabase = entryDatabase;
         }
 
         public async Task OnGet(int id, int entryType)
@@ -35,8 +35,8 @@ namespace ePiggyWeb.Pages
             EntryTypeInt = entryType;
 
             Entry = entryType == 1
-                ? (Entry) await EntryDb.ReadAsync(id, userId, EntryType.Income)
-                : (Entry) await EntryDb.ReadAsync(id, userId, EntryType.Expense);
+                ? (Entry) await EntryDatabase.ReadAsync(id, userId, EntryType.Income)
+                : (Entry) await EntryDatabase.ReadAsync(id, userId, EntryType.Expense);
 
             if (Entry != null)
             {
@@ -58,12 +58,12 @@ namespace ePiggyWeb.Pages
 
             if (EntryTypeInt == 1)
             {
-                await EntryDb.UpdateAsync(Entry.Id, Entry.UserId, Entry, EntryType.Income);
+                await EntryDatabase.UpdateAsync(Entry.Id, Entry.UserId, Entry, EntryType.Income);
                 return RedirectToPage("/Income");
             }
             else
             {
-                await EntryDb.UpdateAsync(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
+                await EntryDatabase.UpdateAsync(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
                 return RedirectToPage("/Expenses");
             }
         }
