@@ -9,8 +9,6 @@ namespace ePiggyWeb.DataManagement.Saving
 {
     public static class AlternativeSavingCalculator
     {
-        //This might not be 1M in the future, that why we are keeping this
-        private static decimal SavingRatio { get; } = 1M;
         private static decimal RegularSavingValue { get; } = 0.25M;
         private static decimal MaximalSavingValue { get; } = 0.5M;
         private static decimal MinimalSavingValue { get; } = 0.1M;
@@ -26,8 +24,7 @@ namespace ePiggyWeb.DataManagement.Saving
             }
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
-
-            var timesToRepeatSaving = 0;
+ 
             decimal[] sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
             decimal[] sumsOfAmountByImportanceDefault = new decimal[enumCount];
             decimal[] averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
@@ -42,9 +39,9 @@ namespace ePiggyWeb.DataManagement.Saving
                 {
                     var amountAfterSaving = savingType switch
                     {
-                        SavingType.Minimal => entry.Amount * SavingRatio * ratio * MinimalSavingValue,
-                        SavingType.Regular => entry.Amount * SavingRatio * ratio * RegularSavingValue,
-                        SavingType.Maximal => entry.Amount * SavingRatio * ratio * MaximalSavingValue,
+                        SavingType.Minimal => entry.Amount * ratio * MinimalSavingValue,
+                        SavingType.Regular => entry.Amount * ratio * RegularSavingValue,
+                        SavingType.Maximal => entry.Amount * ratio * MaximalSavingValue,
                         _ => throw new ArgumentOutOfRangeException()
                     };
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
@@ -55,6 +52,7 @@ namespace ePiggyWeb.DataManagement.Saving
 
                 }
             }
+            var timesToRepeatSaving = 0;
             var approximateSavedAmount = startingBalance;
             while (goal.Amount > approximateSavedAmount)
             {
@@ -73,8 +71,6 @@ namespace ePiggyWeb.DataManagement.Saving
 
                     approximateSavedAmount += averagesOfAmountByImportanceDefault[i - 1] - averagesOfAmountByImportanceAdjusted[i - 1];
                 }
-                Debug.WriteLine(approximateSavedAmount);
-                Debug.WriteLine(timesToRepeatSaving);
                 timesToRepeatSaving++;              
             }
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
@@ -85,4 +81,3 @@ namespace ePiggyWeb.DataManagement.Saving
         }
     }
 }
-//Todo: fix while loop | add startingbalance into calculation | find out why for cycle loops in place
