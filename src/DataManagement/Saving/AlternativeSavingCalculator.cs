@@ -80,9 +80,11 @@ namespace ePiggyWeb.DataManagement.Saving
 
                     Debug.WriteLine(approximateSavedAmount);
                     approximateSavedAmount += averagesOfAmountByImportanceDefault[i - 1] - averagesOfAmountByImportanceAdjusted[i - 1];
-
-                    monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
                 }                              
+            }
+            for (var i = enumCount; i > (int)Importance.Necessary; i--)
+            {
+                monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
         }
     }
