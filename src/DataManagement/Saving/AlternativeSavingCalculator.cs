@@ -15,19 +15,19 @@ namespace ePiggyWeb.DataManagement.Saving
         private static decimal MaximalSavingValue { get; } = 0.5M;
         private static decimal MinimalSavingValue { get; } = 0.1M;
 
-        public static void GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList<ISavingSuggestion> entrySuggestions,
+        public static int GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList<ISavingSuggestion> entrySuggestions,
             List<SavingSuggestionByMonth> monthlySuggestions, decimal startingBalance, SavingType savingType = SavingType.Regular)
         {
             entrySuggestions ??= new List<ISavingSuggestion>();
 
             if (entryList is null)
             {
-                return;
+                return 0;
             }
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
 
-            //decimal[] arrayTemplate = new decimal[enumCount];
+            var timesToRepeatSaving = 0;
             decimal[] sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
             decimal[] sumsOfAmountByImportanceDefault = new decimal[enumCount];
             decimal[] averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
@@ -36,7 +36,7 @@ namespace ePiggyWeb.DataManagement.Saving
 
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
-                var expenses = entryList.GetBy((Importance)i - 1);
+                var expenses = entryList.GetBy((Importance)i);
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
                 {
@@ -58,15 +58,8 @@ namespace ePiggyWeb.DataManagement.Saving
             var approximateSavedAmount = 0M;
             while (goal.Amount > approximateSavedAmount)
             {
-                Debug.WriteLine("While");
                 for (var i = enumCount; i > (int)Importance.Necessary; i--)
                 {
-                    //bad, default and adjusted averages the same
-                    Debug.WriteLine(averagesOfAmountByImportanceAdjusted[i-1]);
-                    Debug.WriteLine(averagesOfAmountByImportanceDefault[i-1]);
-                    //seems 
-                    Debug.WriteLine(entryAmounts[i - 1]);
-                    Debug.WriteLine(i);
                     if (entryAmounts[i - 1] != 0)
                     {
                         averagesOfAmountByImportanceAdjusted[i - 1] = sumsOfAmountByImportanceAdjusted[i - 1] / entryAmounts[i - 1];
@@ -78,14 +71,16 @@ namespace ePiggyWeb.DataManagement.Saving
                         averagesOfAmountByImportanceDefault[i - 1] = 0;
                     }
 
-                    Debug.WriteLine(approximateSavedAmount);
                     approximateSavedAmount += averagesOfAmountByImportanceDefault[i - 1] - averagesOfAmountByImportanceAdjusted[i - 1];
-                }                              
+                }
+
+                timesToRepeatSaving++;              
             }
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
                 monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
+            return timesToRepeatSaving;
         }
     }
 }
