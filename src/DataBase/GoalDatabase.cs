@@ -105,14 +105,9 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
         {
-            var list = new List<GoalModel>();
-            foreach (var id in idArray)
-            {
-                var temp = await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-                list.Add(temp);
-            }
-            
-            Database.Goals.RemoveRange(list);
+            var goalsToRemove = await Task.WhenAll(idArray.Select(selector: async id =>
+                await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)));
+            Database.Goals.RemoveRange(goalsToRemove);
             await Database.SaveChangesAsync();
             return true;
         }
