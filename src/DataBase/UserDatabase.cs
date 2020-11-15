@@ -1,15 +1,23 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ePiggyWeb.DataBase
 {
-    public static class UserDatabase
+    public class UserDatabase
     {
-        public static int Register(string email, string pass)
+        private PiggyDbContext Database { get; }
+        public UserDatabase(PiggyDbContext database)
         {
-            using var db = new DatabaseContext();
-            var userExists = db.Users.Any(a => a.Email == email); //Find if email is in db
+            Database = database;
+        }
+
+        public async Task<int> RegisterAsync(string email, string pass)
+        {
+            var userExists = await Database.Users.AnyAsync(a => a.Email == email); //Find if email is in db
             if (userExists)
             {
                 //This email is already in use
@@ -19,15 +27,15 @@ namespace ePiggyWeb.DataBase
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
 
             var user = new UserModel { Email = email, Password = passwordHash, Salt = salt };
-            db.Add(user);
-            db.SaveChanges();
+            Database.Add(user);
+            await Database.SaveChangesAsync();
 
             return user.Id;
         }
 
-        public static int Authenticate(string email, string pass)
+        public async Task<int> AuthenticateAsync(string email, string pass)
         {
-            var user = GetUser(email);
+            var user = await GetUserAsync(email);
 
             if (user == null)
             {
@@ -43,36 +51,60 @@ namespace ePiggyWeb.DataBase
             return user.Id;
         }
 
-        public static bool ChangePassword(string email, string pass)
+        public async Task<bool> ChangePasswordAsync(string email, string pass)
         {
-            using var db = new DatabaseContext();
-            var user = db.Users.FirstOrDefault(a => a.Email == email);
+            var user = await Database.Users.FirstOrDefaultAsync(a => a.Email == email);
 
             if (user == null)
             {
                 return false;
             }
-                
+
             var salt = HashingProcessor.CreateSalt();
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
 
             user.Password = passwordHash;
             user.Salt = salt;
-            db.SaveChanges();
+            await Database.SaveChangesAsync();
 
             return true;
         }
 
-        public static UserModel GetUser(int userId)
+        public async Task<bool> DeleteUserAsync(int userId)
         {
-            using var db = new DatabaseContext();
-            return db.Users.FirstOrDefault(x => x.Id == userId);
+            return await DeleteUserAsync(x => x.Id == userId);
         }
 
-        public static UserModel GetUser(string email)
+        public async Task<bool> DeleteUserAsync(string email)
         {
-            using var db = new DatabaseContext();
-            return db.Users.FirstOrDefault(x => x.Email == email);
+            return await DeleteUserAsync(x => x.Email == email);
+        }
+
+        public async Task<bool> DeleteUserAsync(Expression<Func<UserModel, bool>> filter)
+        {
+            var temp = await Database.Users.FirstOrDefaultAsync(filter);
+            if (temp is null)
+            {
+                return false;
+            }
+            Database.Users.Remove(temp);
+            await Database.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<UserModel> GetUserAsync(int userId)
+        {
+            return await GetUserAsync(x => x.Id == userId);
+        }
+
+        public async Task<UserModel> GetUserAsync(string email)
+        {
+            return await GetUserAsync(x => x.Email == email);
+        }
+
+        public async Task<UserModel> GetUserAsync(Expression<Func<UserModel, bool>> filter)
+        {
+            return await Database.Users.FirstOrDefaultAsync(filter);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 
@@ -12,114 +11,38 @@ namespace ePiggyWeb.DataManagement
             foreach (var entry in entryManager.EntryList.GetBy(recurring: true))
             {
                 var differenceInMonths = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: entry.Date);
-                if (differenceInMonths > 0)
-                {
-                    if (!UpdateEntry(entryManager, entry, differenceInMonths))
-                    {
-                        return false;
-                    }
-                }
+                if (differenceInMonths <= 0) continue;
+                entry.Date = entry.Date.AddMonths(differenceInMonths);
+                entryManager.Edit(entry.Id, entry);
             }
             return true;
         }
 
-        private static bool UpdateEntry(IEntryManager entryManager, IEntry entry, int months)
+        public static IEntryList CreateRecurringListWithoutOriginalEntry(IEntry entry, EntryType entryType)
         {
-            var nextMonth = entry.Date;
+            var month = entry.Date;
+            var months = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: month);
+            var tempList = new EntryList(entryType);
             // one less since last one has to keep isMonthly = true;
-            var tempList = new EntryList(entryManager.EntryList.EntryType);
             for (var i = 0; i < months - 1; i++)
             {
-                //Adding new entry for each month according to date difference
-                nextMonth = TimeManager.MoveToNextMonth(dateTime: nextMonth);
-                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
+                month = TimeManager.MoveToNextMonth(dateTime: month);
+                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, month, false, entry.Importance);
                 tempList.Add(newEntry);
             }
 
-            /*Adding last entry, which has to keep isMonthly*/
-            nextMonth = TimeManager.MoveToNextMonth(nextMonth);
-            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
+            month = TimeManager.MoveToNextMonth(month);
+            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, month, true, entry.Importance);
             tempList.Add(newestEntry);
-            if (!entryManager.AddRange(tempList))
-            {
-                ExceptionHandler.Log("Couldn't add list of entries in updater: " + tempList);
-                return false;
-            }
-
-            //Moved here since no point to edit in each cycle rotation
-            var editedOriginalEntry = new Entry(entry.Id, entry.UserId, entry.Title, entry.Amount, entry.Date, false, entry.Importance);
-            if (entryManager.Edit(entry, editedOriginalEntry))
-            {
-                return true;
-            }
-
-            ExceptionHandler.Log("Couldn't edit entry in updater:" + editedOriginalEntry);
-            return false;
+            return tempList;
         }
 
-        public static bool UpdateEntry(IEntry entry, int userId, EntryType entryType)
+        public static IEntryList CreateRecurringList(IEntry entry, EntryType entryType)
         {
-            var nextMonth = entry.Date;
-            var months = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: nextMonth);
-            // one less since last one has to keep isMonthly = true;
-            var tempList = new EntryList(entryType);
-            for (var i = 0; i < months - 1; i++)
-            {
-                //Adding new entry for each month according to date difference
-                nextMonth = TimeManager.MoveToNextMonth(dateTime: nextMonth);
-                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
-                tempList.Add(newEntry);
-            }
-
-            /*Adding last entry, which has to keep isMonthly*/
-            nextMonth = TimeManager.MoveToNextMonth(nextMonth);
-            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
-            tempList.Add(newestEntry);
-            if (!EntryDbUpdater.AddRange(tempList, userId))
-            {
-                ExceptionHandler.Log("Couldn't add list of entries in updater: " + tempList);
-                return false;
-            }
-
-            //Moved here since no point to edit in each cycle rotation
-            var editedOriginalEntry = new Entry(entry.Id, entry.UserId, entry.Title, entry.Amount, entry.Date, false, entry.Importance);
-            if (EntryDbUpdater.Edit(entry.Id, editedOriginalEntry, entryType))
-            {
-                return true;
-            }
-
-            ExceptionHandler.Log("Couldn't edit entry in updater:" + editedOriginalEntry);
-            return false;
-        }
-
-
-
-        public static bool AddMonthlyEntry(IEntry entry, int userId, EntryType entryType)
-        {
-            var nextMonth = entry.Date;
-            var months = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: nextMonth);
-            // one less since last one has to keep isMonthly = true;
-            var tempList = new EntryList(entryType);
-            for (var i = 0; i < months - 1; i++)
-            {
-                //Adding new entry for each month according to date difference
-                nextMonth = TimeManager.MoveToNextMonth(dateTime: nextMonth);
-                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, false, entry.Importance);
-                tempList.Add(newEntry);
-            }
-            nextMonth = TimeManager.MoveToNextMonth(nextMonth);
-            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, nextMonth, true, entry.Importance);
-            tempList.Add(newestEntry);
-            var editedOriginalEntry = new Entry(entry.Id, entry.UserId, entry.Title, entry.Amount, entry.Date, false, entry.Importance);
-            tempList.Add(editedOriginalEntry);
-
-            if (EntryDbUpdater.AddRange(tempList, userId))
-            {
-                return true;
-            }
-            ExceptionHandler.Log("Couldn't add list of entries in updater: " + tempList);
-            return false;
-
+            entry.Recurring = false;
+            var tempList = new EntryList(entryType) { entry };
+            tempList.AddRange(CreateRecurringListWithoutOriginalEntry(entry, entryType));
+            return tempList;
         }
     }
 }

@@ -32,10 +32,10 @@
                         Finances
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" asp-page="/Income">Income</a>
-                        <a class="dropdown-item" asp-page="/Expenses">Expenses</a>
+                        <a class="dropdown-item" asp-page="/income">Income</a>
+                        <a class="dropdown-item" asp-page="/expenses">Expenses</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" asp-page="/Goals">Goals</a>
+                        <a class="dropdown-item" asp-page="/goals">Goals</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -43,9 +43,9 @@
                         Reports
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Spending</a>
-                        <a class="dropdown-item" href="#">Balance</a>
-                        <a class="dropdown-item" href="#">Income/Expenses</a>
+                        <a class="dropdown-item" asp-page="/expensesGraph">Expenses</a>
+                        <a class="dropdown-item" asp-page="/incomeGraph">Income</a>
+                        <a class="dropdown-item" asp-page="/comparisonGraph">Comparison</a>
                     </div>
                 </li>
             </ul>
@@ -57,6 +57,7 @@
                     {
                         <form method="post" asp-controller="Logout" asp-action="LogoutTask">
                             <label class="text-light">@User.FindFirst(ClaimTypes.Email).Value</label>
+                            <a asp-page="/changePassword" class="btn btn-primary">Change Password</a>
                             <button class="btn btn-primary">Logout</button>
                         </form>
                     }

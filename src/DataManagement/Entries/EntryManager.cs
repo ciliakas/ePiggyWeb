@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
@@ -19,7 +18,7 @@ namespace ePiggyWeb.DataManagement.Entries
         public IEntryList EntryList { get; }
 
         //Somehow I should get user id here
-        public int UserId { get; } = 0;
+        public int UserId { get; }
 
         public EntryManager(IEntryList entryList, int userId = 0)
         {
@@ -30,50 +29,59 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool Add(IEntry entry)
         {
-            //Should check if valid id or something
-            var id = EntryDbUpdater.Add(entry, UserId, EntryList.EntryType);
+            if (entry is null)
+            {
+                return false;
+            }
+
+            if (entry.Recurring)
+            {
+                return AddRange(RecurringUpdater.CreateRecurringList(entry, EntryList.EntryType));
+            }
+
+            var id = EntryDatabase.CreateSingle(entry, UserId, EntryList.EntryType);
 
             if (id <= 0)
             {
                 ExceptionHandler.Log("Invalid id of entry");
                 return false;
             }
+
             EntryList.Add(new Entry(id, UserId, entry));
             return true;
         }
 
-        public bool AddRange(IEntryEnumerable entryList)
+        public bool AddRange(IEntryList entryList)
         {
-            if (!EntryDbUpdater.AddRange(entryList, UserId))
+            if (!EntryDatabase.CreateList(entryList, UserId))
             {
                 return false;
             }
+
             EntryList.AddRange(entryList);
             return true;
         }
 
-        public bool Edit(IEntry oldEntry, IEntry newEntry)
+        public bool Edit(IEntry oldEntry, IEntry updatedEntry)
         {
-            //If something went wrong with database update return false
-            if (!EntryDbUpdater.Edit(oldEntry.Id, newEntry, EntryList.EntryType))
-            {
-                return false;
-            }
-            var temp = EntryList.FirstOrDefault(x => x.Id == oldEntry.Id);
-            //If couldn't find the entry return false
-            if (temp is null)
-            {
-                ExceptionHandler.Log("Edited entry id: " + oldEntry.Id + " in database but couldn't find it locally");
-                return false;
-            }
-            temp.Edit(newEntry);
-            return true;
+            return Edit(oldEntry.Id, updatedEntry);
         }
 
-        public bool Edit(int id, IEntry newEntry)
+        public bool Edit(int id, IEntry updatedEntry)
         {
+            if (updatedEntry is null)
+            {
+                return false;
+            }
+
+            if (updatedEntry.Recurring)
+            {
+                var list = RecurringUpdater.CreateRecurringListWithoutOriginalEntry(updatedEntry, EntryList.EntryType);
+                EntryDatabase.CreateList(list, UserId);
+                updatedEntry.Recurring = false;
+            }
             //If something went wrong with database update return false
-            if (!EntryDbUpdater.Edit(id, newEntry, EntryList.EntryType))
+            if (!EntryDatabase.UpdateSingle(id, UserId, updatedEntry, EntryList.EntryType))
             {
                 return false;
             }
@@ -84,42 +92,43 @@ namespace ePiggyWeb.DataManagement.Entries
                 ExceptionHandler.Log("Edited entry id: " + id + " in database but couldn't find it locally");
                 return false;
             }
-            temp.Edit(newEntry);
+            temp.Edit(updatedEntry);
             return true;
         }
 
         public bool Remove(IEntry entry)
         {
-            if (!EntryDbUpdater.Remove(entry.Id, UserId, EntryList.EntryType)) return false;
-            var temp = EntryList.FirstOrDefault(x => x.Id == entry.Id);
-            if (temp is null)
-            {
-                ExceptionHandler.Log("Removed entry id: " + entry.Id + " from database but couldn't find it locally");
-                return false;
-            }
-            EntryList.Remove(temp);
-            return true;
+            return Remove(entry.Id);
         }
+
         public bool Remove(int id)
         {
-            if (!EntryDbUpdater.Remove(id, UserId, EntryList.EntryType)) return false;
+            if (!EntryDatabase.Delete(id, UserId, EntryList.EntryType))
+            {
+                return false;
+            }
+
             var temp = EntryList.FirstOrDefault(x => x.Id == id);
+
             if (temp is null)
             {
                 ExceptionHandler.Log("Removed entry id: " + id + " from database but couldn't find it locally");
                 return false;
             }
+
             EntryList.Remove(temp);
             return true;
         }
 
         public bool RemoveAll(IEntryList entryList)
         {
-            var idList = entryList.Select(va => va.Id).ToArray();
-            if (!EntryDbUpdater.RemoveAll(idList, entryList.EntryType))
+            var idArray = entryList.Select(entry => entry.Id).ToArray();
+
+            if (!EntryDatabase.DeleteList(idArray, UserId, entryList.EntryType))
             {
                 return false;
             }
+
             var temp = new EntryList(EntryType.Income);
             EntryList.RemoveAll(entryList.Contains);
             return true;
@@ -128,7 +137,8 @@ namespace ePiggyWeb.DataManagement.Entries
         public bool RemoveAll(IEnumerable<int> idList)
         {
             var idArray = idList as int[] ?? idList.ToArray();
-            if (!EntryDbUpdater.RemoveAll(idArray, EntryList.EntryType))
+
+            if (!EntryDatabase.DeleteList(idArray, UserId, EntryList.EntryType))
             {
                 return false;
             }
@@ -146,28 +156,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool ReadFromDb()
         {
-            using var db = new DatabaseContext();
-            
-            switch (EntryList.EntryType)
-            {
-                case EntryType.Income:
-                    foreach (var dbEntry in db.Incomes.Where(x => x.UserId == UserId)) // query executed and data obtained from database
-                    {
-                        var newEntry = new Entry(dbEntry);
-                        EntryList.Add(newEntry);
-                    }
-                    break;
-                case EntryType.Expense:
-                    foreach (var dbEntry in db.Expenses.Where(x => x.UserId == UserId)) // query executed and data obtained from database
-                    {
-                        var newEntry = new Entry(dbEntry);
-                        EntryList.Add(newEntry);
-                    }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
+            EntryList.AddRange(EntryDatabase.ReadList(UserId, EntryList.EntryType));
             return true;
         }
 

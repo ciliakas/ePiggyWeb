@@ -18,9 +18,11 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [StringLength(30)]
         public string Title { get; set; }
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
@@ -32,32 +34,70 @@ namespace ePiggyWeb.Pages
 
         private int UserId { get; set; }
 
+        public decimal AllExpenses { get; set; }
+
+        [BindProperty]
+        public DateTime StartDate { get; set; }
+        [BindProperty]
+        public DateTime EndDate { get; set; }
+
+        public string ErrorMessage = "";
 
         public void OnGet()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Expenses = dataManager.Expenses.EntryList;
+            var today = DateTime.Now;
+            StartDate = new DateTime(today.Year, today.Month, 1);
+            EndDate = DateTime.Today;
+            SetData();
+        }
+
+        public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
+        {
+            if (startDate > endDate)
+            {
+                ErrorMessage = "Start date is bigger than end date!";
+                var today = DateTime.Now;
+                StartDate = new DateTime(today.Year, today.Month, 1);
+                EndDate = DateTime.Today;
+            }
+            else
+            {
+                StartDate = startDate;
+                EndDate = endDate;
+            }
+            SetData();
+            return Page();
         }
 
         public IActionResult OnPostNewEntry()
         {
             if (!ModelState.IsValid)
             {
-               OnGet();
-               return Page();
+                var today = DateTime.Now;
+                StartDate = new DateTime(today.Year, today.Month, 1);
+                EndDate = DateTime.Today;
+                SetData();
+                return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-            EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
-            return RedirectToPage("/Expenses");
+            EntryDatabase.Create(entry, UserId, EntryType.Expense);
+            return RedirectToPage("/expenses");
         }
 
         public IActionResult OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            EntryDbUpdater.Remove(id, UserId, EntryType.Expense);
-            return RedirectToPage("/Expenses");
+            EntryDatabase.Delete(id, UserId, EntryType.Expense);
+            return RedirectToPage("/expenses");
+        }
+
+        private void SetData()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var dataManager = new DataManager(UserId);
+            Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate);
+            AllExpenses = dataManager.Expenses.EntryList.GetSum();
         }
     }
 }

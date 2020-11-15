@@ -5,7 +5,6 @@ using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
-using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -50,7 +49,7 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = Goal.CreateLocalGoal(Title, Amount);
-            GoalDbUpdater.Add(temp, UserId);
+            GoalDatabase.Create(temp, UserId);
             return RedirectToPage("/goals");
         }
 
@@ -66,16 +65,14 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             decimal.TryParse(amount, out var parsedAmount);
             var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
-            DeleteGoalFromDb(id);
+            GoalDatabase.MoveGoalToExpenses(id, UserId, entry);
             return RedirectToPage("/expenses");
         }
 
         private void DeleteGoalFromDb(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            GoalDbUpdater.Remove(id, UserId);
+            GoalDatabase.Delete(id, UserId);
         }
-
     }
 }
