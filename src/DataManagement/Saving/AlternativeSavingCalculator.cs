@@ -55,7 +55,7 @@ namespace ePiggyWeb.DataManagement.Saving
 
                 }
             }
-            var approximateSavedAmount = 0M;
+            var approximateSavedAmount = startingBalance;
             while (goal.Amount > approximateSavedAmount)
             {
                 for (var i = enumCount; i > (int)Importance.Necessary; i--)
@@ -73,7 +73,8 @@ namespace ePiggyWeb.DataManagement.Saving
 
                     approximateSavedAmount += averagesOfAmountByImportanceDefault[i - 1] - averagesOfAmountByImportanceAdjusted[i - 1];
                 }
-
+                Debug.WriteLine(approximateSavedAmount);
+                Debug.WriteLine(timesToRepeatSaving);
                 timesToRepeatSaving++;              
             }
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
