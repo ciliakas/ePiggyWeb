@@ -142,48 +142,29 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteListAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
         {
-            if (entryType == EntryType.Income)
+            IEnumerable<IEntryModel> entriesToRemove = entryType switch
             {
-                var entriesToRemove = await Database.Incomes.Where(filter).Cast<IncomeModel>().ToListAsync();
-                Database.Incomes.RemoveRange(entriesToRemove);
-            }
-            else
-            {
-                var entriesToRemove = await Database.Expenses.Where(filter).Cast<ExpenseModel>().ToListAsync();
-                Database.Expenses.RemoveRange(entriesToRemove);
-            }
-
+                EntryType.Income => await Database.Incomes.Where(filter).Cast<IncomeModel>().ToListAsync(),
+                _ => await Database.Expenses.Where(filter).Cast<ExpenseModel>().ToListAsync()
+            };
+            Database.RemoveRange(entriesToRemove);
             await Database.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId, EntryType entryType)
         {
-            if (entryType == EntryType.Income)
+            IEnumerable<IEntryModel> entriesToRemove = entryType switch
             {
-                var list = new List<IncomeModel>();
-                foreach (var id in idArray)
-                {
-                    var temp = await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-                    list.Add(temp);
-                }
-                Database.Incomes.RemoveRange(list);
-            }
-            else
-            {
-                var list = new List<ExpenseModel>();
-                foreach (var id in idArray)
-                {
-                    var temp = await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-                    list.Add(temp);
-                }
-                Database.Expenses.RemoveRange(list);
-            }
-
+                EntryType.Income => await Task.WhenAll(idArray.Select(selector: async id =>
+                    await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId))),
+                _ => await Task.WhenAll(idArray.Select(selector: async id =>
+                    await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)))
+            };
+            Database.RemoveRange(entriesToRemove);
             await Database.SaveChangesAsync();
             return true;
         }
-
 
         public async Task<IEntry> ReadAsync(int id, int userId, EntryType entryType)
         {
