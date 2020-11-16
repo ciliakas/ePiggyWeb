@@ -1,4 +1,5 @@
 ﻿@page
+@using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.GoalsModel
 
 <br />
@@ -62,7 +63,7 @@ else
                     }
                     <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                 </div>
-                <h5 class="text-light" title="Saved/Required">@Model.Savings/@item.Amount</h5>
+                <h5 class="text-light" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(item.Amount)</h5>
                 @if (percent == 100)
                 {
                     <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-shopping-cart fa-2x text-info"></i></button>
