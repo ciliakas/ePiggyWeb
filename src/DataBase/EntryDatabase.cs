@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -126,8 +125,8 @@ namespace ePiggyWeb.DataBase
             {
                 var dbEntry = entryType switch
                 {
-                    EntryType.Income => Database.Incomes.FirstOrDefault(filter),
-                    _ => Database.Expenses.FirstOrDefault(filter)
+                    EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(filter),
+                    _ => await Database.Expenses.FirstOrDefaultAsync(filter)
                 };
                 Database.Remove(dbEntry ?? throw new InvalidOperationException());
                 await Database.SaveChangesAsync();
@@ -164,8 +163,8 @@ namespace ePiggyWeb.DataBase
         {
             IEntryModel dbEntry = entryType switch
             {
-                EntryType.Income => Database.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == userId),
-                _ => Database.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == userId)
+                EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId),
+                _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
             };
             return await ReadAsync(x => x.Id == id && x.UserId == userId, entryType);
         }
