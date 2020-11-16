@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -155,16 +156,8 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId, EntryType entryType)
         {
-            IEnumerable<IEntryModel> entriesToRemove = entryType switch
-            {
-                EntryType.Income => await Task.WhenAll(idArray.Select(selector: async id =>
-                    await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId))),
-                _ => await Task.WhenAll(idArray.Select(selector: async id =>
-                    await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)))
-            };
-            Database.RemoveRange(entriesToRemove);
-            await Database.SaveChangesAsync();
-            return true;
+            var filter = PredicateBuilder.BuildEntryFilter(idArray, userId);
+            return await DeleteListAsync(filter, entryType);
         }
 
         public async Task<IEntry> ReadAsync(int id, int userId, EntryType entryType)
