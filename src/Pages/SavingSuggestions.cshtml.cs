@@ -15,6 +15,7 @@ namespace ePiggyWeb.Pages
         public decimal Savings { get; set; }
         private int UserId { get; set; }
         public IEntryList Expenses { get; set; }
+        public int MonthsToSave { get; set; }
 
         public IList<ISavingSuggestion> EntrySuggestions { get; set; }
         public List<SavingSuggestionByMonth> MonthlySuggestions { get; set; }
@@ -31,7 +32,7 @@ namespace ePiggyWeb.Pages
             {
                 Savings = 0;
             }
-            AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses,
+            MonthsToSave = AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses,
                 Goal,
                 EntrySuggestions,
                 MonthlySuggestions,
