@@ -144,8 +144,8 @@ namespace ePiggyWeb.DataBase
         {
             IEnumerable<IEntryModel> entriesToRemove = entryType switch
             {
-                EntryType.Income => await Database.Incomes.Where(filter).Cast<IncomeModel>().ToListAsync(),
-                _ => await Database.Expenses.Where(filter).Cast<ExpenseModel>().ToListAsync()
+                EntryType.Income => await Database.Incomes.Where(filter).ToListAsync(),
+                _ => await Database.Expenses.Where(filter).ToListAsync()
             };
             Database.RemoveRange(entriesToRemove);
             await Database.SaveChangesAsync();
