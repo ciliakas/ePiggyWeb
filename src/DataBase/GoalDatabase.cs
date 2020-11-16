@@ -75,12 +75,12 @@ namespace ePiggyWeb.DataBase
             return await DeleteAsync(x => x.Id == id && x.UserId == userId);
         }
 
-        public async Task<bool> DeleteAsync(Expression<Func<GoalModel, bool>> filter)
+        public async Task<bool> DeleteAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             try
             {
                 var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
-                Database.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
+                Database.Remove(dbGoal ?? throw new InvalidOperationException());
                 await Database.SaveChangesAsync();
             }
             catch (InvalidOperationException ex)
@@ -90,6 +90,27 @@ namespace ePiggyWeb.DataBase
             }
             return true;
         }
+        public async Task<bool> DeleteAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+        {
+            try
+            {
+                var dbEntry = entryType switch
+                {
+                    EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(filter),
+                    _ => await Database.Expenses.FirstOrDefaultAsync(filter)
+                };
+                Database.Remove(dbEntry ?? throw new InvalidOperationException());
+                await Database.SaveChangesAsync();
+            }
+            catch (InvalidOperationException ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
 
         public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList)
         {
@@ -112,10 +133,10 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> DeleteListAsync(Expression<Func<GoalModel, bool>> filter)
+        public async Task<bool> DeleteListAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             var goalsToRemove = await Database.Goals.Where(filter).ToListAsync();
-            Database.Goals.RemoveRange(goalsToRemove);
+            Database.RemoveRange(goalsToRemove);
             await Database.SaveChangesAsync();
             return true;
         }
