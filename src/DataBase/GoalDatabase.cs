@@ -90,47 +90,16 @@ namespace ePiggyWeb.DataBase
             }
             return true;
         }
-        public async Task<bool> DeleteAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+
+        public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList, int userId)
         {
-            try
-            {
-                var dbEntry = entryType switch
-                {
-                    EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(filter),
-                    _ => await Database.Expenses.FirstOrDefaultAsync(filter)
-                };
-                Database.Remove(dbEntry ?? throw new InvalidOperationException());
-                await Database.SaveChangesAsync();
-            }
-            catch (InvalidOperationException ex)
-            {
-                ExceptionHandler.Log(ex.ToString());
-                return false;
-            }
-
-            return true;
-        }
-
-
-        public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList)
-        {
-            var enumerable = goalList as IGoal[] ?? goalList.ToArray();
-            if (!enumerable.Any())
-            {
-                return false;
-            }
-            var userId = enumerable.First().UserId;
-            var idList = enumerable.Select(goal => goal.Id).ToList();
+            var idList = goalList.Select(goal => goal.Id).ToList();
             return await DeleteListAsync(idList, userId);
         }
 
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
         {
-            var goalsToRemove = await Task.WhenAll(idArray.Select(selector: async id =>
-                await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)));
-            Database.Goals.RemoveRange(goalsToRemove);
-            await Database.SaveChangesAsync();
-            return true;
+            return await DeleteListAsync(PredicateBuilder.BuildGoalFilter(idArray, userId));
         }
 
         public async Task<bool> DeleteListAsync(Expression<Func<IGoalModel, bool>> filter)
