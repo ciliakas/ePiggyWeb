@@ -21,7 +21,7 @@
 }
 else
 {
-    <h4 class="text-light">Total Expenses of this period: @Model.Expenses.GetSum().ToString(CultureInfo.InvariantCulture)</h4>
+    <h4 class="text-light">Total Expenses of this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</h4>
 }
 
 <div class="row ml-2 mr-2 mt-3 mb-5">
