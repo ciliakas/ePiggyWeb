@@ -13,50 +13,40 @@
         <th>
             <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Title"></label>
         </th>
-        <th style="width: 18%">
-            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
-        </th>
         <th style="width: 10%">
             <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Date"></label>
         </th>
         <th style="width: 15%">
             <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
         </th>
-        <th style="width: 5%">
-            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Recurring"></label>
+        <th style="width: 18%">
+            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
         </th>
-        <th style="width: 15%">
-            <label>Suggested</label>
+        <th style="width: 18%">
+            <label class="text-warning"><b>Suggested Amount</b></label>
         </th>
 
     </tr>
 
     @foreach (var item in Model.EntrySuggestions)
     {
-        <tr class="table-light border-primary">
-            <td class="border-primary">
-                @Html.DisplayFor(m => item.Entry.Title)
-            </td>
-            <td class="border-primary">
-                @item.Entry.Amount.ToString(CultureInfo.CurrentCulture)
-            </td>
-            <td class="border-primary">
-                @item.Entry.Date.ToShortDateString()
-                <!--Html.DisplayFor(m => item.Date)-->
-            </td>
-            <td class="border-primary">
-                @((Importance)item.Entry.Importance)
-            </td>
-            <td class="border-primary">
-                @if (item.Entry.Recurring)
-                {
-                    <i class="fas fa-check text-success"></i>
-                }
-            </td>
-            <td class="border-primary">
-                @item.Amount
-            </td>
-        </tr>
+<tr class="table-light border-primary">
+    <td class="border-primary">
+        @Html.DisplayFor(m => item.Entry.Title)
+    </td>
+    <td class="border-primary">
+        @item.Entry.Date.ToShortDateString()
+    </td>
+    <td class="border-primary">
+        @((Importance)item.Entry.Importance)
+    </td>
+    <td class="border-primary">
+        @item.Entry.Amount.ToString(CultureInfo.CurrentCulture)
+    </td>
+    <td class="border-primary text-warning">
+        @item.Amount
+    </td>
+</tr>
     }
 </table>
 <hr />
