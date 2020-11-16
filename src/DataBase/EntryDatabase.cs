@@ -72,7 +72,6 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-
         public async Task<bool> UpdateAsync(int id, int userId, IEntry updatedEntry, EntryType entryType)
         {
             if (updatedEntry is null)
@@ -155,8 +154,8 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteListAsync(IEnumerable<IEntry> entryArray, int userId, EntryType entryType)
         {
-            var idList = entryArray.Select(entry => entry.Id).ToArray();
-            return await DeleteListAsync(idList, userId, entryType);
+            var idArray = entryArray.Select(entry => entry.Id).ToArray();
+            return await DeleteListAsync(idArray, userId, entryType);
         }
 
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId, EntryType entryType)
