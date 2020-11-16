@@ -3,7 +3,6 @@
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.ExpensesGraphModel
 
-
 <form method="get" class="mt-5">
     <input type="hidden" name="handler" value="Filter" />
     <label class="text-light">Period:</label>
@@ -18,6 +17,10 @@
     <div class="alert alert-warning" role="alert">
         Graphs are empty, since no data found! Try a <strong>different period.</strong>
     </div>
+}
+else
+{
+    <h4 class="text-light">Total Expenses of this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</h4>
 }
 
 <div class="row ml-2 mr-2 mt-3 mb-5">
@@ -58,7 +61,7 @@
             'title': 'Expenses by importance',
             'height': 600,
             'vAxis': { 'textStyle': { 'color': '#FFF' }, 'gridlines': { 'count': 5 } },
-            'backgroundColor': '#276dc1',
+            'backgroundColor': { 'fill': 'transparent' },
             'colors': ['#F44336', '#9C27B0', '#3F51B5', '#2196F3', '#4CAF50'],
             'legendTextStyle': { color: '#FFF' },
             'titleTextStyle': { color: '#FFF' },
