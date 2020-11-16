@@ -153,6 +153,12 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
+        public async Task<bool> DeleteListAsync(IEnumerable<IEntry> entryArray, int userId, EntryType entryType)
+        {
+            var idList = entryArray.Select(entry => entry.Id).ToArray();
+            return await DeleteListAsync(idList, userId, entryType);
+        }
+
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId, EntryType entryType)
         {
             var filter = PredicateBuilder.BuildEntryFilter(idArray, userId);
