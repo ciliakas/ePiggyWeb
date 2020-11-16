@@ -147,6 +147,7 @@ namespace ePiggyWeb.DataBase
                 EntryType.Income => await Database.Incomes.Where(filter).ToListAsync(),
                 _ => await Database.Expenses.Where(filter).ToListAsync()
             };
+            //var predicate = Expression<Func<IEntryModel, bool>>.Create();
             Database.RemoveRange(entriesToRemove);
             await Database.SaveChangesAsync();
             return true;
@@ -196,8 +197,8 @@ namespace ePiggyWeb.DataBase
             var list = new EntryList(entryType);
             IEnumerable<IEntry> temp = entryType switch
             {
-                EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry)).Cast<IEntry>().ToListAsync(),
-                _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry)).Cast<IEntry>().ToListAsync()
+                EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
+                _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
             };
             list.AddRange(temp);
             return list;
