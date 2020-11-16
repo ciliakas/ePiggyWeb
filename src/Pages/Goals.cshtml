@@ -43,7 +43,7 @@ else
                 <h3 class="text-light problematic-title" title="Title">@item.Title </h3>
                 <div class="progress mt-4">
                     @{
-                        var percent = item.Amount == 0 ? 0 : decimal.Round(Model.Savings / item.Amount * 100);
+                        var percent = item.Amount == 0 ? 100 : decimal.Round(Model.Savings / item.Amount * 100);
                         percent = percent > 100 ? 100 : percent;
                         string color;
                         if (percent < 30)

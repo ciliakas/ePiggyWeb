@@ -27,6 +27,7 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
 
         public void OnGet()
