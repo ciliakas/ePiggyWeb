@@ -72,7 +72,6 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-
         public async Task<bool> UpdateAsync(int id, int userId, IEntry updatedEntry, EntryType entryType)
         {
             if (updatedEntry is null)
@@ -125,8 +124,8 @@ namespace ePiggyWeb.DataBase
             {
                 var dbEntry = entryType switch
                 {
-                    EntryType.Income => Database.Incomes.FirstOrDefault(filter),
-                    _ => Database.Expenses.FirstOrDefault(filter)
+                    EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(filter),
+                    _ => await Database.Expenses.FirstOrDefaultAsync(filter)
                 };
                 Database.Remove(dbEntry ?? throw new InvalidOperationException());
                 await Database.SaveChangesAsync();
@@ -144,34 +143,33 @@ namespace ePiggyWeb.DataBase
         {
             IEnumerable<IEntryModel> entriesToRemove = entryType switch
             {
-                EntryType.Income => await Database.Incomes.Where(filter).Cast<IncomeModel>().ToListAsync(),
-                _ => await Database.Expenses.Where(filter).Cast<ExpenseModel>().ToListAsync()
+                EntryType.Income => await Database.Incomes.Where(filter).ToListAsync(),
+                _ => await Database.Expenses.Where(filter).ToListAsync()
             };
+            //var predicate = Expression<Func<IEntryModel, bool>>.Create();
             Database.RemoveRange(entriesToRemove);
             await Database.SaveChangesAsync();
             return true;
         }
 
+        public async Task<bool> DeleteListAsync(IEnumerable<IEntry> entryArray, int userId, EntryType entryType)
+        {
+            var idArray = entryArray.Select(entry => entry.Id).ToArray();
+            return await DeleteListAsync(idArray, userId, entryType);
+        }
+
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId, EntryType entryType)
         {
-            IEnumerable<IEntryModel> entriesToRemove = entryType switch
-            {
-                EntryType.Income => await Task.WhenAll(idArray.Select(selector: async id =>
-                    await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId))),
-                _ => await Task.WhenAll(idArray.Select(selector: async id =>
-                    await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)))
-            };
-            Database.RemoveRange(entriesToRemove);
-            await Database.SaveChangesAsync();
-            return true;
+            var filter = PredicateBuilder.BuildEntryFilter(idArray, userId);
+            return await DeleteListAsync(filter, entryType);
         }
 
         public async Task<IEntry> ReadAsync(int id, int userId, EntryType entryType)
         {
             IEntryModel dbEntry = entryType switch
             {
-                EntryType.Income => Database.Incomes.FirstOrDefault(x => x.Id == id && x.UserId == userId),
-                _ => Database.Expenses.FirstOrDefault(x => x.Id == id && x.UserId == userId)
+                EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId),
+                _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
             };
             return await ReadAsync(x => x.Id == id && x.UserId == userId, entryType);
         }
@@ -196,8 +194,8 @@ namespace ePiggyWeb.DataBase
             var list = new EntryList(entryType);
             IEnumerable<IEntry> temp = entryType switch
             {
-                EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry)).Cast<IEntry>().ToListAsync(),
-                _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry)).Cast<IEntry>().ToListAsync()
+                EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
+                _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
             };
             list.AddRange(temp);
             return list;
