@@ -13,16 +13,17 @@
 <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MonthsToSave months</span></h4>
 <br />
 <hr />
-<form method="get" class="mt-5">
+<form method="get" class="mt-5 mb-5">
     <input asp-for="Id" type="hidden" value="@Model.Id"/>
     <input type="hidden" name="handler" value="Filter"/>
     <label class="text-light">Period:</label>
     <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()"/>
     <label class="text-light"> - </label>
     <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()"/>
-    <input type="submit" value="Filter" class="btn btn-warning ml-5"/>
+    <input type="submit" value="Filter" class="btn btn-warning ml-3"/>
     <p class="text-warning">@Model.ErrorMessage</p>
 </form>
+<hr/>
 
 <div class="container">
     <h4 class="text-light mb-3">Suggested Expenses improvements</h4>
