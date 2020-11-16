@@ -8,11 +8,22 @@
 </div>
 <h2 class="text-light">@Model.Goal.Title</h2>
 <h3 class="text-light mt-3 mb-4">Currently: @NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(Model.Goal.Amount)</h3>
-<hr/>
-<br/>
+<hr />
+<br />
 <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MonthsToSave months</span></h4>
-<br/>
-<hr/>
+<br />
+<hr />
+<form method="get" class="mt-5">
+    <input asp-for="Id" type="hidden" value="@Model.Id"/>
+    <input type="hidden" name="handler" value="Filter"/>
+    <label class="text-light">Period:</label>
+    <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()"/>
+    <label class="text-light"> - </label>
+    <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()"/>
+    <input type="submit" value="Filter" class="btn btn-warning ml-5"/>
+    <p class="text-warning">@Model.ErrorMessage</p>
+</form>
+
 <div class="container">
     <h4 class="text-light mb-3">Suggested Expenses improvements</h4>
     <table class="table table-hover border-primary table-bordered mb-5">
@@ -20,7 +31,7 @@
             <th>
                 <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Title"></label>
             </th>
-            <th style="width: 10%">
+            <th style="width: 15%">
                 <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Date"></label>
             </th>
             <th style="width: 15%">
@@ -90,4 +101,4 @@
         }
     </table>
 </div>
-<hr/>
+<hr />
