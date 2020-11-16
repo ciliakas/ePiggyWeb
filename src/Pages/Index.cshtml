@@ -15,8 +15,8 @@
    
 }
 
-<div class="jumbotron">
-    <img width="250px" src="images/mainLogo.PNG" alt="" class="title-image">
+<div class="container index-Top">
+    <img width="350px" src="images/mainLogo.PNG" alt="" class="title-image mt-2">
     @if (User.Identity.IsAuthenticated)
     {
         <h1 class="display-4">Welcome Back!</h1>
@@ -29,81 +29,78 @@
     else
     {
         <h1 class="display-4">Save more!</h1>
-        <p class="lead">This is your saving partner that will allow to save more!</p>
+        <p class="lead">This is your saving partner that will allow to list and manage your saving!</p>
         <hr class="my-4">
         <p class="lead">
-            <a class="btn btn-primary btn-lg" asp-page="/Register" role="button">Get Started</a>
+            <a class="btn btn-primary btn-lg mb-5" asp-page="/Register" role="button">Get Started</a>
         </p>
     }
 </div>
 
-    <section class="white-section" id="features">
+<section class="white-section" id="features">
 
-        <div class="container-fluid">
+    <div class="container-fluid">
 
-            <div class="row">
-                <div class="col-lg-4 feature-box">
-                    <p><i class="fas fa-check-circle fa-4x icon-features"></i></p>
-                    <h3 class="header-features">Easy to use.</h3>
-                    <p>So easy to use, even your dog could do it.</p>
-                </div>
-                <div class="col-lg-4 feature-box">
-                    <p><i class="fas fa-piggy-bank fa-4x icon-features"></i></p>
-                    <h3 class="header-features">Detailed saving</h3>
-                    <p>Monitor not only income but expenses as well.</p>
-                </div>
-                <div class="col-lg-4 feature-box">
-                    <p><i class="fas fa-magic fa-4x icon-features"></i></p>
-                    <h3 class="header-features">Automated input</h3>
-                    <p>Income/expenses that occur every month are entered automatically.</p>
-                </div>
+        <div class="row">
+            <div class="col-lg-4 feature-box">
+                <p><i class="fas fa-check-circle fa-4x icon-features"></i></p>
+                <h3 class="header-features">Easy to use.</h3>
+                <p>So easy to use, even your dog could do it.</p>
             </div>
-
-            <div class="row">
-                <div class="col-lg-4 feature-box">
-                    <p><i class="fas fa-calculator fa-4x icon-features"></i></p>
-                    <h3 class="header-features">Suggestions</h3>
-                    <p>Suggested expenses according to their importance and previous amount</p>
-                </div>
-                <div class="col-lg-4 feature-box">
-                    <p><i class="fas fa-bullseye fa-4x icon-features"></i></p>
-                    <h3 class="header-features">Goals</h3>
-                    <p>Enter goal by yourself or just provide name and we will find amount for you.</p>
-                </div>
-                <div class="col-lg-4 feature-box">
-                    <p><i class="fab fa-creative-commons-nc-eu fa-4x icon-features"></i></p>
-                    <h3 class="header-features">Costs nothing</h3>
-                    <p>All features available for every user for free!</p>
-                </div>
+            <div class="col-lg-4 feature-box">
+                <p><i class="fas fa-piggy-bank fa-4x icon-features"></i></p>
+                <h3 class="header-features">Detailed saving</h3>
+                <p>Monitor not only income but expenses as well.</p>
             </div>
+            <div class="col-lg-4 feature-box">
+                <p><i class="fas fa-magic fa-4x icon-features"></i></p>
+                <h3 class="header-features">Automated input</h3>
+                <p>Income/expenses that occur every month are entered automatically.</p>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-lg-4 feature-box">
+                <p><i class="fas fa-calculator fa-4x icon-features"></i></p>
+                <h3 class="header-features">Suggestions</h3>
+                <p>Suggested expenses according to their importance and previous amount</p>
+            </div>
+            <div class="col-lg-4 feature-box">
+                <p><i class="fas fa-bullseye fa-4x icon-features"></i></p>
+                <h3 class="header-features">Goals</h3>
+                <p>Enter goal by yourself or just provide name and we will find amount for you.</p>
+            </div>
+            <div class="col-lg-4 feature-box">
+                <p><i class="fab fa-creative-commons-nc-eu fa-4x icon-features"></i></p>
+                <h3 class="header-features">Costs nothing</h3>
+                <p>All features available for every user for free!</p>
+            </div>
+        </div>
+    </div>
+</section>
 
+<section id="testimonials">
+    <div id="testimonial-carousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="container-fluid carousel-item active">
+                <h2 class="testimonial-text">Because of ePiggy I was able to save for my favorite treats!</h2>
+                <img class="testimonial-image" src="images/dog-img.jpg" alt="dog-profile">
+                <em>Bobikas, Utena</em>
+            </div>
+            <div class="container-fluid carousel-item">
+                <h2 class="testimonial-text">Thanks to ePiggy I do not need rich boyfriend anymore.</h2>
+                <img class="testimonial-image" src="images/lady-img.jpg" alt="lady-profile">
+                <em>Marytė, Kėdainiai</em>
+            </div>
 
         </div>
-    </section>
-
-    <section id="testimonials">
-        <div id="testimonial-carousel" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-                <div class="container-fluid carousel-item active">
-                    <h2 class="testimonial-text">Because of ePiggy I was able to save for my favorite treats!</h2>
-                    <img class="testimonial-image" src="images/dog-img.jpg" alt="dog-profile">
-                    <em>Bobikas, Utena</em>
-                </div>
-                <div class="container-fluid carousel-item">
-                    <h2 class="testimonial-text">Thanks to ePiggy I do not need rich boyfriend anymore.</h2>
-                    <img class="testimonial-image" src="images/lady-img.jpg" alt="lady-profile">
-                    <em>Marytė, Kėdainiai</em>
-                </div>
-
-            </div>
-            <a class="carousel-control-prev" href="#testimonial-carousel" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#testimonial-carousel" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-    </section>
+        <a class="carousel-control-prev" href="#testimonial-carousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#testimonial-carousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+</section>
