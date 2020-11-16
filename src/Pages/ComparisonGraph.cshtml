@@ -1,5 +1,6 @@
 ﻿@page
 @using System.Globalization
+@using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.ComparisonGraphModel
 
 <form method="get" class="mt-5">
@@ -20,7 +21,8 @@
 }
 else
 {
-    <h4 class="text-light">This period: Income: @Model.Income.ToString(CultureInfo.InvariantCulture) / Expenses: @Model.Expenses.ToString(CultureInfo.InvariantCulture)</h4>
+    <h4 class="text-light">This period: Income: @NumberFormatter.FormatCurrency(Model.Income) / Expenses: @NumberFormatter.FormatCurrency(Model.Expenses)</h4>
+    <h4 class="text-light">Balance: @NumberFormatter.FormatCurrency(Model.Income - Model.Expenses)</h4>
 }
 <div class="container p-0 mt-3 mb-5">
     <div class="col-12" id="graph">
