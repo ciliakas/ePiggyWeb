@@ -4,7 +4,7 @@
 <br />
 <h2 class="text-info">Goals</h2>
 <button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal</button>
-<button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal's price</button>
+<button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal</button>
 @if (!ModelState.IsValid)
 {
 <div class="container">
@@ -129,7 +129,7 @@ else
         <form method="post" asp-page-handler="ParseGoal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Goal</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Parse Goal</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -140,6 +140,7 @@ else
                         <input asp-for="Title" type="text" placeholder="Title*" value="" />
                         <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
+                    <p class="text-primary">Enter exact name of item for more precise pricing! :)</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
