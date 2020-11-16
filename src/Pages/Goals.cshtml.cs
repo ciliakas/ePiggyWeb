@@ -1,10 +1,12 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -49,6 +51,19 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = Goal.CreateLocalGoal(Title, Amount);
+            GoalDatabase.Create(temp, UserId);
+            return RedirectToPage("/goals");
+        }
+
+        public async Task<IActionResult> OnPostParseGoal()
+        {
+            if (string.IsNullOrEmpty(Title))
+            {
+                OnGet();
+                return Page();
+            }
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var temp = await InternetParser.ReadPriceFromCamel(Title);
             GoalDatabase.Create(temp, UserId);
             return RedirectToPage("/goals");
         }
