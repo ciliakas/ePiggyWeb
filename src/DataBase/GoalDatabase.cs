@@ -75,12 +75,12 @@ namespace ePiggyWeb.DataBase
             return await DeleteAsync(x => x.Id == id && x.UserId == userId);
         }
 
-        public async Task<bool> DeleteAsync(Expression<Func<GoalModel, bool>> filter)
+        public async Task<bool> DeleteAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             try
             {
                 var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
-                Database.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
+                Database.Remove(dbGoal ?? throw new InvalidOperationException());
                 await Database.SaveChangesAsync();
             }
             catch (InvalidOperationException ex)
@@ -91,31 +91,21 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList)
+        public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList, int userId)
         {
-            var enumerable = goalList as IGoal[] ?? goalList.ToArray();
-            if (!enumerable.Any())
-            {
-                return false;
-            }
-            var userId = enumerable.First().UserId;
-            var idList = enumerable.Select(goal => goal.Id).ToList();
+            var idList = goalList.Select(goal => goal.Id).ToList();
             return await DeleteListAsync(idList, userId);
         }
 
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
         {
-            var goalsToRemove = await Task.WhenAll(idArray.Select(selector: async id =>
-                await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)));
-            Database.Goals.RemoveRange(goalsToRemove);
-            await Database.SaveChangesAsync();
-            return true;
+            return await DeleteListAsync(PredicateBuilder.BuildGoalFilter(idArray, userId));
         }
 
-        public async Task<bool> DeleteListAsync(Expression<Func<GoalModel, bool>> filter)
+        public async Task<bool> DeleteListAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             var goalsToRemove = await Database.Goals.Where(filter).ToListAsync();
-            Database.Goals.RemoveRange(goalsToRemove);
+            Database.RemoveRange(goalsToRemove);
             await Database.SaveChangesAsync();
             return true;
         }
