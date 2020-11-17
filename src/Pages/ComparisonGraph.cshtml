@@ -1,5 +1,6 @@
 ﻿@page
 @using System.Globalization
+@using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.ComparisonGraphModel
 
 <form method="get" class="mt-5">
@@ -18,10 +19,17 @@
         Graph is empty, since no data found! Try a <strong>different period.</strong>
     </div>
 }
+else
+{
+    <h4 class="text-light">This period: Income: @NumberFormatter.FormatCurrency(Model.Income) / Expenses: @NumberFormatter.FormatCurrency(Model.Expenses)</h4>
+    <h4 class="text-light">Balance: @NumberFormatter.FormatCurrency(Model.Income - Model.Expenses)</h4>
+}
 <div class="container p-0 mt-3 mb-5">
-    <div class="col-12" id="graph"> <div class="spinner-border text-warning loader" role="status">
-        <span class="sr-only">Loading...</span>
-    </div></div>
+    <div class="col-12" id="graph">
+        <div class="spinner-border text-warning loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
 </div>
 
 
@@ -46,7 +54,7 @@
             'title': 'Income/expenses comparison',
             'height': 600,
             'vAxis': { 'textStyle': { 'color': '#FFF' }},
-            'backgroundColor': '#276dc1',
+            'backgroundColor': { 'fill': 'transparent' },
             'colors': ['#F44336', '#3F51B5'],
             'legendTextStyle': { color: '#FFF' },
             'titleTextStyle': { color: '#FFF' },

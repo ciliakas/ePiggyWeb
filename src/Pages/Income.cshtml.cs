@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
@@ -42,17 +43,22 @@ namespace ePiggyWeb.Pages
         public DateTime EndDate { get; set; }
 
         public string ErrorMessage = "";
+        private EntryDatabase EntryDatabase { get; }
+        public IncomesModel(EntryDatabase entryDatabase)
+        {
+            EntryDatabase = entryDatabase;
+        }
 
-        public void OnGet()
+        public async Task OnGet()
         {
             var today = DateTime.Now;
             StartDate = new DateTime(today.Year, today.Month, 1);
             EndDate = DateTime.Today;
-            SetData();
+            await SetData();
         }
 
 
-        public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
             if (startDate > endDate)
             {
@@ -66,41 +72,40 @@ namespace ePiggyWeb.Pages
                 StartDate = startDate;
                 EndDate = endDate;
             }
-            SetData();
+            await SetData();
             return Page();
         }
 
 
-        public IActionResult OnPostNewEntry()
+        public async Task<IActionResult> OnPostNewEntry()
         {
             if (!ModelState.IsValid)
             {
                 var today = DateTime.Now;
                 StartDate = new DateTime(today.Year, today.Month, 1);
                 EndDate = DateTime.Today;
-                SetData();
+                await SetData();
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-
-            EntryDatabase.Create(entry, UserId, EntryType.Income);
+            await EntryDatabase.CreateAsync(entry, UserId, EntryType.Income);
             return RedirectToPage("/income");
         }
 
-        public IActionResult OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            EntryDatabase.Delete(id, UserId, EntryType.Income);
+            await EntryDatabase.DeleteAsync(id, UserId, EntryType.Income);
             return RedirectToPage("/income");
         }
 
-        private void SetData()
+        private async Task SetData()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Income = dataManager.Income.EntryList.GetFrom(StartDate).GetTo(EndDate);
-            AllIncome = dataManager.Income.EntryList.GetSum();
+            var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+            Income = entryList.GetFrom(StartDate).GetTo(EndDate);
+            AllIncome = entryList.GetSum();
         }
     }
 }
