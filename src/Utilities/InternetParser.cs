@@ -64,10 +64,11 @@ namespace ePiggyWeb.Utilities
             catch(Exception ex)
             {
                 ExceptionHandler.Log(ex.ToString());
+                itemName = WebUtility.UrlDecode(itemName);
+                httpClient.Dispose();
+                return Goal.CreateLocalGoal(itemName, 0);
             }
-            itemName = WebUtility.UrlDecode(itemName);
-            httpClient.Dispose();
-            return Goal.CreateLocalGoal(itemName, 0);
+            
         }
     }
 }
