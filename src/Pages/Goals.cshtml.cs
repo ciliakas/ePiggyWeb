@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -16,7 +17,7 @@ namespace ePiggyWeb.Pages
     [Authorize]
     public class GoalsModel : PageModel
     {
-        public Lazy<InternetParser> InternetParser = new Lazy<InternetParser>();
+        public Lazy<InternetParser> InternetParser;
         public IGoalList Goals { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
@@ -32,9 +33,12 @@ namespace ePiggyWeb.Pages
         public decimal Amount { get; set; }
 
         private GoalDatabase GoalDatabase { get; }
-        public GoalsModel(GoalDatabase goalDatabase)
+        private HttpClient HttpClient { get; }
+        public GoalsModel(GoalDatabase goalDatabase, HttpClient httpClient)
         {
             GoalDatabase = goalDatabase;
+            HttpClient = httpClient;
+            InternetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
         }
 
         public async Task OnGet()

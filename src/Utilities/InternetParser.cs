@@ -13,9 +13,9 @@ namespace ePiggyWeb.Utilities
         private readonly Func<decimal, decimal> _convertToEur = (price) => price * (decimal) 1.11;
         private readonly HttpClient _httpClient;
 
-        public InternetParser()
+        public InternetParser(HttpClient httpClient)
         {
-            _httpClient = new HttpClient();
+            _httpClient = httpClient;
         }
         public async Task<IGoal> ReadPriceFromCamel(string itemName)
         {
@@ -45,7 +45,6 @@ namespace ePiggyWeb.Utilities
             stringPrice = stringPrice?.Substring(1).Trim();
             if (stringPrice == null)
             {
-                _httpClient.Dispose();
                 return Goal.CreateLocalGoal(itemName, 0);
             }
 
@@ -60,14 +59,12 @@ namespace ePiggyWeb.Utilities
                 }
 
                 var temp = Goal.CreateLocalGoal(name, decimalPrice);
-                _httpClient.Dispose();
                 return temp;
             }
             catch(Exception ex)
             {
                 ExceptionHandler.Log(ex.ToString());
                 itemName = WebUtility.UrlDecode(itemName);
-                _httpClient.Dispose();
                 return Goal.CreateLocalGoal(itemName, 0);
             }
             
