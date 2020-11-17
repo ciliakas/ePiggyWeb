@@ -6,6 +6,7 @@ using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.DataManagement.Saving;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -13,6 +14,7 @@ namespace ePiggyWeb.Pages
 {
     public class SavingSuggestionsModel : PageModel
     {
+        public bool ExceptionHappened { get; set; }
         public IGoal Goal { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
@@ -72,11 +74,21 @@ namespace ePiggyWeb.Pages
             {
                 Savings = 0;
             }
-            MonthsToSave = AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses,
-                Goal,
-                EntrySuggestions,
-                MonthlySuggestions,
-                Savings);
+
+            try
+            {
+                MonthsToSave = AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses,
+                    Goal,
+                    EntrySuggestions,
+                    MonthlySuggestions,
+                    Savings);
+            }
+            catch(Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                ExceptionHappened = true;
+            }
+            
         }
     }
 }
