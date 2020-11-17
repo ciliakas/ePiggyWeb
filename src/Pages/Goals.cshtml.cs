@@ -27,6 +27,7 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public decimal Amount { get; set; }
 
+
         public void OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
