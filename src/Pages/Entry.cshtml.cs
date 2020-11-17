@@ -30,7 +30,12 @@ namespace ePiggyWeb.Pages
 
         private async void OnDeleteUser(object sender, UserModel user)
         {
+            //isnesti i singleton
+
+
             await EmailSender.SendFarewellEmailAsync(user.Email);
+            //await EntryDatabase.DeleteListAsync(x => x.Id == UserId, EntryType.Income);
+            await GoalDatabase.DeleteListAsync(x => x.Id == UserId);
             //ViewData["EntryList"] = user.Email + "Vienas";
             //ViewData["EntryList"] = user.Email + "Du";
             //await EmailSender.SendFarewellEmailAsync(user.Email);
@@ -49,10 +54,11 @@ namespace ePiggyWeb.Pages
         public async Task OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            
             //var ids = new List<int>{1494, 1497, 1495 , 1496, 1501 };
             //await EntryDatabase.DeleteListAsync(ids ,userId, EntryType.Income);
             //ViewData["EntryList"] = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-            //await UserDatabase.DeleteUserAsync(UserId);
+            await UserDatabase.DeleteUserAsync(UserId);
         }
     }
 }
