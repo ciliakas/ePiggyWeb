@@ -1,6 +1,9 @@
 using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,15 +22,21 @@ namespace ePiggyWeb.Pages
         public DateTime EndDate { get; set; }
 
         public string ErrorMessage = "";
-        public void OnGet()
+        private EntryDatabase EntryDatabase { get; }
+        public ComparisonGraphModel(EntryDatabase entryDatabase)
+        {
+            EntryDatabase = entryDatabase;
+        }
+
+        public async Task OnGet()
         {
             var today = DateTime.Now;
             StartDate = new DateTime(today.Year, today.Month, 1);
             EndDate = DateTime.Today;
-            SetData();
+            await SetData();
         }
 
-        public IActionResult OnGetFilter(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
             if (startDate > endDate)
             {
@@ -41,16 +50,15 @@ namespace ePiggyWeb.Pages
                 StartDate = startDate;
                 EndDate = endDate;
             }
-            SetData();
+            await SetData();
             return Page();
         }
 
-        private void SetData()
+        private async Task SetData()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate).GetSum();
-            Income = dataManager.Income.EntryList.GetFrom(StartDate).GetTo(EndDate).GetSum();
+            Expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetFrom(StartDate).GetTo(EndDate).GetSum();
+            Income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetFrom(StartDate).GetTo(EndDate).GetSum();
         }
     }
 }

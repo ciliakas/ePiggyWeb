@@ -39,7 +39,7 @@ namespace ePiggyWeb.DataManagement.Entries
                 return AddRange(RecurringUpdater.CreateRecurringList(entry, EntryList.EntryType));
             }
 
-            var id = EntryDatabase.CreateSingle(entry, UserId, EntryList.EntryType);
+            var id = EntryDatabaseOld.CreateSingle(entry, UserId, EntryList.EntryType);
 
             if (id <= 0)
             {
@@ -53,7 +53,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool AddRange(IEntryList entryList)
         {
-            if (!EntryDatabase.CreateList(entryList, UserId))
+            if (!EntryDatabaseOld.CreateList(entryList, UserId))
             {
                 return false;
             }
@@ -77,11 +77,11 @@ namespace ePiggyWeb.DataManagement.Entries
             if (updatedEntry.Recurring)
             {
                 var list = RecurringUpdater.CreateRecurringListWithoutOriginalEntry(updatedEntry, EntryList.EntryType);
-                EntryDatabase.CreateList(list, UserId);
+                EntryDatabaseOld.CreateList(list, UserId);
                 updatedEntry.Recurring = false;
             }
             //If something went wrong with database update return false
-            if (!EntryDatabase.UpdateSingle(id, UserId, updatedEntry, EntryList.EntryType))
+            if (!EntryDatabaseOld.UpdateSingle(id, UserId, updatedEntry, EntryList.EntryType))
             {
                 return false;
             }
@@ -103,7 +103,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool Remove(int id)
         {
-            if (!EntryDatabase.Delete(id, UserId, EntryList.EntryType))
+            if (!EntryDatabaseOld.Delete(id, UserId, EntryList.EntryType))
             {
                 return false;
             }
@@ -124,7 +124,7 @@ namespace ePiggyWeb.DataManagement.Entries
         {
             var idArray = entryList.Select(entry => entry.Id).ToArray();
 
-            if (!EntryDatabase.DeleteList(idArray, UserId, entryList.EntryType))
+            if (!EntryDatabaseOld.DeleteList(idArray, UserId, entryList.EntryType))
             {
                 return false;
             }
@@ -138,7 +138,7 @@ namespace ePiggyWeb.DataManagement.Entries
         {
             var idArray = idList as int[] ?? idList.ToArray();
 
-            if (!EntryDatabase.DeleteList(idArray, UserId, EntryList.EntryType))
+            if (!EntryDatabaseOld.DeleteList(idArray, UserId, EntryList.EntryType))
             {
                 return false;
             }
@@ -156,7 +156,7 @@ namespace ePiggyWeb.DataManagement.Entries
 
         public bool ReadFromDb()
         {
-            EntryList.AddRange(EntryDatabase.ReadList(UserId, EntryList.EntryType));
+            EntryList.AddRange(EntryDatabaseOld.ReadList(UserId, EntryList.EntryType));
             return true;
         }
 

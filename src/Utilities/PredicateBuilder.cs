@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using ePiggyWeb.DataBase.Models;
 
 namespace ePiggyWeb.Utilities
@@ -25,7 +24,7 @@ namespace ePiggyWeb.Utilities
 
             Expression<Func<IEntryModel, bool>> filter = x => x.Id == idArray[0] && x.UserId == userId;
 
-            for (var i = 1; i <= idArray.Length; i++)
+            for (var i = 1; i < idArray.Length; i++)
             {
                 var i1 = i;
                 filter = filter.Or(x => x.Id == idArray[i1] && x.UserId == userId);
