@@ -43,6 +43,7 @@ namespace ePiggyWeb.Utilities
             stringPrice = stringPrice?.Substring(1).Trim();
             if (stringPrice == null)
             {
+                httpClient.Dispose();
                 return Goal.CreateLocalGoal(itemName, 0);
             }
 
@@ -57,6 +58,7 @@ namespace ePiggyWeb.Utilities
                 }
 
                 var temp = Goal.CreateLocalGoal(name, decimalPrice);
+                httpClient.Dispose();
                 return temp;
             }
             catch(Exception ex)
@@ -64,6 +66,7 @@ namespace ePiggyWeb.Utilities
                 ExceptionHandler.Log(ex.ToString());
             }
             itemName = WebUtility.UrlDecode(itemName);
+            httpClient.Dispose();
             return Goal.CreateLocalGoal(itemName, 0);
         }
     }
