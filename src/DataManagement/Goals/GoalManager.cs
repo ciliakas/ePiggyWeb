@@ -22,7 +22,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool Add(IGoal goal)
         {
-            var id = GoalDatabase.Create(goal, UserId);
+            var id = GoalDatabaseOld.Create(goal, UserId);
 
             if (id <= 0)
             {
@@ -37,7 +37,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool AddRange(IGoalList goalList)
         {
-            if (!GoalDatabase.CreateList(goalList, UserId))
+            if (!GoalDatabaseOld.CreateList(goalList, UserId))
             {
                 return false;
             }
@@ -53,7 +53,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool Edit(int id, IGoal updatedGoal)
         {
-            if (!GoalDatabase.Update(id, UserId, updatedGoal))
+            if (!GoalDatabaseOld.Update(id, UserId, updatedGoal))
             {
                 return false;
             }
@@ -76,7 +76,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public bool Remove(int id)
         {
-            if (!GoalDatabase.Delete(id, UserId))
+            if (!GoalDatabaseOld.Delete(id, UserId))
             {
                 return false;
             }
@@ -97,7 +97,7 @@ namespace ePiggyWeb.DataManagement.Goals
         {
             var idList = entryList.Select(va => va.Id).ToArray();
 
-            if (!GoalDatabase.DeleteList(idList, UserId))
+            if (!GoalDatabaseOld.DeleteList(idList, UserId))
             {
                 return false;
             }
@@ -110,7 +110,7 @@ namespace ePiggyWeb.DataManagement.Goals
         {
             var idArray = idList as int[] ?? idList.ToArray();
 
-            if (!GoalDatabase.DeleteList(idArray, UserId))
+            if (!GoalDatabaseOld.DeleteList(idArray, UserId))
             {
                 return false;
             }
@@ -133,7 +133,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public void ReadFromDb()
         {
-            GoalList.AddRange(GoalDatabase.ReadList(UserId));
+            GoalList.AddRange(GoalDatabaseOld.ReadList(UserId));
         }
 
         public bool MoveGoalToExpenses(IGoal goal, IEntry expense, IEntryManager entryManager)

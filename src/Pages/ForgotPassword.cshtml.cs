@@ -36,10 +36,10 @@ namespace ePiggyWeb.Pages
 
         private EmailSender EmailSender { get; }
         private UserDatabase UserDatabase { get; }
-        public ForgotPasswordModel(EmailSender emailSender, UserDatabase userDatabase)
+        public ForgotPasswordModel(UserDatabase userDatabase, EmailSender emailSender)
         {
-            EmailSender = emailSender;
             UserDatabase = userDatabase;
+            EmailSender = emailSender;
         }
 
         public async Task<IActionResult> OnGet()
