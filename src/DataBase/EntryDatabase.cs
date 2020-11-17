@@ -42,9 +42,17 @@ namespace ePiggyWeb.DataBase
                 EntryType.Income => new IncomeModel(localEntry, userId),
                 _ => new ExpenseModel(localEntry, userId),
             };
-            await Database.AddAsync(dbEntry);
-            await Database.SaveChangesAsync();
+            try
+            {
+                await Database.AddAsync(dbEntry);
+                await Database.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+            }
             return dbEntry.Id;
+
         }
 
         public async Task<bool> CreateListAsync(IEntryList entryList, int userId)
@@ -57,17 +65,44 @@ namespace ePiggyWeb.DataBase
                     EntryType.Income => new IncomeModel(entry, userId),
                     _ => new ExpenseModel(entry, userId),
                 };
-                dictionary.Add(entry, dbEntry);
+                try
+                {
+                    dictionary.Add(entry, dbEntry);
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.Log(ex.ToString());
+                    return false;
+                }
+                
             }
             // Setting all of the ID's to local Entries, just so this method remains usable both with local and only database usage
-            await Database.AddRangeAsync(dictionary.Values);
-            await Database.SaveChangesAsync();
-            entryList.Clear();
-            foreach (var (key, value) in dictionary)
+            try
             {
-                key.Id = value.Id;
-                entryList.Add(key);
+                await Database.AddRangeAsync(dictionary.Values);
+                await Database.SaveChangesAsync();
             }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return false;
+            }
+            
+            entryList.Clear();
+            try
+            {
+                foreach (var (key, value) in dictionary)
+                {
+                    key.Id = value.Id;
+                    entryList.Add(key);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return false;
+            }
+            
 
             return true;
         }
@@ -90,11 +125,22 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> UpdateSingleAsync(int id, int userId, IEntry updatedEntry, EntryType entryType)
         {
-            IEntryModel temp = entryType switch
+            IEntryModel temp;
+            try
             {
-                EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId),
-                _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
-            };
+                temp = entryType switch
+                {
+                    EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(
+                        x => x.Id == id && x.UserId == userId),
+                    _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
+                };
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return false;
+            }
+            
 
             if (temp is null)
             {
@@ -104,7 +150,16 @@ namespace ePiggyWeb.DataBase
 
             updatedEntry.UserId = userId;
             temp.Edit(updatedEntry);
-            await Database.SaveChangesAsync();
+            try
+            {
+                await Database.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return false;
+            }
+            
             return true;
         }
         
@@ -141,21 +196,39 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteListAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
         {
-            IEnumerable<IEntryModel> entriesToRemove = entryType switch
+            try
             {
-                EntryType.Income => await Database.Incomes.Where(filter).ToListAsync(),
-                _ => await Database.Expenses.Where(filter).ToListAsync()
-            };
-            //var predicate = Expression<Func<IEntryModel, bool>>.Create();
-            Database.RemoveRange(entriesToRemove);
-            await Database.SaveChangesAsync();
+                IEnumerable<IEntryModel> entriesToRemove = entryType switch
+                {
+                    EntryType.Income => await Database.Incomes.Where(filter).ToListAsync(),
+                    _ => await Database.Expenses.Where(filter).ToListAsync()
+                };
+                //var predicate = Expression<Func<IEntryModel, bool>>.Create();
+                Database.RemoveRange(entriesToRemove);
+                await Database.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return false;
+            }
+            
             return true;
         }
 
         public async Task<bool> DeleteListAsync(IEnumerable<IEntry> entryArray, int userId, EntryType entryType)
         {
-            var idArray = entryArray.Select(entry => entry.Id).ToArray();
-            return await DeleteListAsync(idArray, userId, entryType);
+            try
+            {
+                var idArray = entryArray.Select(entry => entry.Id).ToArray();
+                return await DeleteListAsync(idArray, userId, entryType);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return false;
+            }
+            
         }
 
         public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId, EntryType entryType)
@@ -166,12 +239,22 @@ namespace ePiggyWeb.DataBase
 
         public async Task<IEntry> ReadAsync(int id, int userId, EntryType entryType)
         {
-            IEntryModel dbEntry = entryType switch
+            try
             {
-                EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId),
-                _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
-            };
-            return await ReadAsync(x => x.Id == id && x.UserId == userId, entryType);
+                IEntryModel dbEntry = entryType switch
+                {
+                    EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(
+                        x => x.Id == id && x.UserId == userId),
+                    _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
+                };
+                return await ReadAsync(x => x.Id == id && x.UserId == userId, entryType);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Log(ex.ToString());
+                return new Entry();
+            }
+            
         }
 
         public async Task<IEntry> ReadAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
