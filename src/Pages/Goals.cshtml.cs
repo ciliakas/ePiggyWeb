@@ -16,6 +16,7 @@ namespace ePiggyWeb.Pages
     [Authorize]
     public class GoalsModel : PageModel
     {
+        public Lazy<InternetParser> InternetParser = new Lazy<InternetParser>();
         public IGoalList Goals { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
@@ -69,7 +70,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var temp = await InternetParser.ReadPriceFromCamel(Title);
+            var temp = await InternetParser.Value.ReadPriceFromCamel(Title);
             await GoalDatabase.CreateAsync(temp, UserId);
             return RedirectToPage("/goals");
         }

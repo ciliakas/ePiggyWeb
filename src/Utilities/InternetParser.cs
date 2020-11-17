@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,22 +7,25 @@ using ePiggyWeb.DataManagement.Goals;
 using HtmlAgilityPack;
 namespace ePiggyWeb.Utilities
 {
-    public static class InternetParser
+    public class InternetParser
     {
-        private static readonly Func<int, string, bool> IsTooLong = (int x, string s) => s.Length > x;
-        private static readonly Func<decimal, decimal> ConvertToEur = (decimal price) => price * (decimal) 1.11;
+        private readonly Func<int, string, bool> _isTooLong = (x, s) => s.Length > x;
+        private readonly Func<decimal, decimal> _convertToEur = (price) => price * (decimal) 1.11;
+        private readonly HttpClient _httpClient;
 
-        public static async Task<IGoal> ReadPriceFromCamel(string itemName)
+        public InternetParser()
         {
-            var httpClient = new HttpClient();
-
+            _httpClient = new HttpClient();
+        }
+        public async Task<IGoal> ReadPriceFromCamel(string itemName)
+        {
             itemName = WebUtility.UrlEncode(itemName);
             var url = "https://uk.camelcamelcamel.com/search?sq=" + itemName;
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml");
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0");
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Charset", "ISO-8859-1");
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml");
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0");
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Charset", "ISO-8859-1");
 
-            var html =  await httpClient.GetStringAsync(url);
+            var html =  await _httpClient.GetStringAsync(url);
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
@@ -43,29 +45,29 @@ namespace ePiggyWeb.Utilities
             stringPrice = stringPrice?.Substring(1).Trim();
             if (stringPrice == null)
             {
-                httpClient.Dispose();
+                _httpClient.Dispose();
                 return Goal.CreateLocalGoal(itemName, 0);
             }
 
             try
             {
                 var decimalPrice = Convert.ToDecimal(stringPrice, System.Globalization.CultureInfo.InvariantCulture);
-                decimalPrice = ConvertToEur(decimalPrice);
-                if (IsTooLong(30, name))
+                decimalPrice = _convertToEur(decimalPrice);
+                if (_isTooLong(30, name))
                 {
                     itemName = WebUtility.UrlDecode(itemName);
                     name = itemName;
                 }
 
                 var temp = Goal.CreateLocalGoal(name, decimalPrice);
-                httpClient.Dispose();
+                _httpClient.Dispose();
                 return temp;
             }
             catch(Exception ex)
             {
                 ExceptionHandler.Log(ex.ToString());
                 itemName = WebUtility.UrlDecode(itemName);
-                httpClient.Dispose();
+                _httpClient.Dispose();
                 return Goal.CreateLocalGoal(itemName, 0);
             }
             
