@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
@@ -25,11 +24,11 @@ namespace ePiggyWeb.DataManagement.Saving
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
  
-            decimal[] sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
-            decimal[] sumsOfAmountByImportanceDefault = new decimal[enumCount];
-            decimal[] averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
-            decimal[] averagesOfAmountByImportanceDefault = new decimal[enumCount];
-            int[] entryAmounts = new int[enumCount];
+            var sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
+            var sumsOfAmountByImportanceDefault = new decimal[enumCount];
+            var averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
+            var averagesOfAmountByImportanceDefault = new decimal[enumCount];
+            var entryAmounts = new int[enumCount];
 
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
