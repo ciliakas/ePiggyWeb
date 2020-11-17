@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataBase.Models;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -27,9 +29,17 @@ namespace ePiggyWeb.Pages
         public bool FailedToSendEmail;
 
         private UserDatabase UserDatabase { get; }
-        public LoginModel(UserDatabase userDatabase)
+        private EmailSender EmailSender { get; }
+        public LoginModel(UserDatabase userDatabase, EmailSender emailSender)
         {
             UserDatabase = userDatabase;
+            EmailSender = emailSender;
+            UserDatabase.Registered += OnRegister;
+        }
+
+        private async void OnRegister(object sender, UserModel user)
+        {
+            await EmailSender.SendGreetingEmailAsync(user.Email);
         }
 
         public IActionResult OnGet()
@@ -65,7 +75,6 @@ namespace ePiggyWeb.Pages
                 Response.Cookies.Delete("Email");
                 return Redirect(returnUrl ?? "/Index");
             }
-
             ErrorMessage = "Invalid E-mail or Password!";
             return Page();
         }
