@@ -4,7 +4,7 @@
     {
         public static void Log(string error = "Undefined exception")
         {
-            System.IO.File.WriteAllText(@"Errors.txt", error + "\n");
+            System.IO.File.AppendAllText(@"Errors.txt", error + "\n");
         }
     }
 }
