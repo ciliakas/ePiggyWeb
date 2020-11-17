@@ -1,7 +1,9 @@
 .navbar {
     text-align: center;
 }
-
+a:hover {
+    text-decoration: none;
+}
 .container-fluid {
     padding: 1% 15%;
     background-color: #f9f7f7;
@@ -27,6 +29,11 @@ body {
     background-color: #276dc1;
 }
 
+.index-Top {
+    margin-top: 2%;
+    margin-bottom: 5%;
+    color: #f9f7f7;
+}
 .title-image {
     left: 5%;
     bottom: 63%;
@@ -68,13 +75,13 @@ body {
     }
 
 #testimonials {
-    background-color: #276dc1;
+    background-color: transparent;
     color: #f9f7f7;
 }
 
 .carousel-item {
     padding: 7% 15%;
-    background-color: #276dc1;
+    background-color: transparent;
 }
 
 .testimonial-image {
@@ -180,5 +187,23 @@ body {
     margin-top: 280px;
 }
 
+#particles-js canvas {
+    display: block;
+    vertical-align: bottom;
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+    -webkit-transition: opacity .8s ease, -webkit-transform 1.4s ease;
+    transition: opacity .8s ease, transform 1.4s ease
+}
 
+#particles-js {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: -10;
+    top: 0;
+    left: 0
+}
 
