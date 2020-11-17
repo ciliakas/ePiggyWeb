@@ -30,11 +30,17 @@ namespace ePiggyWeb.Pages
         [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
 
-        public void OnGet()
+        private GoalDatabase GoalDatabase { get; }
+        public GoalsModel(GoalDatabase goalDatabase)
+        {
+            GoalDatabase = goalDatabase;
+        }
+
+        public async Task OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var dataManager = new DataManager(UserId);
-            Goals = dataManager.Goals.GoalList;
+            Goals = await GoalDatabase.ReadListAsync(UserId);
             Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
             if (Savings < 0)
             {
@@ -42,17 +48,16 @@ namespace ePiggyWeb.Pages
             }
         }
 
-
-        public IActionResult OnPostNewGoal()
+        public async Task<IActionResult> OnPostNewGoal()
         { 
             if (!ModelState.IsValid)
             {
-                OnGet();
+                await OnGet();
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = Goal.CreateLocalGoal(Title, Amount);
-            GoalDatabase.Create(temp, UserId);
+            await GoalDatabase.CreateAsync(temp, UserId);
             return RedirectToPage("/goals");
         }
 
@@ -65,30 +70,30 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = await InternetParser.ReadPriceFromCamel(Title);
-            GoalDatabase.Create(temp, UserId);
+            await GoalDatabase.CreateAsync(temp, UserId);
             return RedirectToPage("/goals");
         }
 
-        public IActionResult OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDelete(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            DeleteGoalFromDb(id);
+            await DeleteGoalFromDb(id);
             return RedirectToPage("/goals");
         }
 
-        public IActionResult OnPostPurchased(int id, string title, string amount)
+        public async Task<IActionResult> OnPostPurchased(int id, string title, string amount)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             decimal.TryParse(amount, out var parsedAmount);
             var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            GoalDatabase.MoveGoalToExpenses(id, UserId, entry);
+            await GoalDatabase.MoveGoalToExpensesAsync(id, UserId, entry);
             return RedirectToPage("/expenses");
         }
 
-        private void DeleteGoalFromDb(int id)
+        private async Task DeleteGoalFromDb(int id)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            GoalDatabase.Delete(id, UserId);
+            await GoalDatabase.DeleteAsync(id, UserId);
         }
     }
 }
