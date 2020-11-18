@@ -12,10 +12,13 @@ namespace ePiggyWeb.Utilities
         private readonly Func<int, string, bool> _isTooLong = (x, s) => s.Length > x;
         private readonly Func<decimal, decimal> _convertToEur = (price) => price * (decimal) 1.11;
         private readonly HttpClient _httpClient;
+        private delegate decimal Cnv(decimal num);
+        private readonly Cnv _cnv;
 
         public InternetParser(HttpClient httpClient)
         {
             _httpClient = httpClient;
+            _cnv = _convertToEur.Invoke;
         }
         public async Task<IGoal> ReadPriceFromCamel(string itemName)
         {
@@ -51,7 +54,7 @@ namespace ePiggyWeb.Utilities
             try
             {
                 var decimalPrice = Convert.ToDecimal(stringPrice, System.Globalization.CultureInfo.InvariantCulture);
-                decimalPrice = _convertToEur(decimalPrice);
+                decimalPrice = _cnv(decimalPrice);
                 if (_isTooLong(30, name))
                 {
                     itemName = WebUtility.UrlDecode(itemName);
