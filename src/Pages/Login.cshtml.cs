@@ -36,7 +36,7 @@ namespace ePiggyWeb.Pages
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToPage("/Index");
+                return RedirectToPage("/index");
             }
 
             if (Request.Cookies.ContainsKey("recoveryCode"))
@@ -63,7 +63,7 @@ namespace ePiggyWeb.Pages
 
                 Response.Cookies.Delete("recoveryCode");
                 Response.Cookies.Delete("Email");
-                return Redirect(returnUrl ?? "/Index");
+                return Redirect(returnUrl ?? "/index");
             }
 
             ErrorMessage = "Invalid E-mail or Password!";

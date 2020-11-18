@@ -8,12 +8,15 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
 {
     [Authorize]
     public class ExpensesGraphModel : PageModel
     {
+        private readonly ILogger<ExpensesGraphModel> _logger;
+        public bool WasException { get; set; }
         public IEntryList Expenses { get; set; }
         private int UserId { get; set; }
         [BindProperty]
@@ -23,9 +26,11 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
-        public ExpensesGraphModel(EntryDatabase entryDatabase)
+
+        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger)
         {
             EntryDatabase = entryDatabase;
+            _logger = logger;
         }
         public async Task OnGet()
         {
@@ -55,9 +60,19 @@ namespace ePiggyWeb.Pages
 
         private async Task SetData()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-            Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+            try
+            {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+                //custom data fill
+            }
+
         }
     }
 }

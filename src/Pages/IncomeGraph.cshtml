@@ -3,6 +3,12 @@
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.IncomeGraphModel
 
+@if (Model.WasException)
+{
+    <div class="alert alert-danger" role="alert">
+        Whoops! Something went wrong!
+    </div>
+}
 <form method="get" class="mt-5">
     <input type="hidden" name="handler" value="Filter" />
     <label class="text-light">Period:</label>
