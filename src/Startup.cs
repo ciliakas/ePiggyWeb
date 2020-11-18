@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb
 {
@@ -56,8 +57,10 @@ namespace ePiggyWeb
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddFile("Logs/ePiggy-{Date}.txt");
+            
             if (env.IsDevelopment())
             {
                 app.UseExceptionHandler("/ErrorPages/Error");
@@ -66,6 +69,7 @@ namespace ePiggyWeb
             else
             {
                 app.UseExceptionHandler("/ErrorPages/Error");
+                app.UseHsts();
             }
 
             app.Use(async (context, next) =>

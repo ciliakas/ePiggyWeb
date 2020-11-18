@@ -32,3 +32,24 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 System.NullReferenceException: Object reference not set to an instance of an object.
    at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
    at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList`1 entrySuggestions, List`1 monthlySuggestions, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 56
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 80
