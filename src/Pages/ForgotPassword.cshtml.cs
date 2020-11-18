@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -32,12 +33,14 @@ namespace ePiggyWeb.Pages
         public bool CodeSent;
         public bool Expired;
 
-        private EmailSender EmailSender { get; }
-        private Lazy<UserDatabase> UserDatabase { get; }
-        public ForgotPasswordModel(PiggyDbContext piggyDbContext, EmailSender emailSender, IConfiguration configuration)
+        private Lazy<EmailSender> EmailSender { get; }
+        private UserDatabase UserDatabase { get; }
+        private IConfiguration Configuration { get; }
+        public ForgotPasswordModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings, IConfiguration configuration)
         {
-            UserDatabase = new Lazy<UserDatabase>(() => new UserDatabase(piggyDbContext));
-            EmailSender = emailSender;
+            UserDatabase = userDatabase;
+            Configuration = configuration;
+            EmailSender = new Lazy<EmailSender>(() => new EmailSender());
         }
 
         public async Task<IActionResult> OnGet()
@@ -52,7 +55,9 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             Email = Request.Cookies["Email"];
-            var recoveryCode = (await EmailSender.SendRecoveryCodeAsync(Email)).ToString();
+
+            Configuration.GetSection(Utilities.EmailSender.Email).Bind(EmailSender.Value);
+            var recoveryCode = (await EmailSender.Value.SendRecoveryCodeAsync(Email)).ToString();
 
             var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
             Response.Cookies.Append("recoveryCode", recoveryCode, option);
@@ -68,11 +73,11 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             var value = Request.Cookies["recoveryCode"];
-            if (string.Equals(EnteredCode, value ))
+            if (string.Equals(EnteredCode, value))
             {
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    await UserDatabase.Value.ChangePasswordAsync(Email, Password);
+                    await UserDatabase.ChangePasswordAsync(Email, Password);
                     Response.Cookies.Delete("recoveryCode");
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");
