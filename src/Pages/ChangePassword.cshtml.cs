@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -22,10 +23,10 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private UserDatabase UserDatabase { get; }
-        public ChangePasswordModel(UserDatabase userDatabase)
+        private Lazy<UserDatabase> UserDatabase { get; }
+        public ChangePasswordModel(PiggyDbContext piggyDbContext)
         {
-            UserDatabase = userDatabase;
+            UserDatabase = new Lazy<UserDatabase>(() => new UserDatabase(piggyDbContext));
         }
 
         public IActionResult OnGet()
@@ -46,7 +47,7 @@ namespace ePiggyWeb.Pages
 
             if (string.Equals(Password, PasswordConfirm))
             {
-                await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
+                await UserDatabase.Value.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                 return RedirectToPage("/index");
             }
             else
