@@ -60,12 +60,12 @@ namespace ePiggyWeb
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseExceptionHandler("/ErrorPages/Error");
+                //app.UseDeveloperExceptionPage();
             }
             else
             {
                 app.UseExceptionHandler("/ErrorPages/Error");
-                app.UseHsts();
             }
 
             app.Use(async (context, next) =>
