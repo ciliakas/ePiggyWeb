@@ -52,7 +52,7 @@ namespace ePiggyWeb.Utilities
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Log(ex.ToString());
+                throw ex;
             }
             
             

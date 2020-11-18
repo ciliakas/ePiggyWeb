@@ -1,24 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using ePiggyWeb.DataManagement;
-using ePiggyWeb.DataManagement.Entries;
+using System.Threading.Tasks;
+using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.DataManagement.Saving;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
 {
     public class SavingSuggestionsModel : PageModel
     {
-        public bool ExceptionHappened { get; set; }
+        private readonly ILogger<SavingSuggestionsModel> _logger;
+        public bool WasException { get; set; }
         public IGoal Goal { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
-        public IEntryList Expenses { get; set; }
         public int MonthsToSave { get; set; }
         [BindProperty]
         public int Id { get; set; }
@@ -31,17 +31,26 @@ namespace ePiggyWeb.Pages
         public DateTime EndDate { get; set; }
 
         public string ErrorMessage = "";
-        public void OnGet(int id)
+
+        private GoalDatabase GoalDatabase { get; }
+        private EntryDatabase EntryDatabase { get; }
+
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase)
+        {
+            _logger = logger;
+            GoalDatabase = goalDatabase;
+            EntryDatabase = entryDatabase;
+        }
+        public async Task OnGet(int id)
         {
             Id = id;
             var today = DateTime.Now;
             StartDate = new DateTime(today.Year, today.Month, 1);
             EndDate = DateTime.Today;
-            SetData();
-            
+            await SetData();
         }
 
-        public IActionResult OnGetFilter(DateTime startDate, DateTime endDate, int id)
+        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
         {
             if (startDate > endDate)
             {
@@ -57,38 +66,41 @@ namespace ePiggyWeb.Pages
             }
 
             Id = id;
-            SetData();
+            await SetData();
             return Page();
         }
 
-        public void SetData()
+        public async Task SetData()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate);
-            Goal = dataManager.Goals.GoalList.FirstOrDefault(x => x.Id == Id);
-            EntrySuggestions = new List<ISavingSuggestion>();
-            MonthlySuggestions = new List<SavingSuggestionByMonth>();
-            Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
-            if (Savings < 0)
-            {
-                Savings = 0;
-            }
-
             try
             {
-                MonthsToSave = AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses,
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                Goal = await GoalDatabase.ReadAsync(Id, UserId);
+                EntrySuggestions = new List<ISavingSuggestion>();
+                MonthlySuggestions = new List<SavingSuggestionByMonth>();
+                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+                Savings = income.GetSum() - expenses.GetSum();
+                if (Savings < 0)
+                {
+                    Savings = 0;
+                }
+
+                MonthsToSave = AlternativeSavingCalculator.GetSuggestedExpensesOffers(expenses,
                     Goal,
                     EntrySuggestions,
                     MonthlySuggestions,
                     Savings);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                ExceptionHandler.Log(ex.ToString());
-                ExceptionHappened = true;
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+                Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100);
+                Savings = 0;
             }
             
+
         }
     }
 }
