@@ -6,6 +6,7 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.Pages
 {
@@ -32,10 +33,10 @@ namespace ePiggyWeb.Pages
         public bool Expired;
 
         private EmailSender EmailSender { get; }
-        private UserDatabase UserDatabase { get; }
-        public ForgotPasswordModel(UserDatabase userDatabase, EmailSender emailSender)
+        private Lazy<UserDatabase> UserDatabase { get; }
+        public ForgotPasswordModel(PiggyDbContext piggyDbContext, EmailSender emailSender, IConfiguration configuration)
         {
-            UserDatabase = userDatabase;
+            UserDatabase = new Lazy<UserDatabase>(() => new UserDatabase(piggyDbContext));
             EmailSender = emailSender;
         }
 
@@ -71,7 +72,7 @@ namespace ePiggyWeb.Pages
             {
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    await UserDatabase.ChangePasswordAsync(Email, Password);
+                    await UserDatabase.Value.ChangePasswordAsync(Email, Password);
                     Response.Cookies.Delete("recoveryCode");
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");
