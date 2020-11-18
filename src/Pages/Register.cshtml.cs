@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -33,10 +34,10 @@ namespace ePiggyWeb.Pages
 
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        public RegisterModel(UserDatabase userDatabase, EmailSender emailSender)
+        public RegisterModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings)
         {
             UserDatabase = userDatabase;
-            EmailSender = emailSender;
+            EmailSender = emailSenderSettings.Value;
             UserDatabase.Registered += OnRegister;
         }
 

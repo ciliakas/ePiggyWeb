@@ -6,6 +6,7 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -33,10 +34,10 @@ namespace ePiggyWeb.Pages
 
         private EmailSender EmailSender { get; }
         private UserDatabase UserDatabase { get; }
-        public ForgotPasswordModel(UserDatabase userDatabase, EmailSender emailSender)
+        public ForgotPasswordModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings)
         {
             UserDatabase = userDatabase;
-            EmailSender = emailSender;
+            EmailSender = emailSenderSettings.Value;
         }
 
         public async Task<IActionResult> OnGet()
