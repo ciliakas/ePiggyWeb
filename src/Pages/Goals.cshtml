@@ -1,9 +1,11 @@
 ﻿@page
+@using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.GoalsModel
 
 <br />
 <h2 class="text-info">Goals</h2>
 <button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal</button>
+<button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal</button>
 @if (!ModelState.IsValid)
 {
 <div class="container">
@@ -41,7 +43,7 @@ else
                 <h3 class="text-light problematic-title" title="Title">@item.Title </h3>
                 <div class="progress mt-4">
                     @{
-                        var percent = item.Amount == 0 ? 0 : decimal.Round(Model.Savings / item.Amount * 100);
+                        var percent = item.Amount == 0 ? 100 : decimal.Round(Model.Savings / item.Amount * 100);
                         percent = percent > 100 ? 100 : percent;
                         string color;
                         if (percent < 30)
@@ -61,7 +63,7 @@ else
                     }
                     <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                 </div>
-                <h5 class="text-light" title="Saved/Required">@Model.Savings/@item.Amount</h5>
+                <h5 class="text-light" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(item.Amount)</h5>
                 @if (percent == 100)
                 {
                     <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-shopping-cart fa-2x text-info"></i></button>
@@ -117,6 +119,33 @@ else
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <input type="submit" value="Add" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="ParseGoalModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" asp-page-handler="ParseGoal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Parse Goal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <input asp-for="Title" type="text" placeholder="Title*" value="" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <p class="text-primary">Enter exact name of item for more precise pricing! :)</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" value="Parse" class="btn btn-primary" />
                 </div>
             </div>
         </form>

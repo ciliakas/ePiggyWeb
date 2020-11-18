@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -41,6 +42,7 @@ namespace ePiggyWeb
             services.AddScoped<EntryDatabase>();
             services.AddScoped<GoalDatabase>();
             services.Configure<EmailSender>(options => Configuration.GetSection("Email").Bind(options));
+            services.AddSingleton<HttpClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
