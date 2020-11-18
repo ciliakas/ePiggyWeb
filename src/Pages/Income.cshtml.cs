@@ -3,18 +3,21 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataManagement;
+using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
 {
     [Authorize]
     public class IncomesModel : PageModel
     {
+        private readonly ILogger<IncomeModel> _logger;
+        public bool WasException { get; set; }
         public IEntryList Income { get; set; }
 
         [Required(ErrorMessage = "Required")]
@@ -44,9 +47,11 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
-        public IncomesModel(EntryDatabase entryDatabase)
+
+        public IncomesModel(EntryDatabase entryDatabase, ILogger<IncomeModel> logger)
         {
             EntryDatabase = entryDatabase;
+            _logger = logger;
         }
 
         public async Task OnGet()
@@ -79,33 +84,62 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPostNewEntry()
         {
-            if (!ModelState.IsValid)
+            try
             {
-                var today = DateTime.Now;
-                StartDate = new DateTime(today.Year, today.Month, 1);
-                EndDate = DateTime.Today;
-                await SetData();
-                return Page();
+                if (!ModelState.IsValid)
+                {
+                    var today = DateTime.Now;
+                    StartDate = new DateTime(today.Year, today.Month, 1);
+                    EndDate = DateTime.Today;
+                    await SetData();
+                    return Page();
+                }
+
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
+                await EntryDatabase.CreateAsync(entry, UserId, EntryType.Income);
             }
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-            await EntryDatabase.CreateAsync(entry, UserId, EntryType.Income);
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+            }
+            
             return RedirectToPage("/income");
         }
 
         public async Task<IActionResult> OnPostDelete(int id)
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            await EntryDatabase.DeleteAsync(id, UserId, EntryType.Income);
+            try
+            {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                await EntryDatabase.DeleteAsync(id, UserId, EntryType.Income);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+            }
             return RedirectToPage("/income");
+
         }
 
         private async Task SetData()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-            Income = entryList.GetFrom(StartDate).GetTo(EndDate);
-            AllIncome = entryList.GetSum();
+            try
+            {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+                Income = entryList.GetFrom(StartDate).GetTo(EndDate);
+                AllIncome = entryList.GetSum();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+                //custom filling
+            }
+
         }
     }
 }

@@ -73,8 +73,5 @@ namespace ePiggyWeb.Pages
         {
             return RedirectToPage(EntryTypeInt == 1 ? "/Income" : "/Expenses");
         }
-
-
-
     }
 }

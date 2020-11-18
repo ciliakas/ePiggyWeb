@@ -566,3 +566,41 @@ System.ArgumentNullException: Value cannot be null. (Parameter 'source')
    at ePiggyWeb.Pages.ComparisonGraphModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\ComparisonGraph.cshtml.cs:line 64 (9b9d5727)
 2020-11-18T17:53:16.0342375+02:00 80000021-0000-fd00-b63f-84710c7967bb [INF] System.Exception: Exception of type 'System.Exception' was thrown.
    at ePiggyWeb.Pages.ComparisonGraphModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\ComparisonGraph.cshtml.cs:line 64 (9b9d5727)
+2020-11-18T17:59:28.0952798+02:00  [INF] Application started. Press Ctrl+C to shut down. (dcaefe54)
+2020-11-18T17:59:28.1084724+02:00  [INF] Hosting environment: "Development" (c3307c92)
+2020-11-18T17:59:28.1108645+02:00  [INF] Content root path: "C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src" (b5d60022)
+2020-11-18T17:59:31.1468529+02:00 8000006d-0006-fc00-b63f-84710c7967bb [INF] System.Exception: Exception of type 'System.Exception' was thrown.
+   at ePiggyWeb.Pages.ExpensesModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\Expenses.cshtml.cs:line 110 (4ec17865)
+2020-11-18T17:59:31.4287240+02:00 8000006d-0006-fc00-b63f-84710c7967bb [ERR] An unhandled exception has occurred while executing the request. (48a46595)
+System.ArgumentNullException: Value cannot be null. (Parameter 'source')
+   at System.Linq.ThrowHelper.ThrowArgumentNullException(ExceptionArgument argument)
+   at System.Linq.Enumerable.Any[TSource](IEnumerable`1 source)
+   at ePiggyWeb.Pages.Pages_Expenses.<ExecuteAsync>b__45_2() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\Expenses.cshtml:line 70
+   at Microsoft.AspNetCore.Razor.Runtime.TagHelpers.TagHelperExecutionContext.GetChildContentAsync(Boolean useCachedResult, HtmlEncoder encoder)
+   at Microsoft.AspNetCore.Mvc.TagHelpers.RenderAtEndOfFormTagHelper.ProcessAsync(TagHelperContext context, TagHelperOutput output)
+   at Microsoft.AspNetCore.Razor.Runtime.TagHelpers.TagHelperRunner.<RunAsync>g__Awaited|0_0(Task task, TagHelperExecutionContext executionContext, Int32 i, Int32 count)
+   at ePiggyWeb.Pages.Pages_Expenses.ExecuteAsync() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\Expenses.cshtml:line 65
+   at Microsoft.AspNetCore.Mvc.Razor.RazorView.RenderPageCoreAsync(IRazorPage page, ViewContext context)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorView.RenderPageAsync(IRazorPage page, ViewContext context, Boolean invokeViewStarts)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorView.RenderAsync(ViewContext context)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewExecutor.ExecuteAsync(ViewContext viewContext, String contentType, Nullable`1 statusCode)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewExecutor.ExecuteAsync(ViewContext viewContext, String contentType, Nullable`1 statusCode)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|29_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|24_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at ePiggyWeb.Startup.<>c.<<Configure>b__5_0>d.MoveNext() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Startup.cs:line 77
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware.<Invoke>g__Awaited|6_0(ExceptionHandlerMiddleware middleware, HttpContext context, Task task)
+2020-11-18T17:59:31.4537594+02:00 8000006d-0006-fc00-b63f-84710c7967bb [INF] Microsoft.AspNetCore.Diagnostics.ExceptionHandlerFeature (1f1a7c68)
