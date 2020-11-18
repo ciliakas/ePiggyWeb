@@ -37,7 +37,6 @@ namespace ePiggyWeb
 
             services.AddDbContext<PiggyDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            //Nebutini
             services.AddScoped(provider =>
             {
                 var db = provider.GetService<PiggyDbContext>();

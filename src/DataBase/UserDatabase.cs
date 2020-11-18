@@ -102,12 +102,9 @@ namespace ePiggyWeb.DataBase
                 return false;
             }
 
-            var userCopy = new UserModel {Email = user.Email, Id = user.Id, Password = user.Password, Salt = user.Salt};
             Database.Users.Remove(user);
             await Database.SaveChangesAsync();
-
-            Deleted?.Invoke(this, userCopy);
-
+            Deleted?.Invoke(this, user);
             return true;
         }
 

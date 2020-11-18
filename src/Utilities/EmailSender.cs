@@ -8,7 +8,6 @@ namespace ePiggyWeb.Utilities
 {
     public class EmailSender
     {
-        //11 iki 18 deti i appsetingus
         private string OurEmail { get; } = "smartsaverrecovery@gmail.com";
         private string EmailPassword { get; } = "Smartsaver123456";
         private string RecoveryMessageSubject { get; } = "Password Recovery";
