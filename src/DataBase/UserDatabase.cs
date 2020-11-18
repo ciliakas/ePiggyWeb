@@ -10,7 +10,12 @@ namespace ePiggyWeb.DataBase
     public class UserDatabase
     {
         public event EventHandler<UserModel> LoggedIn;
-        public event EventHandler<UserModel> Registered;
+
+        public delegate void RegisterEvent(object? sender, UserModel user);
+
+        public event RegisterEvent Registered;
+        //public event EventHandler<UserModel> Registered;
+
         public event EventHandler<UserModel> Deleted;
 
         private PiggyDbContext Database { get; }
