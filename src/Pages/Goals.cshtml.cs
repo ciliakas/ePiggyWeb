@@ -70,7 +70,7 @@ namespace ePiggyWeb.Pages
         {
             if (string.IsNullOrEmpty(Title))
             {
-                OnGet();
+                await OnGet();
                 return Page();
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
