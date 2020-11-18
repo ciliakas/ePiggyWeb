@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -16,6 +17,7 @@ namespace ePiggyWeb.Pages
     [Authorize]
     public class GoalsModel : PageModel
     {
+        public Lazy<InternetParser> InternetParser;
         public IGoalList Goals { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
@@ -27,14 +29,17 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
 
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
-        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase)
+        private HttpClient HttpClient { get; }
+        public GoalsModel(GoalDatabase goalDatabase, HttpClient httpClient)
         {
             GoalDatabase = goalDatabase;
-            EntryDatabase = entryDatabase;
+            HttpClient = httpClient;
+            InternetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
         }
 
         public async Task OnGet()
@@ -59,6 +64,19 @@ namespace ePiggyWeb.Pages
             }
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = Goal.CreateLocalGoal(Title, Amount);
+            await GoalDatabase.CreateAsync(temp, UserId);
+            return RedirectToPage("/goals");
+        }
+
+        public async Task<IActionResult> OnPostParseGoal()
+        {
+            if (string.IsNullOrEmpty(Title))
+            {
+                await OnGet();
+                return Page();
+            }
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var temp = await InternetParser.Value.ReadPriceFromCamel(Title);
             await GoalDatabase.CreateAsync(temp, UserId);
             return RedirectToPage("/goals");
         }
