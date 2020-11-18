@@ -36,7 +36,7 @@ namespace ePiggyWeb.Pages
         private Lazy<EmailSender> EmailSender { get; }
         private UserDatabase UserDatabase { get; }
         private IConfiguration Configuration { get; }
-        public ForgotPasswordModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings, IConfiguration configuration)
+        public ForgotPasswordModel(UserDatabase userDatabase, IConfiguration configuration)
         {
             UserDatabase = userDatabase;
             Configuration = configuration;
