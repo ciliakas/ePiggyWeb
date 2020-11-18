@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ePiggyWeb.Utilities;
+using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
@@ -22,6 +23,5 @@ namespace ePiggyWeb.DataManagement.Entries
         public DateTime GetOldestEntryDate();
         public DateTime GetNewestEntryDate();
         public decimal GetSum();
-
     }
 }
