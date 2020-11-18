@@ -95,14 +95,16 @@ namespace ePiggyWeb.Pages
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
                 await EntryDatabase.CreateAsync(entry, UserId, EntryType.Expense);
+                return RedirectToPage("/expenses");
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
+                return Page();
             }
            
-            return RedirectToPage("/expenses");
+            
         }
 
         public async Task<IActionResult> OnPostDelete(int id)
