@@ -35,12 +35,12 @@ namespace ePiggyWeb.Pages
         {
             UserDatabase = userDatabase;
             EmailSender = emailSenderSettings.Value;
-            UserDatabase.Registered += OnRegister;
+            UserDatabase.LoggedIn += OnLogin;
         }
 
-        private async void OnRegister(object sender, UserModel user)
+        private void OnLogin(object sender, UserModel user)
         {
-            await EmailSender.SendGreetingEmailAsync(user.Email);
+            //Could do something here
         }
 
         public IActionResult OnGet()
