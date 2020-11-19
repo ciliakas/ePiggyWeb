@@ -33,6 +33,7 @@ namespace ePiggyWeb.Pages
         public decimal Amount { get; set; }
 
         private GoalDatabase GoalDatabase { get; }
+        private EntryDatabase EntryDatabase { get; }
         private HttpClient HttpClient { get; }
         public GoalsModel(GoalDatabase goalDatabase, HttpClient httpClient)
         {
@@ -44,9 +45,10 @@ namespace ePiggyWeb.Pages
         public async Task OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
             Goals = await GoalDatabase.ReadListAsync(UserId);
-            Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
+            var incomes = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+            var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+            Savings = incomes.GetSum() - expenses.GetSum();
             if (Savings < 0)
             {
                 Savings = 0;

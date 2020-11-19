@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -37,6 +38,12 @@ namespace ePiggyWeb.Pages
         {
             UserDatabase = userDatabase;
             EmailSender = emailSenderSettings.Value;
+            UserDatabase.Registered += OnRegister;
+        }
+
+        private async void OnRegister(object sender, UserModel user)
+        {
+            await EmailSender.SendGreetingEmailAsync(user.Email);
         }
 
         public IActionResult OnGet()
