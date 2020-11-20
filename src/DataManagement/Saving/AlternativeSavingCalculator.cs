@@ -6,20 +6,20 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
-    public static class AlternativeSavingCalculator
+    public class AlternativeSavingCalculator
     {
         private static decimal RegularSavingValue { get; } = 0.25M;
         private static decimal MaximalSavingValue { get; } = 0.5M;
         private static decimal MinimalSavingValue { get; } = 0.1M;
 
-        public static int GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, IList<ISavingSuggestion> entrySuggestions,
-            List<SavingSuggestionByMonth> monthlySuggestions, decimal startingBalance, SavingType savingType = SavingType.Regular)
+        public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType = SavingType.Regular)
         {
-            entrySuggestions ??= new List<ISavingSuggestion>();
-
+            var entrySuggestions = new List<ISavingSuggestion>();
+            var monthlySuggestions = new List<SavingSuggestionByMonth>();
+            
             if (entryList is null)
             {
-                return 0;
+                return new CalculationResults(entrySuggestions, monthlySuggestions, 0);              
             }
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
@@ -76,7 +76,7 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
-            return timesToRepeatSaving;
+            return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving);
         }
     }
 }

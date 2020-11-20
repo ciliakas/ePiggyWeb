@@ -30,6 +30,8 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public DateTime EndDate { get; set; }
 
+        private readonly AlternativeSavingCalculator alternativeSavingCalculator = new AlternativeSavingCalculator();
+
         public string ErrorMessage = "";
         public void OnGet(int id)
         {
@@ -67,28 +69,26 @@ namespace ePiggyWeb.Pages
             var dataManager = new DataManager(UserId);
             Expenses = dataManager.Expenses.EntryList.GetFrom(StartDate).GetTo(EndDate);
             Goal = dataManager.Goals.GoalList.FirstOrDefault(x => x.Id == Id);
-            EntrySuggestions = new List<ISavingSuggestion>();
-            MonthlySuggestions = new List<SavingSuggestionByMonth>();
             Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
             if (Savings < 0)
             {
                 Savings = 0;
             }
 
+            var calculationResults = new CalculationResults();
             try
-            {
-                MonthsToSave = AlternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses,
-                    Goal,
-                    EntrySuggestions,
-                    MonthlySuggestions,
-                    Savings);
+            {                
+                calculationResults = alternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses, Goal, Savings);
             }
             catch(Exception ex)
             {
                 ExceptionHandler.Log(ex.ToString());
                 ExceptionHappened = true;
             }
-            
+            EntrySuggestions = calculationResults.EntrySuggestions;
+            MonthlySuggestions = calculationResults.MonthlySuggestions;
+            MonthsToSave = calculationResults.TimesToRepeatSaving;
+
         }
     }
 }
