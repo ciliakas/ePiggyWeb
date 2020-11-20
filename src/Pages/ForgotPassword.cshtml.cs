@@ -6,22 +6,20 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
     public class ForgotPasswordModel : PageModel
     {
-        [Required]
         [BindProperty]
         public string EnteredCode { get; set; }
 
-        [Required(ErrorMessage = "All fields required!")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", ErrorMessage = "Password must contain at least one uppercase letter, at least one number, special character and be longer than six characters.")]
         [BindProperty]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Required]
         [BindProperty]
         [DataType(DataType.Password)]
         public string PasswordConfirm { get; set; }
@@ -36,10 +34,10 @@ namespace ePiggyWeb.Pages
 
         private EmailSender EmailSender { get; }
         private UserDatabase UserDatabase { get; }
-        public ForgotPasswordModel(UserDatabase userDatabase, EmailSender emailSender)
+        public ForgotPasswordModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings)
         {
             UserDatabase = userDatabase;
-            EmailSender = emailSender;
+            EmailSender = emailSenderSettings.Value;
         }
 
         public async Task<IActionResult> OnGet()

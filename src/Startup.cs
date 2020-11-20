@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -37,22 +38,11 @@ namespace ePiggyWeb
 
             services.AddDbContext<PiggyDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped(provider =>
-            {
-                var db = provider.GetService<PiggyDbContext>();
-                return new UserDatabase(db);
-            });
-            services.AddScoped(provider =>
-            {
-                var db = provider.GetService<PiggyDbContext>();
-                return new EntryDatabase(db);
-            });
-            services.AddScoped(provider =>
-            {
-                var db = provider.GetService<PiggyDbContext>();
-                return new GoalDatabase(db);
-            });
-            services.AddScoped<EmailSender>();
+            services.AddScoped<UserDatabase>();
+            services.AddScoped<EntryDatabase>();
+            services.AddScoped<GoalDatabase>();
+            services.Configure<EmailSender>(options => Configuration.GetSection("Email").Bind(options));
+            services.AddSingleton<HttpClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
