@@ -2,12 +2,12 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
@@ -26,11 +26,13 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
+        private IConfiguration Configuration { get; }
 
-        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger)
+        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger, IConfiguration configuration)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
+            Configuration = configuration;
         }
         public async Task OnGet()
         {
@@ -70,7 +72,7 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                //custom data fill
+                Expenses = EntryList.RandomList(Configuration, EntryType.Expense);
             }
 
         }
