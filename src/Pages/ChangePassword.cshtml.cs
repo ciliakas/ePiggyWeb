@@ -3,8 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataBase.Models;
+using ePiggyWeb.Utilities;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -23,10 +27,14 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private Lazy<UserDatabase> UserDatabase { get; }
-        public ChangePasswordModel(PiggyDbContext piggyDbContext)
+        private UserDatabase UserDatabase { get; }
+        private EmailSender EmailSender { get; }
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings)
         {
-            UserDatabase = new Lazy<UserDatabase>(() => new UserDatabase(piggyDbContext));
+            UserDatabase = new UserDatabase(piggyDbContext);
+            UserDatabase.Deleted += OnDeleteUser;
+            EmailSender = emailSenderSettings.Value;
+
         }
 
         public IActionResult OnGet()
@@ -47,7 +55,7 @@ namespace ePiggyWeb.Pages
 
             if (string.Equals(Password, PasswordConfirm))
             {
-                await UserDatabase.Value.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
+                await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                 return RedirectToPage("/index");
             }
             else
@@ -55,6 +63,18 @@ namespace ePiggyWeb.Pages
                 ErrorMessage = "Passwords did not match!";
                 return Page();
             }
+        }
+
+        public async Task<IActionResult> OnPostDeleteAccount()
+        {
+            await HttpContext.SignOutAsync();
+            await UserDatabase.DeleteUserAsync(User.FindFirst(ClaimTypes.Email).Value);
+            return Redirect("/index");
+        }
+
+        private async void OnDeleteUser(object sender, UserModel user)
+        {
+            await EmailSender.SendFarewellEmailAsync(user.Email);
         }
     }
 }
