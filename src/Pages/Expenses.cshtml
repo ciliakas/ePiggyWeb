@@ -1,5 +1,4 @@
 ﻿@page
-@using System.Globalization
 @using System.Linq
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.ExpensesModel
@@ -88,7 +87,7 @@
                                 @Html.DisplayFor(m => item.Title)
                             </td>
                             <td class="border-primary">
-                                @item.Amount.ToString(CultureInfo.CurrentCulture)
+                                @NumberFormatter.FormatCurrency(item.Amount)
                             </td>
                             <td class="border-primary">
                                 @item.Date.ToShortDateString()
@@ -118,8 +117,8 @@
         </form>
     </div>
     <div class="col-2 border p-3 mt-3 mb-3">
-        <p class="text-light">Spent this period: @Model.Expenses.GetSum()</p>
-        <p class="text-light">All expenses: @Model.AllExpenses</p>
+        <p class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</p>
+        <p class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses)</p>
     </div>
 </div>
 
