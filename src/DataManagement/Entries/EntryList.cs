@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ePiggyWeb.Utilities;
+using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
@@ -78,6 +81,29 @@ namespace ePiggyWeb.DataManagement.Entries
             }
 
             return sb.ToString();
+        }
+
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        public static IEntryList RandomList(IConfiguration configuration, EntryType entryType)
+        {
+            IEntryList list = new EntryList(entryType);
+            var section = configuration.GetSection(entryType.ToString());
+            var random = new Random();
+            var enumCount = Enum.GetValues(typeof(Importance));
+
+            var minImportance = (int)enumCount.GetValue(0);
+            var maxImportance = (int)enumCount.GetValue(enumCount.Length - 1);
+
+
+            foreach (var thing in section.GetChildren())
+            {
+                var amount = random.Next(50, 500);
+                var importance = random.Next(minImportance, maxImportance);
+                IEntry entry = Entry.CreateLocalEntry(thing.Value, amount, DateTime.UtcNow, false, importance);
+                list.Add(entry);
+            }
+
+            return list;
         }
     }
 }
