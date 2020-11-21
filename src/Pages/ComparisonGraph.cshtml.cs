@@ -69,10 +69,13 @@ namespace ePiggyWeb.Pages
             }
             catch (Exception ex)
             {
+                var rand = new Random();
+                const int min = 10000;
+                const int max = 500001;
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                Expenses = 1000;
-                Income = 1000;
+                Expenses = (decimal)rand.Next(min,max)/100;
+                Income = (decimal)rand.Next(min, max) / 100;
             }
 
         }
