@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -30,10 +31,10 @@ namespace ePiggyWeb.Pages
 
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        public LoginModel(UserDatabase userDatabase, EmailSender emailSender)
+        public LoginModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings)
         {
             UserDatabase = userDatabase;
-            EmailSender = emailSender;
+            EmailSender = emailSenderSettings.Value;
             UserDatabase.LoggedIn += OnLogin;
         }
 

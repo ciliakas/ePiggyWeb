@@ -8,6 +8,7 @@ namespace ePiggyWeb.Utilities
 {
     public class EmailSender
     {
+        public const string Email = "Email";
         public string OurEmail { get; set; }
         public string EmailPassword { get; set; }
         public string RecoveryMessageSubject { get; set; }
