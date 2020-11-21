@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
@@ -47,10 +48,13 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
 
         private EntryDatabase EntryDatabase { get; }
-        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger)
+        private IConfiguration Configuration { get; }
+
+        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
+            Configuration = configuration;
         }
 
         public async Task OnGet()
@@ -136,7 +140,8 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                //custom filling
+                Expenses = EntryList.RandomList(Configuration, EntryType.Expense);
+                AllExpenses = Expenses.GetSum();
             }
         }
     }
