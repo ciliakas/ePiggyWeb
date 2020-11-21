@@ -35,9 +35,10 @@ namespace ePiggyWeb.Pages
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         private HttpClient HttpClient { get; }
-        public GoalsModel(GoalDatabase goalDatabase, HttpClient httpClient)
+        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, HttpClient httpClient)
         {
             GoalDatabase = goalDatabase;
+            EntryDatabase = entryDatabase;
             HttpClient = httpClient;
             InternetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
         }
