@@ -1,5 +1,6 @@
 ﻿@page
 @using System.Globalization
+@using System.Linq
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.SavingSuggestionsModel
 
@@ -55,16 +56,16 @@ else
                 <table class="table table-hover border-primary table-bordered mb-5">
                     <tr class="table-primary">
                         <th>
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Title"></label>
+                            <label asp-for="MinimalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Title"></label>
                         </th>
                         <th style="width: 15%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Date"></label>
+                            <label asp-for="MinimalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Date"></label>
                         </th>
                         <th style="width: 15%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
+                            <label asp-for="MinimalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
                         </th>
                         <th style="width: 18%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
+                            <label asp-for="MinimalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
                         </th>
                         <th style="width: 18%">
                             <label class="text-info"><b>Suggested Amount</b></label>
@@ -72,7 +73,7 @@ else
 
                     </tr>
 
-                    @foreach (var item in Model.EntrySuggestions)
+                    @foreach (var item in Model.MinimalSuggestions.EntrySuggestions)
                     {
                         <tr class="table-light border-primary">
                             <td class="border-primary">
@@ -94,23 +95,23 @@ else
                     }
                 </table>
             </div>
-            <hr />
+            <hr/>
             <div class="container">
                 <h4 class="text-light mb-3">Suggested Expenses by category (Minimal)</h4>
                 <table class="table table-hover border-primary table-bordered mt-5">
                     <tr class="table-primary">
                         <th>
-                            <label asp-for="MonthlySuggestions.FirstOrDefault().Importance"></label>
+                            <label asp-for="MinimalSuggestions.ImportanceSuggestions.FirstOrDefault().Importance"></label>
                         </th>
                         <th>
-                            <label asp-for="MonthlySuggestions.FirstOrDefault().OldAverage"></label>
+                            <label asp-for="MinimalSuggestions.ImportanceSuggestions.FirstOrDefault().OldAverage"></label>
                         </th>
                         <th>
-                            <label class="text-info" asp-for="MonthlySuggestions.FirstOrDefault().NewAverage"></label>
+                            <label class="text-info" asp-for="MinimalSuggestions.ImportanceSuggestions.FirstOrDefault().NewAverage"></label>
                         </th>
                     </tr>
 
-                    @foreach (var item in Model.MonthlySuggestions)
+                    @foreach (var item in Model.MinimalSuggestions.ImportanceSuggestions)
                     {
                         <tr class="table-light border-primary">
                             <td class="border-primary">
@@ -127,7 +128,7 @@ else
                     }
                 </table>
             </div>
-            <hr />
+            <hr/>
             <!----------------------------PastedCode----------------------------------------->
         </div>
         <!----------------------------REGULAR----------------------------------------->
@@ -138,16 +139,16 @@ else
                 <table class="table table-hover border-primary table-bordered mb-5">
                     <tr class="table-primary">
                         <th>
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Title"></label>
+                            <label asp-for="RegularSuggestions.EntrySuggestions.FirstOrDefault().Entry.Title"></label>
                         </th>
                         <th style="width: 15%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Date"></label>
+                            <label asp-for="RegularSuggestions.EntrySuggestions.FirstOrDefault().Entry.Date"></label>
                         </th>
                         <th style="width: 15%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
+                            <label asp-for="RegularSuggestions.EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
                         </th>
                         <th style="width: 18%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
+                            <label asp-for="RegularSuggestions.EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
                         </th>
                         <th style="width: 18%">
                             <label class="text-info"><b>Suggested Amount</b></label>
@@ -155,7 +156,7 @@ else
 
                     </tr>
 
-                    @foreach (var item in Model.EntrySuggestions)
+                    @foreach (var item in Model.RegularSuggestions.EntrySuggestions)
                     {
                         <tr class="table-light border-primary">
                             <td class="border-primary">
@@ -183,17 +184,17 @@ else
                 <table class="table table-hover border-primary table-bordered mt-5">
                     <tr class="table-primary">
                         <th>
-                            <label asp-for="MonthlySuggestions.FirstOrDefault().Importance"></label>
+                            <label asp-for="RegularSuggestions.ImportanceSuggestions.FirstOrDefault().Importance"></label>
                         </th>
                         <th>
-                            <label asp-for="MonthlySuggestions.FirstOrDefault().OldAverage"></label>
+                            <label asp-for="RegularSuggestions.ImportanceSuggestions.FirstOrDefault().OldAverage"></label>
                         </th>
                         <th>
-                            <label class="text-info" asp-for="MonthlySuggestions.FirstOrDefault().NewAverage"></label>
+                            <label class="text-info" asp-for="RegularSuggestions.ImportanceSuggestions.FirstOrDefault().NewAverage"></label>
                         </th>
                     </tr>
 
-                    @foreach (var item in Model.MonthlySuggestions)
+                    @foreach (var item in Model.RegularSuggestions.ImportanceSuggestions)
                     {
                         <tr class="table-light border-primary">
                             <td class="border-primary">
@@ -221,16 +222,16 @@ else
                 <table class="table table-hover border-primary table-bordered mb-5">
                     <tr class="table-primary">
                         <th>
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Title"></label>
+                            <label asp-for="MaximalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Title"></label>
                         </th>
                         <th style="width: 15%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Date"></label>
+                            <label asp-for="MaximalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Date"></label>
                         </th>
                         <th style="width: 15%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
+                            <label asp-for="MaximalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Importance"></label>
                         </th>
                         <th style="width: 18%">
-                            <label asp-for="EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
+                            <label asp-for="MaximalSuggestions.EntrySuggestions.FirstOrDefault().Entry.Amount"></label>
                         </th>
                         <th style="width: 18%">
                             <label class="text-info"><b>Suggested Amount</b></label>
@@ -238,7 +239,7 @@ else
 
                     </tr>
 
-                    @foreach (var item in Model.EntrySuggestions)
+                    @foreach (var item in Model.MaximalSuggestions.EntrySuggestions)
                     {
                         <tr class="table-light border-primary">
                             <td class="border-primary">
@@ -266,17 +267,17 @@ else
                 <table class="table table-hover border-primary table-bordered mt-5">
                     <tr class="table-primary">
                         <th>
-                            <label asp-for="MonthlySuggestions.FirstOrDefault().Importance"></label>
+                            <label asp-for="MaximalSuggestions.ImportanceSuggestions.FirstOrDefault().Importance"></label>
                         </th>
                         <th>
-                            <label asp-for="MonthlySuggestions.FirstOrDefault().OldAverage"></label>
+                            <label asp-for="MaximalSuggestions.ImportanceSuggestions.FirstOrDefault().OldAverage"></label>
                         </th>
                         <th>
-                            <label class="text-info" asp-for="MonthlySuggestions.FirstOrDefault().NewAverage"></label>
+                            <label class="text-info" asp-for="MaximalSuggestions.ImportanceSuggestions.FirstOrDefault().NewAverage"></label>
                         </th>
                     </tr>
 
-                    @foreach (var item in Model.MonthlySuggestions)
+                    @foreach (var item in Model.MaximalSuggestions.ImportanceSuggestions)
                     {
                         <tr class="table-light border-primary">
                             <td class="border-primary">

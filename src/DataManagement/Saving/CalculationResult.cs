@@ -6,20 +6,20 @@ namespace ePiggyWeb.DataManagement.Saving
     public class CalculationResults
     {
         public IList<ISavingSuggestion> EntrySuggestions;
-        public List<SavingSuggestionByMonth> MonthlySuggestions;
+        public List<SavingSuggestionByImportance> ImportanceSuggestions;
         public int TimesToRepeatSaving;
 
-        public CalculationResults(IList<ISavingSuggestion> entrySuggestions, List<SavingSuggestionByMonth> monthlySuggestions, int timesToRepeatSaving)
+        public CalculationResults(IList<ISavingSuggestion> entrySuggestions, List<SavingSuggestionByImportance> importanceSuggestions, int timesToRepeatSaving)
         {
             EntrySuggestions = entrySuggestions;
-            MonthlySuggestions = monthlySuggestions;
+            ImportanceSuggestions = importanceSuggestions;
             TimesToRepeatSaving = timesToRepeatSaving;
         }
 
         public CalculationResults()
         {
             EntrySuggestions = new List<ISavingSuggestion>();
-            MonthlySuggestions = new List<SavingSuggestionByMonth>();
+            ImportanceSuggestions = new List<SavingSuggestionByImportance>();
             TimesToRepeatSaving = 0;
         }
     }

@@ -15,7 +15,7 @@ namespace ePiggyWeb.DataManagement.Saving
         public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType = SavingType.Regular)
         {
             var entrySuggestions = new List<ISavingSuggestion>();
-            var monthlySuggestions = new List<SavingSuggestionByMonth>();
+            var monthlySuggestions = new List<SavingSuggestionByImportance>();
             
             if (entryList is null)
             {
@@ -74,7 +74,7 @@ namespace ePiggyWeb.DataManagement.Saving
             }
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
-                monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
+                monthlySuggestions.Add(new SavingSuggestionByImportance(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
             return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving);
         }

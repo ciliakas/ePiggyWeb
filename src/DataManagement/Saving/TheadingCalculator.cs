@@ -10,7 +10,7 @@ namespace ePiggyWeb.DataManagement.Saving
     {
         public Dictionary<SavingType, CalculationResults> GetAllSuggestedExpenses(IEntryList entryList, IGoal goal, decimal startingBalance)
         {
-            Dictionary<SavingType, CalculationResults> fullResults = new Dictionary<SavingType, CalculationResults>();
+            var fullResults = new Dictionary<SavingType, CalculationResults>();
             var alternativeSavingCalculator = new AlternativeSavingCalculator();
             var savingTypes = Enum.GetValues(typeof(Importance));
             //TODO: insert threads here
