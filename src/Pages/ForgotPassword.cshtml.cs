@@ -6,6 +6,8 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -31,12 +33,14 @@ namespace ePiggyWeb.Pages
         public bool CodeSent;
         public bool Expired;
 
-        private EmailSender EmailSender { get; }
+        private Lazy<EmailSender> EmailSender { get; }
         private UserDatabase UserDatabase { get; }
-        public ForgotPasswordModel(UserDatabase userDatabase, EmailSender emailSender)
+        private IConfiguration Configuration { get; }
+        public ForgotPasswordModel(UserDatabase userDatabase, IConfiguration configuration)
         {
             UserDatabase = userDatabase;
-            EmailSender = emailSender;
+            Configuration = configuration;
+            EmailSender = new Lazy<EmailSender>(() => new EmailSender());
         }
 
         public async Task<IActionResult> OnGet()
@@ -51,7 +55,9 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             Email = Request.Cookies["Email"];
-            var recoveryCode = (await EmailSender.SendRecoveryCodeAsync(Email)).ToString();
+
+            Configuration.GetSection(Utilities.EmailSender.Email).Bind(EmailSender.Value);
+            var recoveryCode = (await EmailSender.Value.SendRecoveryCodeAsync(Email)).ToString();
 
             var option = new CookieOptions() { Expires = DateTime.Now.AddMinutes(15) };
             Response.Cookies.Append("recoveryCode", recoveryCode, option);
@@ -67,7 +73,7 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
             var value = Request.Cookies["recoveryCode"];
-            if (string.Equals(EnteredCode, value ))
+            if (string.Equals(EnteredCode, value))
             {
                 if (string.Equals(Password, PasswordConfirm))
                 {

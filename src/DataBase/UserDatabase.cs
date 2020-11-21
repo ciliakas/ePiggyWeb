@@ -9,6 +9,15 @@ namespace ePiggyWeb.DataBase
 {
     public class UserDatabase
     {
+        public event EventHandler<UserModel> LoggedIn;
+
+        public delegate void RegisterEvent(object? sender, UserModel user);
+
+        public event RegisterEvent Registered;
+        //public event EventHandler<UserModel> Registered;
+
+        public event EventHandler<UserModel> Deleted;
+
         private PiggyDbContext Database { get; }
         public UserDatabase(PiggyDbContext database)
         {
@@ -30,6 +39,8 @@ namespace ePiggyWeb.DataBase
             Database.Add(user);
             await Database.SaveChangesAsync();
 
+            Registered?.Invoke(this, user);
+
             return user.Id;
         }
 
@@ -48,6 +59,9 @@ namespace ePiggyWeb.DataBase
                 //Password is wrong
                 return -2;
             }
+
+            LoggedIn?.Invoke(this, user);
+
             return user.Id;
         }
 
@@ -82,13 +96,15 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteUserAsync(Expression<Func<UserModel, bool>> filter)
         {
-            var temp = await Database.Users.FirstOrDefaultAsync(filter);
-            if (temp is null)
+            var user = await Database.Users.FirstOrDefaultAsync(filter);
+            if (user is null)
             {
                 return false;
             }
-            Database.Users.Remove(temp);
+
+            Database.Users.Remove(user);
             await Database.SaveChangesAsync();
+            Deleted?.Invoke(this, user);
             return true;
         }
 

@@ -10,6 +10,7 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
@@ -37,14 +38,16 @@ namespace ePiggyWeb.Pages
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         private HttpClient HttpClient { get; }
+        private IConfiguration Configuration { get; }
 
-        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient)
+        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
             _logger = logger;
             HttpClient = httpClient;
             InternetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
+            Configuration = configuration;
         }
 
         public async Task OnGet()
@@ -66,7 +69,8 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                //fill custom data
+                Goals = GoalList.RandomList(Configuration);
+                Savings = 0;
             }
         }
 

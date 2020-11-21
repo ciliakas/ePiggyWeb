@@ -28,11 +28,12 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private UserDatabase UserDatabase { get; }
-        public ChangePasswordModel(UserDatabase userDatabase, ILogger<ChangePasswordModel> logger)
+        private Lazy<UserDatabase> UserDatabase { get; }
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, ILogger<ChangePasswordModel> logger)
         {
-            UserDatabase = userDatabase;
+            UserDatabase = new Lazy<UserDatabase>(() => new UserDatabase(piggyDbContext));
             _logger = logger;
+
         }
 
         public IActionResult OnGet()
@@ -52,10 +53,9 @@ namespace ePiggyWeb.Pages
                 {
                     return Page();
                 }
-
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
+                    await UserDatabase.Value.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                     return RedirectToPage("/index");
                 }
                 else
