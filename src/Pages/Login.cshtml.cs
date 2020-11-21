@@ -76,7 +76,13 @@ namespace ePiggyWeb.Pages
                 Response.Cookies.Delete("Email");
                 return Redirect(returnUrl ?? "/index");
             }
-            ErrorMessage = "Invalid E-mail or Password!";
+
+            ErrorMessage = id switch
+            {
+                -1 => "User not found!",
+                -2 => "Incorrect Password!",
+                _ => "Authentication failed!"
+            };
             return Page();
         }
 

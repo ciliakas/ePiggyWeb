@@ -7,6 +7,10 @@ using ePiggyWeb.Pages.ErrorPages;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using ePiggyWeb.DataBase.Models;
+using ePiggyWeb.Utilities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -27,12 +31,14 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private Lazy<UserDatabase> UserDatabase { get; }
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, ILogger<ChangePasswordModel> logger)
+        private UserDatabase UserDatabase { get; }
+        private EmailSender EmailSender { get; }
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger)
         {
-            UserDatabase = new Lazy<UserDatabase>(() => new UserDatabase(piggyDbContext));
-            _logger = logger;
-
+            UserDatabase = new UserDatabase(piggyDbContext);
+            UserDatabase.Deleted += OnDeleteUser;
+            EmailSender = emailSenderSettings.Value;
+             _logger = logger;
         }
 
         public IActionResult OnGet()
@@ -54,7 +60,7 @@ namespace ePiggyWeb.Pages
                 }
                 if (string.Equals(Password, PasswordConfirm))
                 {
-                    await UserDatabase.Value.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
+                    await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                     return RedirectToPage("/index");
                 }
                 else
@@ -69,6 +75,18 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
            
+        }
+
+        public async Task<IActionResult> OnPostDeleteAccount()
+        {
+            await HttpContext.SignOutAsync();
+            await UserDatabase.DeleteUserAsync(User.FindFirst(ClaimTypes.Email).Value);
+            return Redirect("/index");
+        }
+
+        private async void OnDeleteUser(object sender, UserModel user)
+        {
+            await EmailSender.SendFarewellEmailAsync(user.Email);
         }
     }
 }

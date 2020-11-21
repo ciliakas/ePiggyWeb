@@ -1,8 +1,6 @@
 ﻿@page
-@using System.Globalization
 @using System.Linq
 @using ePiggyWeb.Utilities
-@using IListExtension
 @model ePiggyWeb.Pages.IncomesModel
 
 @if (Model.WasException)
@@ -90,33 +88,32 @@ else
                             <th style="width: 15%">
 
                             </th>
-
-                        </tr>
-                        @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
-                        {
-                            <tr class="table-light border-primary">
-                                <td class="border-primary">
-                                    @Html.DisplayFor(m => item.Title)
-                                </td>
-                                <td class="border-primary">
-                                    @item.Amount.ToString(CultureInfo.CurrentCulture)
-                                </td>
-                                <td class="border-primary">
-                                    @item.Date.ToShortDateString()
-                                </td>
-                                <td class="border-primary">
-                                    @((Importance)item.Importance)
-                                </td>
-                                <td class="border-primary">
-                                    @if (item.Recurring)
-                                    {
-                                        <i class="fas fa-check text-success"></i>
-                                    }
-                                </td>
-                                <td class="border-primary">
-                                    <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
-                                    <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
-                                </td>
+                    </tr>
+                    @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
+                    {
+                        <tr class="table-light border-primary">
+                            <td class="border-primary">
+                                @Html.DisplayFor(m => item.Title)
+                            </td>
+                            <td class="border-primary">
+                                @NumberFormatter.FormatCurrency(item.Amount)
+                            </td>
+                            <td class="border-primary">
+                                @item.Date.ToShortDateString()
+                            </td>
+                            <td class="border-primary">
+                                @((Importance)item.Importance)
+                            </td>
+                            <td class="border-primary">
+                                @if (item.Recurring)
+                                {
+                                    <i class="fas fa-check text-success"></i>
+                                }
+                            </td>
+                            <td class="border-primary">
+                                <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
+                                <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
+                            </td>
                             </tr>
                         }
                     </table>
@@ -125,13 +122,11 @@ else
                 {
                     <p>No income available</p>
                 }
-
-            </form>
-        </div>
-        <div class="col-2 border p-3 mt-3 mb-3">
-            <p class="text-light">Earned this period: @Model.Income.GetSum()</p>
-            <p class="text-light">All income: @Model.AllIncome</p>
-        </div>
+        </form>
+    </div>
+    <div class="col-2 border p-3 mt-3 mb-3">
+        <p class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum())</p>
+        <p class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome)</p>
     </div>
 
     @section Scripts{
