@@ -1,4 +1,4 @@
-﻿@page
+@page
 @using System.Linq
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.GoalsModel
@@ -49,8 +49,7 @@ else
             {
                 @Html.Raw("<div class=\"row p-0 mx-auto mt-3\">")
             }
-
-        <div class="border m-3 bg-primary col-sm">
+            <div class="border m-3 bg-primary col-sm">
             <button asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-primary float-right" type="submit" title="Remove Goal"><i class="far fa-trash-alt text-danger "></i></button>
             <div class="clearfix"></div>
             <h3 class="text-light problematic-title" title="Title">@item.Title </h3>
@@ -79,7 +78,7 @@ else
                 <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
             </div>
             <h5 class="text-light" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(item.Amount)</h5>
-            @if (percent == 100)
+                                                                                                                                                       @if (percent == 100)
             {
                 <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-shopping-cart fa-2x text-info"></i></button>
             }
@@ -93,6 +92,7 @@ else
 
             }
         </div>
+
             num++;
             if (num % 3 == 0)
             {

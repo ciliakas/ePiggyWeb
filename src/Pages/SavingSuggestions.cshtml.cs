@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.DataManagement.Saving;
 using ePiggyWeb.Utilities;
@@ -19,16 +20,20 @@ namespace ePiggyWeb.Pages
         public IGoal Goal { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
-        public int MonthsToSave { get; set; }
+        public IEntryList Expenses { get; set; }
+
         [BindProperty]
         public int Id { get; set; }
 
-        public IList<ISavingSuggestion> EntrySuggestions { get; set; }
-        public List<SavingSuggestionByMonth> MonthlySuggestions { get; set; }
         [BindProperty]
         public DateTime StartDate { get; set; }
         [BindProperty]
         public DateTime EndDate { get; set; }
+        public CalculationResults MinimalSuggestions { get; set; }
+        public CalculationResults RegularSuggestions { get; set; }
+        public CalculationResults MaximalSuggestions { get; set; }
+
+        private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
         public string ErrorMessage = "";
 
@@ -72,25 +77,22 @@ namespace ePiggyWeb.Pages
 
         public async Task SetData()
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+            Goal = await GoalDatabase.ReadAsync(Id, UserId);
+            var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+            Savings = income.GetSum() - Expenses.GetSum();
+            if (Savings < 0)
+            {
+                Savings = 0;
+            }
+
             try
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Goal = await GoalDatabase.ReadAsync(Id, UserId);
-                EntrySuggestions = new List<ISavingSuggestion>();
-                MonthlySuggestions = new List<SavingSuggestionByMonth>();
-                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                Savings = income.GetSum() - expenses.GetSum();
-                if (Savings < 0)
-                {
-                    Savings = 0;
-                }
-
-                MonthsToSave = AlternativeSavingCalculator.GetSuggestedExpensesOffers(expenses,
-                    Goal,
-                    EntrySuggestions,
-                    MonthlySuggestions,
-                    Savings);
+                var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings);
+                MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
+                RegularSuggestions = suggestionDictionary[SavingType.Regular];
+                MaximalSuggestions = suggestionDictionary[SavingType.Maximal];
             }
             catch (Exception ex)
             {
@@ -99,7 +101,6 @@ namespace ePiggyWeb.Pages
                 Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100);
                 Savings = 0;
             }
-            
 
         }
     }
