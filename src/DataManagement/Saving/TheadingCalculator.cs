@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
