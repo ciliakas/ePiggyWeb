@@ -50,7 +50,7 @@ namespace ePiggyWeb.Pages
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToPage("/Index");
+                return RedirectToPage("/index");
             }
 
             if (Request.Cookies.ContainsKey("recoveryCode"))
@@ -90,7 +90,7 @@ namespace ePiggyWeb.Pages
 
                 await EmailSender.SendGreetingEmailAsync(Email);
 
-                return Redirect("/Index");
+                return Redirect("/index");
             }
 
             ErrorMessage = "Such User already exists";

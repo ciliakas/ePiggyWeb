@@ -1,5 +1,0 @@
-System.FormatException: Input string was not in a correct format.
-   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
-   at System.Number.ParseDecimal(ReadOnlySpan`1 value, NumberStyles styles, NumberFormatInfo info)
-   at System.Convert.ToDecimal(String value, IFormatProvider provider)
-   at ePiggyWeb.Utilities.InternetParser.ReadPriceFromCamel(String itemName) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Utilities\InternetParser.cs:line 52

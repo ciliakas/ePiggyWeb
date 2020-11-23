@@ -2,18 +2,21 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
 {
     [Authorize]
     public class ExpensesGraphModel : PageModel
     {
+        private readonly ILogger<ExpensesGraphModel> _logger;
+        public bool WasException { get; set; }
         public IEntryList Expenses { get; set; }
         private int UserId { get; set; }
         [BindProperty]
@@ -23,9 +26,13 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
-        public ExpensesGraphModel(EntryDatabase entryDatabase)
+        private IConfiguration Configuration { get; }
+
+        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger, IConfiguration configuration)
         {
             EntryDatabase = entryDatabase;
+            _logger = logger;
+            Configuration = configuration;
         }
         public async Task OnGet()
         {
@@ -55,9 +62,19 @@ namespace ePiggyWeb.Pages
 
         private async Task SetData()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-            Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+            try
+            {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+                Expenses = EntryList.RandomList(Configuration, EntryType.Expense);
+            }
+
         }
     }
 }
