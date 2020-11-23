@@ -5,14 +5,15 @@ using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
     public class ThreadingCalculator
     {
-        public Dictionary<SavingType, CalculationResults> GetAllSuggestedExpenses(IEntryList entryList, IGoal goal, decimal startingBalance)
+        public ConcurrentDictionary<SavingType, CalculationResults> GetAllSuggestedExpenses(IEntryList entryList, IGoal goal, decimal startingBalance)
         {
-            var fullResults = new Dictionary<SavingType, CalculationResults>();
+            var fullResults = new ConcurrentDictionary<SavingType, CalculationResults>();
             //var alternativeSavingCalculator = new AlternativeSavingCalculator();
             var tasks = new List<Task>();
             var savingTypes = Enum.GetValues(typeof(SavingType));
@@ -46,7 +47,7 @@ namespace ePiggyWeb.DataManagement.Saving
                     var resultMaximal = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType);
                 });
                 */
-                var task = ThreadWorkAsync(entryList, goal, startingBalance, (SavingType)savingType);
+                var task = ThreadWorkAsync(entryList, goal, startingBalance, (SavingType)savingType, fullResults);
                 //var result = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType);
                 //AsyncCallback fullResults.Add((SavingType)savingType, result);
                 tasks.Add(task);
@@ -55,13 +56,12 @@ namespace ePiggyWeb.DataManagement.Saving
             Task.WaitAll(tasks.ToArray());
             return fullResults;
         }
-        private async Task<CalculationResults> ThreadWorkAsync(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType)
+        private async Task<CalculationResults> ThreadWorkAsync(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType,
+            ConcurrentDictionary<SavingType, CalculationResults> fullResults)
         {
-            var fullResults = new Dictionary<SavingType, CalculationResults>();
             var alternativeSavingCalculator = new AlternativeSavingCalculator();
             var result = await Task.Factory.StartNew(() => alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType));
-            //var resultRegular = await Task.Factory.StartNew(() => alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Regular));
-            //var resultMaximal = await Task.Factory.StartNew(() => alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Maximal));
+            fullResults.TryAdd((SavingType)savingType, result);
             return result;
         }
       
