@@ -2,13 +2,13 @@
 
 namespace ePiggyWeb.DataManagement.Saving
 {
-    public class SavingSuggestionByMonth
+    public class SavingSuggestionByImportance
     {
         public decimal OldAverage { get; set; }
         public decimal NewAverage { get; set; }
         public Importance Importance { get; set; }
 
-        public SavingSuggestionByMonth(decimal newAverage, decimal oldAverage, Importance importance)
+        public SavingSuggestionByImportance(decimal newAverage, decimal oldAverage, Importance importance)
         {
             Importance = importance;
             NewAverage = newAverage;

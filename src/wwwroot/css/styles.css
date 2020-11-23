@@ -18,6 +18,11 @@ h1, h2 {
     font-family: Oswald;
 }
 
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: Montserrat;
     text-align: center;
@@ -70,9 +75,9 @@ body {
     color: #276dc1;
 }
 
-    .icon-features:hover {
-        color: #2e9aed;
-    }
+.icon-features:hover {
+    color: #2e9aed;
+}
 
 #testimonials {
     background-color: transparent;
@@ -96,7 +101,8 @@ body {
 }
 
 .footer {
-    padding-top: 75px;
+    margin-top: 4%;
+    padding-top:5%;
     background-color: #f9f7f7;
     color: #8f8f8f;
 }

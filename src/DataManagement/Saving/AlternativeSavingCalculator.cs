@@ -9,13 +9,13 @@ namespace ePiggyWeb.DataManagement.Saving
     public class AlternativeSavingCalculator
     {
         private static decimal RegularSavingValue { get; } = 0.25M;
-        private static decimal MaximalSavingValue { get; } = 0.5M;
-        private static decimal MinimalSavingValue { get; } = 0.1M;
+        private static decimal MaximalSavingValue { get; } = 0.1M;
+        private static decimal MinimalSavingValue { get; } = 0.5M;
 
         public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType = SavingType.Regular)
         {
             var entrySuggestions = new List<ISavingSuggestion>();
-            var monthlySuggestions = new List<SavingSuggestionByMonth>();
+            var monthlySuggestions = new List<SavingSuggestionByImportance>();
             
             if (entryList is null)
             {
@@ -36,12 +36,28 @@ namespace ePiggyWeb.DataManagement.Saving
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
                 {
-                    var amountAfterSaving = savingType switch
+                    var amountAfterSaving = 0M;
+                    switch (savingType)
                     {
-                        SavingType.Minimal => entry.Amount * ratio * MinimalSavingValue,
-                        SavingType.Regular => entry.Amount * ratio * RegularSavingValue,
-                        SavingType.Maximal => entry.Amount * ratio * MaximalSavingValue,
-                        _ => throw new ArgumentOutOfRangeException()
+                        case SavingType.Minimal:
+                            if (entry.Amount * ratio * MinimalSavingValue < entry.Amount)
+                            {
+                                amountAfterSaving = entry.Amount * ratio * MinimalSavingValue;
+                            }
+                            else
+                            {
+                                amountAfterSaving = entry.Amount;
+                            }
+                            break;
+                        case SavingType.Regular:
+                            amountAfterSaving = entry.Amount * ratio * RegularSavingValue;
+                            break;
+                        case SavingType.Maximal:
+                            amountAfterSaving = entry.Amount * ratio * MaximalSavingValue;
+                            break;
+                        default:
+                            ExceptionHandler.Log("Unexpected saving type");
+                            break;
                     };
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
 
@@ -74,7 +90,7 @@ namespace ePiggyWeb.DataManagement.Saving
             }
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
-                monthlySuggestions.Add(new SavingSuggestionByMonth(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
+                monthlySuggestions.Add(new SavingSuggestionByImportance(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
             return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving);
         }

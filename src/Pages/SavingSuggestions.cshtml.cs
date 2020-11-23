@@ -19,18 +19,18 @@ namespace ePiggyWeb.Pages
         public decimal Savings { get; set; }
         private int UserId { get; set; }
         public IEntryList Expenses { get; set; }
-        public int MonthsToSave { get; set; }
         [BindProperty]
         public int Id { get; set; }
 
-        public IList<ISavingSuggestion> EntrySuggestions { get; set; }
-        public List<SavingSuggestionByMonth> MonthlySuggestions { get; set; }
         [BindProperty]
         public DateTime StartDate { get; set; }
         [BindProperty]
         public DateTime EndDate { get; set; }
+        public CalculationResults MinimalSuggestions { get; set; }
+        public CalculationResults RegularSuggestions { get; set; }
+        public CalculationResults MaximalSuggestions { get; set; }
 
-        private readonly AlternativeSavingCalculator alternativeSavingCalculator = new AlternativeSavingCalculator();
+        private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
         public string ErrorMessage = "";
         public void OnGet(int id)
@@ -75,20 +75,18 @@ namespace ePiggyWeb.Pages
                 Savings = 0;
             }
 
-            var calculationResults = new CalculationResults();
             try
-            {                
-                calculationResults = alternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses, Goal, Savings);
+            {
+                var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings);
+                MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
+                RegularSuggestions = suggestionDictionary[SavingType.Regular];
+                MaximalSuggestions = suggestionDictionary[SavingType.Maximal];
             }
             catch(Exception ex)
             {
                 ExceptionHandler.Log(ex.ToString());
                 ExceptionHappened = true;
             }
-            EntrySuggestions = calculationResults.EntrySuggestions;
-            MonthlySuggestions = calculationResults.MonthlySuggestions;
-            MonthsToSave = calculationResults.TimesToRepeatSaving;
-
         }
     }
 }
