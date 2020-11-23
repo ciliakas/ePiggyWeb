@@ -53,7 +53,10 @@ namespace ePiggyWeb.DataManagement.Saving
                             amountAfterSaving = entry.Amount * ratio * RegularSavingValue;
                             break;
                         case SavingType.Maximal:
-                            amountAfterSaving = entry.Amount * ratio * MaximalSavingValue;                            
+                            amountAfterSaving = entry.Amount * ratio * MaximalSavingValue;
+                            break;
+                        default:
+                            ExceptionHandler.Log("Unexpected saving type");
                             break;
                     };
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));

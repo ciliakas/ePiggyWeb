@@ -1,3 +1,0 @@
-System.Collections.Generic.KeyNotFoundException: The given key 'Minimal' was not present in the dictionary.
-   at System.Collections.Generic.Dictionary`2.get_Item(TKey key)
-   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\deivi\Desktop\PSI_Programming\web-improvement\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 90
