@@ -19,8 +19,6 @@
 }
 else
 {
-   
-    <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MonthsToSave months</span></h4>
     <br />
     <hr />
     <form method="get" class="mt-5 mb-5">
@@ -50,6 +48,7 @@ else
         </p>
         <!----------------------------MINIMAL----------------------------------------->
         <div class="collapse" id="minimalSuggestions" data-parent="#SavingType">
+            <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MinimalSuggestions.TimesToRepeatSaving months</span></h4>
             <!----------------------------PastedCode----------------------------------------->
             <div class="container">
                 <h4 class="text-light mb-3">Suggested Expenses improvements (Minimal)</h4>
@@ -95,7 +94,7 @@ else
                     }
                 </table>
             </div>
-            <hr/>
+            <hr />
             <div class="container">
                 <h4 class="text-light mb-3">Suggested Expenses by category (Minimal)</h4>
                 <table class="table table-hover border-primary table-bordered mt-5">
@@ -128,11 +127,12 @@ else
                     }
                 </table>
             </div>
-            <hr/>
+            <hr />
             <!----------------------------PastedCode----------------------------------------->
         </div>
         <!----------------------------REGULAR----------------------------------------->
         <div class="collapse" id="regularSuggestions" data-parent="#SavingType">
+            <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.RegularSuggestions.TimesToRepeatSaving months</span></h4>
             <!----------------------------PastedCode----------------------------------------->
             <div class="container">
                 <h4 class="text-light mb-3">Suggested Expenses improvements (Regular)</h4>
@@ -178,7 +178,7 @@ else
                     }
                 </table>
             </div>
-            <hr />
+            <hr/>
             <div class="container">
                 <h4 class="text-light mb-3">Suggested Expenses by category (Regular)</h4>
                 <table class="table table-hover border-primary table-bordered mt-5">
@@ -211,11 +211,12 @@ else
                     }
                 </table>
             </div>
-            <hr />
+            <hr/>
             <!----------------------------PastedCode----------------------------------------->
         </div>
         <!----------------------------MAXIMAL----------------------------------------->
         <div class="collapse" id="maximalSuggestions" data-parent="#SavingType">
+            <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MaximalSuggestions.TimesToRepeatSaving months</span></h4>
             <!----------------------------PastedCode----------------------------------------->
             <div class="container">
                 <h4 class="text-light mb-3">Suggested Expenses improvements (Maximal)</h4>
@@ -261,7 +262,7 @@ else
                     }
                 </table>
             </div>
-            <hr />
+            <hr/>
             <div class="container">
                 <h4 class="text-light mb-3">Suggested Expenses by category (Maximal)</h4>
                 <table class="table table-hover border-primary table-bordered mt-5">
@@ -294,7 +295,7 @@ else
                     }
                 </table>
             </div>
-            <hr />
+            <hr/>
             <!----------------------------PastedCode----------------------------------------->
         </div>
     </div>

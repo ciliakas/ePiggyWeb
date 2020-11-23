@@ -19,12 +19,9 @@ namespace ePiggyWeb.Pages
         public decimal Savings { get; set; }
         private int UserId { get; set; }
         public IEntryList Expenses { get; set; }
-        public int MonthsToSave { get; set; }
         [BindProperty]
         public int Id { get; set; }
 
-       // public IList<ISavingSuggestion> EntrySuggestions { get; set; }
-       // public List<SavingSuggestionByImportance> MonthlySuggestions { get; set; }
         [BindProperty]
         public DateTime StartDate { get; set; }
         [BindProperty]
@@ -33,7 +30,6 @@ namespace ePiggyWeb.Pages
         public CalculationResults RegularSuggestions { get; set; }
         public CalculationResults MaximalSuggestions { get; set; }
 
-       // private readonly AlternativeSavingCalculator alternativeSavingCalculator = new AlternativeSavingCalculator();
         private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
         public string ErrorMessage = "";
@@ -80,12 +76,7 @@ namespace ePiggyWeb.Pages
             }
 
             try
-            {                
-                //var calculationResults = alternativeSavingCalculator.GetSuggestedExpensesOffers(Expenses, Goal, Savings);
-                //EntrySuggestions = calculationResults.EntrySuggestions;
-                //MonthlySuggestions = calculationResults.ImportanceSuggestions;
-                //MonthsToSave = calculationResults.TimesToRepeatSaving;
-
+            {
                 var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings);
                 MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
                 RegularSuggestions = suggestionDictionary[SavingType.Regular];
