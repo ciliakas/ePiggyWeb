@@ -57,8 +57,7 @@ namespace ePiggyWeb.DataBase
             var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (dbGoal == null)
             {
-                ExceptionHandler.Log("Couldn't find goal id: " + id + " in database");
-                return false;
+               throw new Exception("Couldn't find goal id: " + id + " in database");
             }
             dbGoal.Edit(newGoal);
             await Database.SaveChangesAsync();
@@ -77,17 +76,9 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteAsync(Expression<Func<IGoalModel, bool>> filter)
         {
-            try
-            {
-                var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
-                Database.Remove(dbGoal ?? throw new InvalidOperationException());
-                await Database.SaveChangesAsync();
-            }
-            catch (InvalidOperationException ex)
-            {
-                ExceptionHandler.Log(ex.ToString());
-                return false;
-            }
+            var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
+            Database.Remove(dbGoal ?? throw new InvalidOperationException());
+            await Database.SaveChangesAsync();
             return true;
         }
 
@@ -117,21 +108,12 @@ namespace ePiggyWeb.DataBase
 
         public async Task<int> MoveGoalToExpensesAsync(int goalId, int userId, IEntry expense)
         {
-            try
-            {
-                var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == goalId && x.UserId == userId);
-                Database.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
-                var dbExpense = new ExpenseModel(expense, userId);
-                await Database.Expenses.AddAsync(dbExpense);
-                await Database.SaveChangesAsync();
-                return dbExpense.Id;
-            }
-            catch (InvalidOperationException ex)
-            {
-                ExceptionHandler.Log(ex.ToString());
-                ExceptionHandler.Log("Couldn't find goal id: " + goalId + " in database");
-                return -1;
-            }
+            var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == goalId && x.UserId == userId);
+            Database.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
+            var dbExpense = new ExpenseModel(expense, userId);
+            await Database.Expenses.AddAsync(dbExpense);
+            await Database.SaveChangesAsync();
+            return dbExpense.Id;
         }
 
         public async Task<IGoal> ReadAsync(int id, int userId)

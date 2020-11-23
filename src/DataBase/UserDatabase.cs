@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase.Models;
@@ -102,8 +103,16 @@ namespace ePiggyWeb.DataBase
                 return false;
             }
 
+            var id = user.Id;
+            var goalsToRemove = await Database.Goals.Where(x => x.Id == id).ToListAsync();
+            Database.RemoveRange(goalsToRemove);
+            var incomesToRemove = await Database.Incomes.Where(x => x.Id == id).ToListAsync();
+            Database.RemoveRange(incomesToRemove);
+            var expensesToRemove = await Database.Expenses.Where(x => x.Id == id).ToListAsync();
+            Database.RemoveRange(expensesToRemove);
             Database.Users.Remove(user);
             await Database.SaveChangesAsync();
+
             Deleted?.Invoke(this, user);
             return true;
         }

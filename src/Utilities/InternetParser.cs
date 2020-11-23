@@ -66,9 +66,7 @@ namespace ePiggyWeb.Utilities
             }
             catch(Exception ex)
             {
-                ExceptionHandler.Log(ex.ToString());
-                itemName = WebUtility.UrlDecode(itemName);
-                return Goal.CreateLocalGoal(itemName, 0);
+                throw ex;
             }
             
         }

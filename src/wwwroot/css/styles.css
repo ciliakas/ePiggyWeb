@@ -168,6 +168,12 @@ body {
     font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
 }
 
+.container-error {
+    background-color: transparent;
+    padding-bottom: 25%;
+    font-size: 3rem;
+}
+
 .container404 {
     background-image: url("/images/LostPig.jpg");
     background-repeat: no-repeat;

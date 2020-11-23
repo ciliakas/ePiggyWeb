@@ -1,13 +1,23 @@
 @page
-@using System.Globalization
 @using System.Linq
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.GoalsModel
 
-<br />
-<h2 class="text-info">Goals</h2>
-<button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal</button>
-<button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal</button>
+@if (Model.WasException)
+{
+    <div class="alert alert-danger" role="alert">
+        Whoops! Something went wrong!
+    </div>
+    <h1 class="text-warning">Example Goals data used:</h1>
+}
+else
+{
+    <br />
+    <h2 class="text-info">Goals</h2>
+    <button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal</button>
+    <button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal</button>
+}
+
 @if (!ModelState.IsValid)
 {
     <div class="container">
@@ -40,41 +50,48 @@ else
                 @Html.Raw("<div class=\"row p-0 mx-auto mt-3\">")
             }
             <div class="border m-3 bg-primary col-sm">
-                <button asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-primary float-right" type="submit" title="Remove Goal"><i class="far fa-trash-alt text-danger "></i></button>
-                <div class="clearfix"></div>
-                <h3 class="text-light problematic-title" title="Title">@item.Title </h3>
-                <div class="progress mt-4">
-                    @{
-                        var percent = item.Amount == 0 ? 100 : decimal.Round(Model.Savings / item.Amount * 100);
-                        percent = percent > 100 ? 100 : percent;
-                        string color;
-                        if (percent < 30)
-                        {
-                            color = "danger";
-                        }else if (percent < 85)
-                        {
-                            color = "warning";
-                        }else if (percent < 100)
-                        {
-                            color = "info";
-                        }
-                        else
-                        {
-                            color = "success";
-                        }
+            <button asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-primary float-right" type="submit" title="Remove Goal"><i class="far fa-trash-alt text-danger "></i></button>
+            <div class="clearfix"></div>
+            <h3 class="text-light problematic-title" title="Title">@item.Title </h3>
+            <div class="progress mt-4">
+                @{
+                    var percent = item.Amount == 0 ? 100 : decimal.Round(Model.Savings / item.Amount * 100);
+                    percent = percent > 100 ? 100 : percent;
+                    string color;
+                    if (percent < 30)
+                    {
+                        color = "danger";
                     }
-                    <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
-                </div>
-                <h5 class="text-light" title="Saved/Required">@Model.Savings/@item.Amount</h5>
-            @if (percent == 100)
+                    else if (percent < 85)
+                    {
+                        color = "warning";
+                    }
+                    else if (percent < 100)
+                    {
+                        color = "info";
+                    }
+                    else
+                    {
+                        color = "success";
+                    }
+                }
+                <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
+            </div>
+            <h5 class="text-light" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(item.Amount)</h5>
+                                                                                                                                                       @if (percent == 100)
             {
                 <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-shopping-cart fa-2x text-info"></i></button>
             }
             else
             {
                 <i class="fas fa-piggy-bank fa-2x text-warning" title="Still saving"></i>
-                <a class="text-light" asp-page="/savingSuggestions" asp-route-id="@item.Id" title="Suggest savings"><i class="fas fa-calculator fa-2x"></i></a>
+                @if (!Model.WasException)
+                {
+                    <a class="text-light" asp-page="/savingSuggestions" asp-route-id="@item.Id" title="Suggest savings"><i class="fas fa-calculator fa-2x"></i></a>
+                }
+
             }
+        </div>
 
             num++;
             if (num % 3 == 0)
@@ -91,7 +108,7 @@ else
 
 
 <div class="container bg-primary border p-0 mx-auto mt-3 mb-5">
-    <h2 class="text-light mt-5 mb-5">Click on Goal to get suggestions.</h2>
+    <h2 class="text-light mt-5 mb-5">Click on Calculator icon on goals to get suggestions.</h2>
     <!--Table here somewhere-->
 </div>
 
@@ -156,7 +173,7 @@ else
 </div>
 
 @section Scripts{
-    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
 }
 
 

@@ -4,20 +4,22 @@
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.SavingSuggestionsModel
 
-<div class="row p-3">
+@if (Model.WasException)
+{
+    <div class="alert alert-danger" role="alert">
+        Whoops! Something went wrong!
+    </div>
+
+}
+<div class="row p-3 mb-5">
     <a class="btn btn-sm btn-outline-light" asp-page="/goals"><i class="fas fa-arrow-left"></i> Back to Goals</a>
 </div>
 <h2 class="text-light">@Model.Goal.Title</h2>
 <h3 class="text-light mt-3 mb-4">Currently: @NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(Model.Goal.Amount)</h3>
 <hr />
 <br />
-@if (Model.ExceptionHappened)
-{
-    <div class="alert alert-warning" role="alert">
-        Whoops! Suggestions was not loaded, because something went wrong!
-    </div>
-}
-else
+
+@if (!Model.WasException)
 {
     <br />
     <hr />
@@ -301,5 +303,9 @@ else
     </div>
 
     
+}
+else
+{
+    <br/><br /><br /><br/><br/><br /><br /> <br/><br/><br/>
 }
 

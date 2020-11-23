@@ -9,6 +9,8 @@ using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -18,13 +20,15 @@ namespace ePiggyWeb.Pages
         private GoalDatabase GoalDatabase { get; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
+        private IConfiguration Configuration { get; }
         private int UserId { get; set; }
-        public EntryModel(EntryDatabase entryDatabase, GoalDatabase goalDatabase,UserDatabase userDatabase, EmailSender emailSender)
+        public EntryModel(EntryDatabase entryDatabase, GoalDatabase goalDatabase,UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings, IConfiguration configuration)
         {
             EntryDatabase = entryDatabase;
             GoalDatabase = goalDatabase;
             UserDatabase = userDatabase;
-            EmailSender = emailSender;
+            EmailSender = emailSenderSettings.Value;
+            Configuration = configuration;
             UserDatabase.Deleted += OnDeleteUser;
         }
 
@@ -35,8 +39,11 @@ namespace ePiggyWeb.Pages
 
         public async Task OnGet()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            await UserDatabase.DeleteUserAsync(UserId);
+            //@ViewData["EntryList"] = EntryList.RandomList(Configuration, EntryType.Expense);
+            @ViewData["IncomeList"] = EntryList.RandomList(Configuration, EntryType.Income);
+            @ViewData["ExpenseList"] = EntryList.RandomList(Configuration, EntryType.Expense);
+            @ViewData["GoalList"] = GoalList.RandomList(Configuration);
+
         }
     }
 }
