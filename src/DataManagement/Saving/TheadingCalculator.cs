@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
@@ -14,13 +15,47 @@ namespace ePiggyWeb.DataManagement.Saving
             var fullResults = new Dictionary<SavingType, CalculationResults>();
             var alternativeSavingCalculator = new AlternativeSavingCalculator();
             var savingTypes = Enum.GetValues(typeof(SavingType));
-            //TODO: insert threads here
+
+            Thread threadMinimal = new Thread(() => {
+                var resultMinimal = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Minimal);
+            });
+            Thread threadRegular = new Thread(() => {
+                var resultRegular = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Regular);
+            });
+            Thread threadMaximal = new Thread(() => {
+                var resultMaximal = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Maximal);
+            });
+
+            threadMinimal.Start();
+            threadRegular.Start();
+            threadMaximal.Start();
+            while(threadMaximal.IsAlive && threadRegular.IsAlive && threadMaximal.IsAlive)
+            {
+                if (!(threadMaximal.IsAlive && threadRegular.IsAlive && threadMaximal.IsAlive))
+                {
+                    return fullResults;
+                }
+            }
+            
             foreach (var savingType in savingTypes)
             {
+                /*
+                Thread thread = new Thread(() => {
+                    var resultMaximal = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType);
+                });
+                */
                 var result = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType);
                 fullResults.Add((SavingType)savingType, result);
             }
+            var result = ThreadWorkAsync(entryList, goal, startingBalance, (SavingType)savingType);
             return fullResults;
         }
+        private async Task<CalculationResults> ThreadWorkAsync(IEntryList entryList, IGoal goal, decimal startingBalance)
+        {
+            var alternativeSavingCalculator = new AlternativeSavingCalculator();
+            alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Minimal);
+            return alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Minimal);
+        }
+      
     }
 }
