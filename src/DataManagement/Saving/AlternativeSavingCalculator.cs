@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
+using System.Diagnostics;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
@@ -42,17 +43,21 @@ namespace ePiggyWeb.DataManagement.Saving
                         case SavingType.Minimal:
                             if (entry.Amount * ratio * MinimalSavingValue < entry.Amount)
                             {
+                                Debug.WriteLine("min");
                                 amountAfterSaving = entry.Amount * ratio * MinimalSavingValue;
                             }
                             else
                             {
+                                Debug.WriteLine("min");
                                 amountAfterSaving = entry.Amount;
                             }
                             break;
                         case SavingType.Regular:
+                            Debug.WriteLine("reg");
                             amountAfterSaving = entry.Amount * ratio * RegularSavingValue;
                             break;
                         case SavingType.Maximal:
+                            Debug.WriteLine("max");
                             amountAfterSaving = entry.Amount * ratio * MaximalSavingValue;                            
                             break;
                     };

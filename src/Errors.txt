@@ -1,4 +1,3 @@
-System.ArgumentOutOfRangeException: Specified argument was out of the range of valid values.
-   at ePiggyWeb.DataManagement.Saving.AlternativeSavingCalculator.GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, Decimal startingBalance, SavingType savingType) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\AlternativeSavingCalculator.cs:line 44
-   at ePiggyWeb.DataManagement.Saving.ThreadingCalculator.GetAllSuggestedExpenses(IEntryList entryList, IGoal goal, Decimal startingBalance) in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\DataManagement\Saving\TheadingCalculator.cs:line 19
-   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\GiTis\Desktop\PSI\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 89
+System.Collections.Generic.KeyNotFoundException: The given key 'Minimal' was not present in the dictionary.
+   at System.Collections.Generic.Dictionary`2.get_Item(TKey key)
+   at ePiggyWeb.Pages.SavingSuggestionsModel.SetData() in C:\Users\deivi\Desktop\PSI_Programming\web-improvement\ePiggyWeb\src\Pages\SavingSuggestions.cshtml.cs:line 90

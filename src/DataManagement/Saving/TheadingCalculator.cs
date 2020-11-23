@@ -13,9 +13,10 @@ namespace ePiggyWeb.DataManagement.Saving
         public Dictionary<SavingType, CalculationResults> GetAllSuggestedExpenses(IEntryList entryList, IGoal goal, decimal startingBalance)
         {
             var fullResults = new Dictionary<SavingType, CalculationResults>();
-            var alternativeSavingCalculator = new AlternativeSavingCalculator();
+            //var alternativeSavingCalculator = new AlternativeSavingCalculator();
+            var tasks = new List<Task>();
             var savingTypes = Enum.GetValues(typeof(SavingType));
-
+            /*
             Thread threadMinimal = new Thread(() => {
                 var resultMinimal = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Minimal);
             });
@@ -36,6 +37,7 @@ namespace ePiggyWeb.DataManagement.Saving
                     return fullResults;
                 }
             }
+            */
             
             foreach (var savingType in savingTypes)
             {
@@ -44,17 +46,23 @@ namespace ePiggyWeb.DataManagement.Saving
                     var resultMaximal = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType);
                 });
                 */
-                var result = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType);
-                fullResults.Add((SavingType)savingType, result);
+                var task = ThreadWorkAsync(entryList, goal, startingBalance, (SavingType)savingType);
+                //var result = alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType);
+                //AsyncCallback fullResults.Add((SavingType)savingType, result);
+                tasks.Add(task);
+                
             }
-            var result = ThreadWorkAsync(entryList, goal, startingBalance, (SavingType)savingType);
+            Task.WaitAll(tasks.ToArray());
             return fullResults;
         }
-        private async Task<CalculationResults> ThreadWorkAsync(IEntryList entryList, IGoal goal, decimal startingBalance)
+        private async Task<CalculationResults> ThreadWorkAsync(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType)
         {
+            var fullResults = new Dictionary<SavingType, CalculationResults>();
             var alternativeSavingCalculator = new AlternativeSavingCalculator();
-            alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Minimal);
-            return alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Minimal);
+            var result = await Task.Factory.StartNew(() => alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, (SavingType)savingType));
+            //var resultRegular = await Task.Factory.StartNew(() => alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Regular));
+            //var resultMaximal = await Task.Factory.StartNew(() => alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, SavingType.Maximal));
+            return result;
         }
       
     }
