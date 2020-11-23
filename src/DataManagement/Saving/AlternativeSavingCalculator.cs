@@ -9,8 +9,8 @@ namespace ePiggyWeb.DataManagement.Saving
     public class AlternativeSavingCalculator
     {
         private static decimal RegularSavingValue { get; } = 0.25M;
-        private static decimal MaximalSavingValue { get; } = 0.5M;
-        private static decimal MinimalSavingValue { get; } = 0.1M;
+        private static decimal MaximalSavingValue { get; } = 0.1M;
+        private static decimal MinimalSavingValue { get; } = 0.5M;
 
         public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType = SavingType.Regular)
         {
@@ -36,12 +36,25 @@ namespace ePiggyWeb.DataManagement.Saving
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
                 {
-                    var amountAfterSaving = savingType switch
+                    var amountAfterSaving = 0M;
+                    switch (savingType)
                     {
-                        SavingType.Minimal => entry.Amount * ratio * MinimalSavingValue,
-                        SavingType.Regular => entry.Amount * ratio * RegularSavingValue,
-                        SavingType.Maximal => entry.Amount * ratio * MaximalSavingValue,
-                        _ => throw new ArgumentOutOfRangeException()
+                        case SavingType.Minimal:
+                            if (entry.Amount * ratio * MinimalSavingValue < entry.Amount)
+                            {
+                                amountAfterSaving = entry.Amount * ratio * MinimalSavingValue;
+                            }
+                            else
+                            {
+                                amountAfterSaving = entry.Amount;
+                            }
+                            break;
+                        case SavingType.Regular:
+                            amountAfterSaving = entry.Amount * ratio * RegularSavingValue;
+                            break;
+                        case SavingType.Maximal:
+                            amountAfterSaving = entry.Amount * ratio * MaximalSavingValue;                            
+                            break;
                     };
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
 
