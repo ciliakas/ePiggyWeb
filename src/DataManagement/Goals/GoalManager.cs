@@ -1,77 +1,147 @@
-﻿using System.Linq;
-using ePiggyWeb.DataBase;
-using ePiggyWeb.Utilities;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using ePiggyWeb.DataBase;
+//using ePiggyWeb.DataManagement.Entries;
+//using ePiggyWeb.Utilities;
+//using IListExtension;
 
-namespace ePiggyWeb.DataManagement.Goals
-{
-    public class GoalManager : IGoalManager
-    {
-        public IGoalList GoalList { get; }
+//namespace ePiggyWeb.DataManagement.Goals
+//{
+//    public class GoalManager : IGoalManager
+//    {
+//        public IGoalList GoalList { get; }
 
-        public int UserId { get; }
+//        public int UserId { get; }
 
-        public GoalManager(IGoalList goalList, int userId = 0)
-        {
-            GoalList = goalList;
-            UserId = userId;
-            ReadFromDb();
-        }
+//        public GoalManager(IGoalList goalList, int userId = 0)
+//        {
+//            GoalList = goalList;
+//            UserId = userId;
+//            ReadFromDb();
+//        }
 
-        public bool Add(IGoal goal)
-        {
-            var id = GoalDbUpdater.Add(goal, UserId);
-            //Check if id is correct, return false if something is wrong
+//        public bool Add(IGoal goal)
+//        {
+//            var id = GoalDatabaseOld.Create(goal, UserId);
 
-            goal.Id = id;
-            goal.UserId = UserId;
-            GoalList.Add(goal);
-            return false;
-        }
+//            if (id <= 0)
+//            {
+//                throw new Exception("Invalid id of goal");
+//            }
 
-        public bool Edit(IGoal oldGoal, IGoal newGoal)
-        {
-            if (!GoalDbUpdater.Edit(oldGoal, newGoal))
-            {
-                return false;
-            }
-            var localGoal = GoalList.FirstOrDefault(x => x.Id == oldGoal.Id);
-            if (localGoal is null)
-            {
-                ExceptionHandler.Log("Edited goal id: " + oldGoal.Id + " in database but couldn't find it locally");
-                return false;
-            }
-            localGoal.Edit(newGoal);
-            return true;
-        }
+//            goal.Id = id;
+//            GoalList.Add(goal);
+//            return true;
+//        }
 
-        public bool Remove(IGoal goal)
-        {
-            if (!GoalDbUpdater.Remove(goal))
-            {
-                return false;
-            }
-            var localGoal = GoalList.FirstOrDefault(x => x.Id == goal.Id);
-            if (localGoal is null)
-            {
-                ExceptionHandler.Log("Removed goal id: " + goal.Id  + " from database but couldn't find it locally" );
-                return false;
-            }
+//        public bool AddRange(IGoalList goalList)
+//        {
+//            if (!GoalDatabaseOld.CreateList(goalList, UserId))
+//            {
+//                return false;
+//            }
 
-            GoalList.Remove(localGoal);
-            return true;
-        }
+//            GoalList.AddRange(goalList);
+//            return true;
+//        }
 
-        public bool ReadFromDb()
-        {
-            using var db = new DatabaseContext();
+//        public bool Edit(IGoal oldGoal, IGoal updatedGoal)
+//        {
+//            return Edit(oldGoal.Id, updatedGoal);
+//        }
 
-            foreach (var dbGoal in db.Goals.Where(x => x.UserId == UserId)) // query executed and data obtained from database
-            {
-                var newEntry = new Goal(dbGoal);
-                GoalList.Add(newEntry);
-            }
+//        public bool Edit(int id, IGoal updatedGoal)
+//        {
+//            if (!GoalDatabaseOld.Update(id, UserId, updatedGoal))
+//            {
+//                return false;
+//            }
 
-            return true;
-        }
-    }
-}
+//            var localGoal = GoalList.FirstOrDefault(x => x.Id == id);
+
+//            if (localGoal is null)
+//            {
+//                throw new Exception("Edited goal id: " + id + " in database but couldn't find it locally");
+//            }
+//            localGoal.Edit(updatedGoal);
+//            return true;
+//        }
+
+//        public bool Remove(IGoal goal)
+//        {
+//            return Remove(goal.Id);
+//        }
+
+//        public bool Remove(int id)
+//        {
+//            if (!GoalDatabaseOld.Delete(id, UserId))
+//            {
+//                return false;
+//            }
+
+//            var localGoal = GoalList.FirstOrDefault(x => x.Id == id);
+
+//            if (localGoal is null)
+//            {
+//                throw new Exception("Removed goal id: " + id + " from database but couldn't find it locally");
+//            }
+
+//            GoalList.Remove(localGoal);
+//            return true;
+//        }
+
+//        public bool RemoveAll(IGoalList entryList)
+//        {
+//            var idList = entryList.Select(va => va.Id).ToArray();
+
+//            if (!GoalDatabaseOld.DeleteList(idList, UserId))
+//            {
+//                return false;
+//            }
+
+//            GoalList.RemoveAll(entryList.Contains);
+//            return true;
+//        }
+
+//        public bool RemoveAll(IEnumerable<int> idList)
+//        {
+//            var idArray = idList as int[] ?? idList.ToArray();
+
+//            if (!GoalDatabaseOld.DeleteList(idArray, UserId))
+//            {
+//                return false;
+//            }
+
+//            var temp = new GoalList();
+//            temp.AddRange(
+//                from goal in GoalList 
+//                from id in idArray 
+//                where goal.Id == id 
+//                select goal);
+
+//            foreach (var entry in temp)
+//            {
+//                GoalList.Remove(entry);
+//            }
+
+//            return true;
+//        }
+
+
+//        public void ReadFromDb()
+//        {
+//            GoalList.AddRange(GoalDatabaseOld.ReadList(UserId));
+//        }
+
+//        public bool MoveGoalToExpenses(IGoal goal, IEntry expense, IEntryManager entryManager)
+//        {
+//            return Remove(goal.Id) && entryManager.Add(expense);
+//        }
+
+//        public bool MoveGoalToExpenses(int goalId, IEntry expense, IEntryManager entryManager)
+//        {
+//            return Remove(goalId) && entryManager.Add(expense);
+//        }
+//    }
+//}

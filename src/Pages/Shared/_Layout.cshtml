@@ -9,9 +9,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;1,200&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+    <script src="js/particles.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 </head>
 
 <body>
+    <div id="particles-js"> </div>
 
     <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" asp-page="/index">
@@ -32,10 +35,10 @@
                         Finances
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" asp-page="/Income">Income</a>
-                        <a class="dropdown-item" asp-page="/Expenses">Expenses</a>
+                        <a class="dropdown-item" asp-page="/income">Income</a>
+                        <a class="dropdown-item" asp-page="/expenses">Expenses</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" asp-page="/Goals">Goals</a>
+                        <a class="dropdown-item" asp-page="/goals">Goals</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -43,9 +46,9 @@
                         Reports
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Spending</a>
-                        <a class="dropdown-item" href="#">Balance</a>
-                        <a class="dropdown-item" href="#">Income/Expenses</a>
+                        <a class="dropdown-item" asp-page="/expensesGraph">Expenses</a>
+                        <a class="dropdown-item" asp-page="/incomeGraph">Income</a>
+                        <a class="dropdown-item" asp-page="/comparisonGraph">Comparison</a>
                     </div>
                 </li>
             </ul>
@@ -53,10 +56,26 @@
         <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
+                    @if (!Context.Request.Cookies.ContainsKey("snow"))
+                    {
+                        <form method="post" asp-controller="Snow" asp-action="StartSnow" asp-route-returnUrl="@Context.Request.Path">
+                            <button class="btn btn-outline-light mr-4">I'm feeling Christmas!</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-controller="Snow" asp-action="StopSnow" asp-route-returnUrl="@Context.Request.Path">
+                            <button class="btn btn-outline-light mr-4">I don't feel Christmas!</button>
+                        </form>
+                    }
+
+                </li>
+                <li class="nav-item">
                     @if (User.Identity.IsAuthenticated)
                     {
                         <form method="post" asp-controller="Logout" asp-action="LogoutTask">
                             <label class="text-light">@User.FindFirst(ClaimTypes.Email).Value</label>
+                            <a asp-page="/changePassword" class="btn btn-primary">Change Password</a>
                             <button class="btn btn-primary">Logout</button>
                         </form>
                     }
@@ -68,25 +87,30 @@
             </ul>
         </div>
     </nav>
-
     @RenderBody()
-    @RenderSection("Scripts", false)
-
+    @await RenderSectionAsync("Scripts", false)
     <div class="container-fluid footer">
-        <i class="footer-image fab fa-twitter"></i>
-        <i class="footer-image fab fa-facebook-f"></i>
-        <i class="footer-image fab fa-instagram"></i>
-        <i class="footer-image fas fa-envelope"></i>
+        <a href="https://twitter.com/vu_lt" class="footer-image fab fa-twitter"></a>
+        <a href="https://www.facebook.com/VilniusUniversity/" class="footer-image fab fa-facebook-f"></a>
+        <a href="https://www.instagram.com/vilniusuniversity/" class="footer-image fab fa-instagram"></a>
 
         <p>© Vilnius University</p>
     </div>
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
     <!-- Font Awesome  -->
     <script src="https://kit.fontawesome.com/f58a6230c2.js" crossorigin="anonymous"></script>
+
+    <script>
+    var snow = @Context.Request.Cookies.TryGetValue("Snow", out var value).ToString().ToLower();
+    if (snow) {
+        document.addEventListener("DOMContentLoaded",
+            function() {
+                particlesJS.load('particles-js', 'js/particle-cfg.json');
+            });
+    };
+    </script>
+
 </body>
 
 </html>

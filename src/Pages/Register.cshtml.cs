@@ -3,10 +3,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataBase.Models;
+using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -16,7 +19,7 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "All fields required!")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", ErrorMessage = "Password must contain at least one uppercase letter, at least one number, special character and be longer than six characters.")]
         [BindProperty]
         [DataType(DataType.Password)]
@@ -29,11 +32,30 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
+        private UserDatabase UserDatabase { get; }
+        private EmailSender EmailSender { get; }
+        public RegisterModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings)
+        {
+            UserDatabase = userDatabase;
+            EmailSender = emailSenderSettings.Value;
+            UserDatabase.Registered += OnRegister;
+        }
+
+        private async void OnRegister(object sender, UserModel user)
+        {
+            await EmailSender.SendGreetingEmailAsync(user.Email);
+        }
+
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToPage("/Index");
+                return RedirectToPage("/index");
+            }
+
+            if (Request.Cookies.ContainsKey("recoveryCode"))
+            {
+                return RedirectToPage("/forgotPassword");
             }
 
             return Page();
@@ -41,28 +63,34 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
             if (!Password.Equals(PasswordConfirm))
             {
                 ErrorMessage = "Passwords did not match!";
                 return Page();
             }
 
-            var id = UserDatabase.Register(Email, Password);
+            var id = await UserDatabase.RegisterAsync(Email, Password);
             if (id > -1)
             {
-                 var claims = new List<Claim>
-                 {
-                     new Claim(ClaimTypes.UserData, id.ToString()),
-                     new Claim(ClaimTypes.Email, Email)
-                 };
-                 var claimsIdentity = new ClaimsIdentity(claims, "Login");
-                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                     new ClaimsPrincipal(claimsIdentity));
- 
-                 return Redirect("/Index");
-            };
- 
- 
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, id.ToString()),
+                    new Claim(ClaimTypes.Email, Email)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, "Login");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                Response.Cookies.Delete("recoveryCode");
+                Response.Cookies.Delete("Email");
+
+                return Redirect("/index");
+            }
+
             ErrorMessage = "Such User already exists";
             return Page();
         }

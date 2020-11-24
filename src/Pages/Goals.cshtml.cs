@@ -1,20 +1,26 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
 {
     [Authorize]
     public class GoalsModel : PageModel
     {
+        private readonly ILogger<GoalsModel> _logger;
+        public bool WasException { get; set; }
+        public Lazy<InternetParser> InternetParser;
         public IGoalList Goals { get; set; }
         public decimal Savings { get; set; }
         private int UserId { get; set; }
@@ -26,55 +32,127 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
+        [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
 
-        public void OnGet()
+        private GoalDatabase GoalDatabase { get; }
+        private EntryDatabase EntryDatabase { get; }
+        private HttpClient HttpClient { get; }
+        private IConfiguration Configuration { get; }
+
+        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration)
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(UserId);
-            Goals = dataManager.Goals.GoalList;
-            Savings = dataManager.Income.EntryList.GetSum() - dataManager.Expenses.EntryList.GetSum();
-            if (Savings < 0)
+            GoalDatabase = goalDatabase;
+            EntryDatabase = entryDatabase;
+            _logger = logger;
+            HttpClient = httpClient;
+            InternetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
+            Configuration = configuration;
+        }
+
+        public async Task OnGet()
+        {
+            try
             {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                Goals = await GoalDatabase.ReadListAsync(UserId);
+
+                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                Savings = income.GetSum() - expenses.GetSum();
+                if (Savings < 0)
+                {
+                    Savings = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+                Goals = GoalList.RandomList(Configuration);
                 Savings = 0;
             }
         }
 
-
-        public IActionResult OnPostNewGoal()
-        { 
-            if (!ModelState.IsValid)
+        public async Task<IActionResult> OnPostNewGoal()
+        {
+            try
             {
-                OnGet();
-                return Page();
+                if (!ModelState.IsValid)
+                {
+                    await OnGet();
+                    return Page();
+                }
+
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var temp = Goal.CreateLocalGoal(Title, Amount);
+                await GoalDatabase.CreateAsync(temp, UserId);
             }
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var temp = Goal.CreateLocalGoal(Title, Amount);
-            GoalDbUpdater.Add(temp, UserId);
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+            }
+           
             return RedirectToPage("/goals");
         }
 
-        public IActionResult OnPostDelete(int id)
+        public async Task<IActionResult> OnPostParseGoal()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            DeleteGoalFromDb(id);
+            try
+            {
+                if (string.IsNullOrEmpty(Title))
+                {
+                    await OnGet();
+                    return Page();
+                }
+
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var temp = await InternetParser.Value.ReadPriceFromCamel(Title);
+                await GoalDatabase.CreateAsync(temp, UserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+            }
+            return RedirectToPage("/goals");
+
+        }
+
+        public async Task<IActionResult> OnPostDelete(int id)
+        {
+            try
+            {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                await GoalDatabase.DeleteAsync(id, UserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+            }
             return RedirectToPage("/goals");
         }
 
-        public IActionResult OnPostPurchased(int id, string title, string amount)
+        public async Task<IActionResult> OnPostPurchased(int id, string title, string amount)
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            decimal.TryParse(amount, out var parsedAmount);
-            var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring:false, importance:1);
-            EntryDbUpdater.Add(entry, UserId, EntryType.Expense);
-            DeleteGoalFromDb(id);
-            return RedirectToPage("/expenses");
-        }
-
-        private void DeleteGoalFromDb(int id)
-        {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            GoalDbUpdater.Remove(id, UserId);
+            try
+            {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                decimal.TryParse(amount, out var parsedAmount);
+                var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring: false,
+                    importance: 1);
+                await GoalDatabase.MoveGoalToExpensesAsync(id, UserId, entry);
+                return RedirectToPage("/expenses");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+                return RedirectToPage("/goals");
+            }
+            
         }
 
     }

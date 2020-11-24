@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +21,20 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public int EntryTypeInt { get; set; }
-        
-        public void OnGet(int id, int entryType)
+        private EntryDatabase EntryDatabase { get; }
+        public EditEntryModel(EntryDatabase entryDatabase)
+        {
+            EntryDatabase = entryDatabase;
+        }
+
+        public async Task OnGet(int id, int entryType)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var dataManager = new DataManager(userId);
             EntryTypeInt = entryType;
 
             Entry = entryType == 1
-                ? (Entry)dataManager.Income.EntryList.FirstOrDefault(x => x.Id == id)
-                : (Entry)dataManager.Expenses.EntryList.FirstOrDefault(x => x.Id == id);
+                ? (Entry) await EntryDatabase.ReadAsync(id, userId, EntryType.Income)
+                : (Entry) await EntryDatabase.ReadAsync(id, userId, EntryType.Expense);
 
             if (Entry != null)
             {
@@ -44,7 +46,7 @@ namespace ePiggyWeb.Pages
         }
 
         /*Editing and redirecting according to EntryType*/
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
@@ -54,12 +56,12 @@ namespace ePiggyWeb.Pages
 
             if (EntryTypeInt == 1)
             {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Income);
+                await EntryDatabase.UpdateAsync(Entry.Id, Entry.UserId, Entry, EntryType.Income);
                 return RedirectToPage("/Income");
             }
             else
             {
-                EntryDbUpdater.Edit(Entry.Id, Entry, EntryType.Expense);
+                await EntryDatabase.UpdateAsync(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
                 return RedirectToPage("/Expenses");
             }
         }
@@ -69,8 +71,5 @@ namespace ePiggyWeb.Pages
         {
             return RedirectToPage(EntryTypeInt == 1 ? "/Income" : "/Expenses");
         }
-
-
-
     }
 }

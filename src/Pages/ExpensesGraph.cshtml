@@ -1,0 +1,89 @@
+﻿@page
+@using System.Globalization
+@using ePiggyWeb.Utilities
+@model ePiggyWeb.Pages.ExpensesGraphModel
+
+@if (Model.WasException)
+{
+    <div class="alert alert-danger" role="alert">
+        Whoops! Something went wrong!
+    </div>
+    <h1 class="text-warning">Displaying placeholder data:</h1>
+}
+else
+{
+    <form method="get" class="mt-5">
+        <input type="hidden" name="handler" value="Filter" />
+        <label class="text-light">Period:</label>
+        <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+        <label class="text-light"> - </label>
+        <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+        <input type="submit" value="Filter" class="btn btn-warning ml-5" />
+        <p class="text-warning">@Model.ErrorMessage</p>
+    </form>
+}
+
+@if (!Model.Expenses.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        Graphs are empty, since no data found! Try a <strong>different period.</strong>
+    </div>
+}
+else
+{
+    <h4 class="text-light">Total Expenses of this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</h4>
+}
+
+<div class="row ml-2 mr-2 mt-3 mb-5">
+    <div class="col-sm" id="graphPie">
+        <div class="spinner-border text-warning loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <div class="col-sm" id="graphColumn">
+        <div class="spinner-border text-danger loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    // Load google charts
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Draw the chart and set the chart values
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Importance', 'Amount'],
+            ['Necessary', @Model.Expenses.GetBy(Importance.Necessary).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['High', @Model.Expenses.GetBy(Importance.High).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Medium', @Model.Expenses.GetBy(Importance.Medium).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Low', @Model.Expenses.GetBy(Importance.Low).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Unnecessary', @Model.Expenses.GetBy(Importance.Unnecessary).GetSum().ToString(CultureInfo.InvariantCulture)]
+        ]);
+
+        // Optional; add a title and set the width and height of the chart
+        var options = {
+            'title': 'Expenses by importance',
+            'height': 600,
+            'vAxis': { 'textStyle': { 'color': '#FFF' }, 'gridlines': { 'count': 5 } },
+            'backgroundColor': { 'fill': 'transparent' },
+            'colors': ['#F44336', '#9C27B0', '#3F51B5', '#2196F3', '#4CAF50'],
+            'legendTextStyle': { color: '#FFF' },
+            'titleTextStyle': { color: '#FFF' },
+            'hAxis': { 'textStyle':{'color': '#FFF'} }
+        };
+
+        var chartPie = new google.visualization.PieChart(document.getElementById('graphPie'));
+        var chartColumn = new google.visualization.ColumnChart(document.getElementById('graphColumn'));
+        chartPie.draw(data, options);
+        chartColumn.draw(data, options);
+    }
+</script>
+
+
