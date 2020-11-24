@@ -88,8 +88,6 @@ namespace ePiggyWeb.Pages
                 Response.Cookies.Delete("recoveryCode");
                 Response.Cookies.Delete("Email");
 
-                await EmailSender.SendGreetingEmailAsync(Email);
-
                 return Redirect("/index");
             }
 
