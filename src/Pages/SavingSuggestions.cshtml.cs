@@ -78,9 +78,9 @@ namespace ePiggyWeb.Pages
         public async Task SetData()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+            Expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetFrom(StartDate).GetTo(EndDate);
             Goal = await GoalDatabase.ReadAsync(Id, UserId);
-            var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+            var income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetFrom(StartDate).GetTo(EndDate);
             Savings = income.GetSum() - Expenses.GetSum();
             if (Savings < 0)
             {
