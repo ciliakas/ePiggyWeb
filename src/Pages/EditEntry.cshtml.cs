@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataManagement;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
