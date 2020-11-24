@@ -16,8 +16,6 @@
 </div>
 <h2 class="text-light">@Model.Goal.Title</h2>
 <h3 class="text-light mt-3 mb-4">Currently: @NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(Model.Goal.Amount)</h3>
-<hr />
-<br />
 
 @if (!Model.WasException)
 {
