@@ -62,8 +62,10 @@ namespace ePiggyWeb.Pages
 
         private async Task SetData()
         {
+            //throw new Exception();
             try
             {
+                //throw new Exception();
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
