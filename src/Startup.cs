@@ -36,14 +36,14 @@ namespace ePiggyWeb
                     options.SlidingExpiration = true;
 
                 });
-
+            
             services.AddDbContext<PiggyDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<UserDatabase>();
             services.AddScoped<EntryDatabase>();
             services.AddScoped<GoalDatabase>();
             services.Configure<EmailSender>(options => Configuration.GetSection("Email").Bind(options));
-            services.AddSingleton<HttpClient>();
+            services.AddScoped<HttpClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
