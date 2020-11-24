@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ePiggyWeb.DataManagement.Entries;
-using ePiggyWeb.Utilities;
 using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Goals
