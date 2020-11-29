@@ -30,6 +30,7 @@ body {
     background-color: #276dc1;
 }
 
+
 #siteHeader {
     margin: 2% 20% 1%;
     background-color: #276dc1;
@@ -41,7 +42,11 @@ body {
     color: #f9f7f7;
 }
 
-
+.title-image {
+    max-width: 100%;
+    height: auto;
+}
+}
 .jumbotron {
     background-color: #276dc1;
     color: #f9f7f7;
@@ -111,7 +116,7 @@ body {
 /*LOGIN*/
 .login-container {
     padding-top: 5%;
-    max-width: 60%;
+    max-width: 30%;
     margin-top: 5%;
     margin-bottom: 16%;
     text-align: center;
@@ -140,12 +145,6 @@ body {
     cursor: pointer;
 }
 
-.login-form-1 .btnSubmit {
-    font-weight: 600;
-    color: #fff;
-    background-color: #0062cc;
-}
-
 .login-form-2 .btnSubmit {
     font-weight: 600;
     color: #0062cc;
@@ -156,17 +155,6 @@ body {
     color: #fff;
     font-weight: 600;
     text-decoration: none;
-}
-
-.login-form-1 .ForgetPwd {
-    color: #0062cc;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.problematic-title {
-    /* font-size: calc([minimum size] + ([maximum size] - [minimum size]) * ((100vw - [minimum viewport width]) / ([maximum viewport width] - [minimum viewport width]))); */
-    font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
 }
 
 .container-error {
@@ -220,9 +208,11 @@ body {
     left: 0
 }
 
-@media (max-width: 400px) {
-    img {
-        width: 100%;
+@media (max-width: 500px) {
+    .login-container {
+        max-width: 100%;
+        margin-bottom: 40%;
+        margin-top: 20%;
     }
 }
 
