@@ -84,7 +84,6 @@ body {
 }
 
 #testimonials {
-    margin-top: 10%;
     background-color: transparent;
     color: #f9f7f7;
 }
@@ -106,9 +105,9 @@ body {
 }
 
 .footer {
-    margin-top: 10%;
     background-color: #f9f7f7;
     color: #8f8f8f;
+    padding-top: 3%;
 }
 
 .footer-image {
@@ -223,6 +222,14 @@ body {
 
     .title-image {
         width: 80%;
+    }
+
+    #testimonials {
+        margin-top: 10%;
+    }
+    .footer {
+        margin-top: 10%;
+        padding-top: 5%;
     }
 }
 
