@@ -10,6 +10,7 @@ a:hover {
     text-align: center;
 }
 
+
 hr {
     width: 60%;
 }
@@ -98,8 +99,7 @@ body {
 }
 
 .footer {
-    margin-top: 4%;
-    padding-top:5%;
+    margin-top: 15%;
     background-color: #f9f7f7;
     color: #8f8f8f;
 }
