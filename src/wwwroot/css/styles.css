@@ -47,7 +47,7 @@ body {
     width: 30%;
     height: auto;
 }
-}
+
 .jumbotron {
     background-color: #276dc1;
     color: #f9f7f7;
@@ -117,7 +117,7 @@ body {
 /*LOGIN*/
 .login-container {
     padding-top: 5%;
-    max-width: 30%;
+    max-width: 50%;
     margin-top: 5%;
     margin-bottom: 16%;
     text-align: center;
@@ -209,11 +209,27 @@ body {
     left: 0
 }
 
-@media (max-width: 500px) {
+/*tablets (portrait)*/
+@media (max-width: 1024px) {
+
+    .login-container {
+        max-width: 80%;
+        margin-bottom: 25%;
+        margin-top: 12%;
+    }
+
+    .title-image {
+        width: 50%;
+    }
+
+}
+
+/*smartphones*/
+@media (min-width: 320px) and (max-width: 480px) {
     .login-container {
         max-width: 100%;
         margin-bottom: 40%;
-        margin-top: 20%;    
+        margin-top: 20%;
     }
 
     .testimonial-text {
@@ -227,6 +243,7 @@ body {
     #testimonials {
         margin-top: 10%;
     }
+
     .footer {
         margin-top: 10%;
         padding-top: 5%;
