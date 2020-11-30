@@ -41,13 +41,12 @@ else
 }
 else
 {
-    var num = 0;
-    <div class="container-fluid bg-transparent">
+    <div class="container-fluid bg-transparent mt-3">
         <form method="post">
             <div class="row">
                 @foreach (var item in Model.Goals)
                 {
-                    <div class="card text-center col-lg-4 col-md-6 text-light bg-primary">
+                    <div class="card text-center col-lg-4 col-md-5 text-light bg-primary mb-3">
                         <div class="card-header">
                             <button asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-primary float-right" type="submit" title="Remove Goal"><i class="far fa-trash-alt text-danger "></i></button>
                         </div>
@@ -55,32 +54,32 @@ else
                             <h5 class="card-title" title="Title">@item.Title</h5>
                             <div class="progress mt-4">
                                 @{
-                                    var percentc = item.Amount == 0 ? 100 : decimal.Round(Model.Savings / item.Amount * 100);
-                                    percentc = percentc > 100 ? 100 : percentc;
-                                    string colorc;
-                                    if (percentc < 30)
+                                    var percent = item.Amount == 0 ? 100 : decimal.Round(Model.Savings / item.Amount * 100);
+                                    percent = percent > 100 ? 100 : percent;
+                                    string color;
+                                    if (percent < 30)
                                     {
-                                        colorc = "danger";
+                                        color = "danger";
                                     }
-                                    else if (percentc < 85)
+                                    else if (percent < 85)
                                     {
-                                        colorc = "warning";
+                                        color = "warning";
                                     }
-                                    else if (percentc < 100)
+                                    else if (percent < 100)
                                     {
-                                        colorc = "info";
+                                        color = "info";
                                     }
                                     else
                                     {
-                                        colorc = "success";
+                                        color = "success";
                                     }
                                 }
-                                <div class="progress-bar bg-@colorc" role="progressbar" style="width: @percentc%;" aria-valuenow="@percentc" aria-valuemin="0" aria-valuemax="100" title="Progress">@percentc%</div>
+                                <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                             </div>
                             <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(item.Amount)</p>
                         </div>
                         <div class="card-footer">
-                            @if (percentc == 100)
+                            @if (percent == 100)
                             {
                                 <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-sm btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-check fa-2x text-success"></i></button>
                             }
