@@ -18,10 +18,22 @@ namespace ePiggyWeb.DataManagement
             return true;
         }
 
+        public static bool Recurring(IEntryList entryList)
+        {
+            foreach (var entry in entryList.GetBy(recurring: true))
+            {
+                var differenceInMonths = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: entry.Date);
+                if (differenceInMonths <= 0) continue;
+                entry.Date = entry.Date.AddMonths(differenceInMonths);
+                //entryManager.Edit(entry.Id, entry);
+            }
+            return true;
+        }
+
         public static IEntryList CreateRecurringListWithoutOriginalEntry(IEntry entry, EntryType entryType)
         {
             var tempList = new EntryList(entryType);
-            if ((entry.Date.Year == DateTime.UtcNow.Year && entry.Date.Month >= DateTime.UtcNow.Month) || entry.Date.Year > DateTime.UtcNow.Year)
+            if (TimeManager.IsDateInFuture(entry.Date))
             {
                 return tempList;
             }
@@ -44,7 +56,7 @@ namespace ePiggyWeb.DataManagement
         public static IEntryList CreateRecurringList(IEntry entry, EntryType entryType)
         {
             var tempList = new EntryList(entryType) { entry };
-            if ((entry.Date.Year == DateTime.UtcNow.Year && entry.Date.Month >= DateTime.UtcNow.Month) || entry.Date.Year > DateTime.UtcNow.Year)
+            if (TimeManager.IsDateInFuture(entry.Date))
             {
                 return tempList;
             }

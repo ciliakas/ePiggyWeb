@@ -82,28 +82,21 @@ namespace ePiggyWeb.DataBase
                 return false;
             }
 
-            if (updatedEntry.Recurring)
-            {
-                await CreateListAsync(RecurringUpdater.CreateRecurringListWithoutOriginalEntry(updatedEntry, entryType), userId);
-                updatedEntry.Recurring = false;
-            }
-
-            return await UpdateSingleAsync(id, userId, updatedEntry, entryType);
-        }
-
-        public async Task<bool> UpdateSingleAsync(int id, int userId, IEntry updatedEntry, EntryType entryType)
-        {
             IEntryModel temp = entryType switch
             {
-                EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(
-                    x => x.Id == id && x.UserId == userId),
+                EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId),
                 _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
             };
-
 
             if (temp is null)
             {
                 throw new Exception("Couldn't find entry id: " + id + " in database");
+            }
+
+            if (updatedEntry.Recurring && !TimeManager.IsDateInFuture(updatedEntry.Date))
+            {
+                await CreateListAsync(RecurringUpdater.CreateRecurringListWithoutOriginalEntry(updatedEntry, entryType), userId);
+                updatedEntry.Recurring = false;
             }
 
             updatedEntry.UserId = userId;
@@ -112,7 +105,7 @@ namespace ePiggyWeb.DataBase
 
             return true;
         }
-        
+
         public async Task<bool> DeleteAsync(IEntry entry, EntryType entryType)
         {
             return await DeleteAsync(x => x.Id == entry.Id && x.UserId == entry.UserId, entryType);
@@ -198,6 +191,17 @@ namespace ePiggyWeb.DataBase
             };
             list.AddRange(temp);
             return list;
+        }
+
+        public async Task UpdateRecurringListAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+        {
+            var list = new EntryList(entryType);
+            IEnumerable<IEntry> temp = entryType switch
+            {
+                EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
+                _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
+            };
+            list.AddRange(temp);
         }
     }
 }
