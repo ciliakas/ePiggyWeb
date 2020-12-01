@@ -33,7 +33,7 @@ namespace ePiggyWeb.DataManagement
         public static IEntryList CreateRecurringListWithoutOriginalEntry(IEntry entry, EntryType entryType)
         {
             var tempList = new EntryList(entryType);
-            if (TimeManager.IsDateInFuture(entry.Date))
+            if (TimeManager.IsDateThisMonthAndLater(entry.Date))
             {
                 return tempList;
             }
@@ -56,7 +56,7 @@ namespace ePiggyWeb.DataManagement
         public static IEntryList CreateRecurringList(IEntry entry, EntryType entryType)
         {
             var tempList = new EntryList(entryType) { entry };
-            if (TimeManager.IsDateInFuture(entry.Date))
+            if (TimeManager.IsDateThisMonthAndLater(entry.Date))
             {
                 return tempList;
             }

@@ -93,7 +93,7 @@ namespace ePiggyWeb.DataBase
                 throw new Exception("Couldn't find entry id: " + id + " in database");
             }
 
-            if (updatedEntry.Recurring && !TimeManager.IsDateInFuture(updatedEntry.Date))
+            if (updatedEntry.Recurring && !TimeManager.IsDateThisMonthAndLater(updatedEntry.Date))
             {
                 await CreateListAsync(RecurringUpdater.CreateRecurringListWithoutOriginalEntry(updatedEntry, entryType), userId);
                 updatedEntry.Recurring = false;
@@ -178,30 +178,36 @@ namespace ePiggyWeb.DataBase
 
         public async Task<IEntryList> ReadListAsync(int userId, EntryType entryType)
         {
-            return await ReadListAsync(x => x.UserId == userId, entryType);
+            return await ReadListAsync(x => true, userId, entryType);
         }
 
-        public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+        public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType)
         {
+            await UpdateRecurringAsync(userId, entryType);
+            var updatedFilter = filter.And(x => x.UserId == userId);
             var list = new EntryList(entryType);
             IEnumerable<IEntry> temp = entryType switch
             {
-                EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
-                _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
+                EntryType.Income => await Database.Incomes.Where(updatedFilter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
+                _ => await Database.Expenses.Where(updatedFilter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
             };
             list.AddRange(temp);
             return list;
         }
 
-        public async Task UpdateRecurringListAsync(Expression<Func<IEntryModel, bool>> filter, EntryType entryType)
+        public async Task UpdateRecurringAsync(int userId, EntryType entryType)
         {
             var list = new EntryList(entryType);
             IEnumerable<IEntry> temp = entryType switch
             {
-                EntryType.Income => await Database.Incomes.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
-                _ => await Database.Expenses.Where(filter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
+                EntryType.Income => await Database.Incomes.Where(x => x.UserId == userId && x.IsMonthly).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
+                _ => await Database.Expenses.Where(x => x.UserId == userId && x.IsMonthly).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
             };
             list.AddRange(temp);
+            foreach (var entry in list.Where(entry => !TimeManager.IsDateThisMonthAndLater(entry.Date)))
+            {
+                await UpdateAsync(entry.Id, userId, entry, entryType);
+            }
         }
     }
 }
