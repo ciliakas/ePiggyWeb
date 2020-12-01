@@ -20,9 +20,13 @@ namespace ePiggyWeb.DataManagement
 
         public static IEntryList CreateRecurringListWithoutOriginalEntry(IEntry entry, EntryType entryType)
         {
+            var tempList = new EntryList(entryType);
+            if ((entry.Date.Year == DateTime.UtcNow.Year && entry.Date.Month >= DateTime.UtcNow.Month) || entry.Date.Year > DateTime.UtcNow.Year)
+            {
+                return tempList;
+            }
             var month = entry.Date;
             var months = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: month);
-            var tempList = new EntryList(entryType);
             // one less since last one has to keep isMonthly = true;
             for (var i = 0; i < months - 1; i++)
             {
@@ -39,8 +43,12 @@ namespace ePiggyWeb.DataManagement
 
         public static IEntryList CreateRecurringList(IEntry entry, EntryType entryType)
         {
-            entry.Recurring = false;
             var tempList = new EntryList(entryType) { entry };
+            if ((entry.Date.Year == DateTime.UtcNow.Year && entry.Date.Month >= DateTime.UtcNow.Month) || entry.Date.Year > DateTime.UtcNow.Year)
+            {
+                return tempList;
+            }
+            entry.Recurring = false;
             tempList.AddRange(CreateRecurringListWithoutOriginalEntry(entry, entryType));
             return tempList;
         }
