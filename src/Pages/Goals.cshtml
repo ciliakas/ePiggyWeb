@@ -46,7 +46,7 @@ else
             <div class="row">
                 @foreach (var item in Model.Goals)
                 {
-                    <div class="card text-center col-lg-4 col-md-5 text-light bg-primary mb-3">
+                    <div class="card text-center col-lg-4 col-md-6 text-light bg-primary mb-3">
                         <div class="card-header">
                             <button asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-primary float-right" type="submit" title="Remove Goal"><i class="far fa-trash-alt text-danger "></i></button>
                         </div>
