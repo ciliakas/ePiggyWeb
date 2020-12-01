@@ -208,7 +208,6 @@ body {
     top: 0;
     left: 0
 }
-
 /*tablets (portrait)*/
 @media (max-width: 1024px) {
 
@@ -221,7 +220,6 @@ body {
     .title-image {
         width: 50%;
     }
-
 }
 
 /*smartphones*/
