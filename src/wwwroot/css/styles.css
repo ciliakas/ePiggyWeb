@@ -25,11 +25,20 @@ html, body {
 }
 
 body {
+    /*Code to make footer stay always at the bottom of page*/
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column; /*END of that code*/
     font-family: Montserrat;
     text-align: center;
     background-color: #276dc1;
 }
 
+.content {
+    flex: 1;
+    /*Code to make footer stay always at the bottom of page*/
+    /*!!!THIS METHOD NOT COMPATIBLE WITH CHROME 27; IE 8;  OPERA 12; SAFARI 8.0*/
+}
 
 #siteHeader {
     margin: 2% 20% 1%;
