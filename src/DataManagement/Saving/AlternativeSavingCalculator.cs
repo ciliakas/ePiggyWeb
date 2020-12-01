@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
-    public class AlternativeSavingCalculator
+    public class AlternativeSavingCalculator : PageModel
     {
         private static decimal RegularSavingValue { get; } = 0.25M;
         private static decimal MaximalSavingValue { get; } = 0.1M;
         private static decimal MinimalSavingValue { get; } = 0.5M;
 
-        public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType = SavingType.Regular)
+        public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType, IConfiguration configuration)
         {
             var entrySuggestions = new List<ISavingSuggestion>();
             var monthlySuggestions = new List<SavingSuggestionByImportance>();
-            
-            if (entryList.Count == 0)
-            {
-                return new CalculationResults(entrySuggestions, monthlySuggestions, -1);              
-            }
+            var expensesRandomList = EntryList.RandomList(configuration, EntryType.Expense);
+            var generateRandomData = false;
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
  
@@ -30,9 +29,27 @@ namespace ePiggyWeb.DataManagement.Saving
             var averagesOfAmountByImportanceDefault = new decimal[enumCount];
             var entryAmounts = new int[enumCount];
 
+            if (entryList.Count == 0)
+            {
+                generateRandomData = true;
+                //return new CalculationResults(entrySuggestions, monthlySuggestions, -1);              
+            }
+
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
-                var expenses = entryList.GetBy((Importance)i);
+                //_ = entryList.GetBy((Importance)1); //Not sure how to cleanly declare "expenses" here, suggestions?
+                IEntryList expenses;
+                if (!generateRandomData)
+                {
+                    expenses = entryList.GetBy((Importance)i);
+                }
+                else
+                {
+                    expenses = expensesRandomList.GetBy((Importance)i);
+                }
+
+
+
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
                 {
@@ -73,7 +90,7 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 if(!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
                 {
-                    //inform user that his data is insufficient/show example lists
+                    //TODO: inform user that his data is incorrect for calculations
                     return new CalculationResults(entrySuggestions, monthlySuggestions, -2);
                 }
                 firstTimeThroughWhile = false;
