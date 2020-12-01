@@ -31,13 +31,11 @@ namespace ePiggyWeb.DataManagement.Saving
 
             if (entryList.Count == 0)
             {
-                generateRandomData = true;
-                //return new CalculationResults(entrySuggestions, monthlySuggestions, -1);              
+                generateRandomData = true;              
             }
 
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
-                //_ = entryList.GetBy((Importance)1); //Not sure how to cleanly declare "expenses" here, suggestions?
                 IEntryList expenses;
                 if (!generateRandomData)
                 {
@@ -47,8 +45,6 @@ namespace ePiggyWeb.DataManagement.Saving
                 {
                     expenses = expensesRandomList.GetBy((Importance)i);
                 }
-
-
 
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
@@ -90,8 +86,9 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 if(!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
                 {
-                    //TODO: inform user that his data is incorrect for calculations
-                    return new CalculationResults(entrySuggestions, monthlySuggestions, -2);
+                    //TODO: inform user that his data is "incorrect" for calculations
+                    var entrySuggestionsEmpty = new List<ISavingSuggestion>();
+                    return new CalculationResults(entrySuggestionsEmpty, monthlySuggestions, 0);
                 }
                 firstTimeThroughWhile = false;
                 for (var i = enumCount; i > (int)Importance.Necessary; i--)
@@ -115,7 +112,15 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 monthlySuggestions.Add(new SavingSuggestionByImportance(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
-            return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving);
+            if (!generateRandomData)
+            {
+                return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving);
+            }
+            else
+            {
+                return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving * -1);
+            }
+            
         }
     }
 }
