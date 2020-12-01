@@ -218,6 +218,9 @@ body {
         margin-top: 12%;
     }
 
+    .testimonial-image {
+        width: 20%;
+    }
     .title-image {
         width: 50%;
     }
@@ -234,6 +237,10 @@ body {
 
     .testimonial-text {
         font-size: 2rem;
+    }
+
+    .testimonial-image {
+        width: 20%;
     }
 
     .title-image {
