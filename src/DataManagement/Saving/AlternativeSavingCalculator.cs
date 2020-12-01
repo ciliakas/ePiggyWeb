@@ -19,7 +19,7 @@ namespace ePiggyWeb.DataManagement.Saving
             
             if (entryList.Count == 0)
             {
-                return new CalculationResults(entrySuggestions, monthlySuggestions, 0);              
+                return new CalculationResults(entrySuggestions, monthlySuggestions, -1);              
             }
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
@@ -67,9 +67,16 @@ namespace ePiggyWeb.DataManagement.Saving
                 }
             }
             var timesToRepeatSaving = 0;
+            var firstTimeThroughWhile = true;
             var approximateSavedAmount = startingBalance;
             while (goal.Amount > approximateSavedAmount)
             {
+                if(!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
+                {
+                    //inform user that his data is insufficient/show example lists
+                    return new CalculationResults(entrySuggestions, monthlySuggestions, -2);
+                }
+                firstTimeThroughWhile = false;
                 for (var i = enumCount; i > (int)Importance.Necessary; i--)
                 {
                     if (entryAmounts[i - 1] != 0)
