@@ -189,6 +189,7 @@ body {
     margin-top: 10%;
 }
 
+
 #particles-js canvas {
     display: block;
     vertical-align: bottom;
@@ -208,7 +209,6 @@ body {
     top: 0;
     left: 0
 }
-
 /*tablets (portrait)*/
 @media (max-width: 1024px) {
 
@@ -224,7 +224,6 @@ body {
     .title-image {
         width: 50%;
     }
-
 }
 
 /*smartphones*/
@@ -254,6 +253,10 @@ body {
     .footer {
         margin-top: 10%;
         padding-top: 5%;
+    }
+    .total-graphs {
+        font-size: 1.1rem;
+        font-weight: bold;
     }
 }
 
