@@ -1,12 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -59,31 +66,22 @@ namespace ePiggyWeb.Pages
 
         public async Task OnGet()
         {
-            var today = DateTime.Now;
-            StartDate = new DateTime(today.Year, today.Month, 1);
-            EndDate = DateTime.Today;
+            TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
+            StartDate = tempStartDate;
+            EndDate = tempEndDate;
+
             await SetData();
         }
-
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            if (startDate > endDate)
-            {
-                ErrorMessage = "Start date is bigger than end date!";
-                var today = DateTime.Now;
-                StartDate = new DateTime(today.Year, today.Month, 1);
-                EndDate = DateTime.Today;
-            }
-            else
-            {
-                StartDate = startDate;
-                EndDate = endDate;
-            }
+            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request,out var tempStartDate, out var tempEndDate);
+            StartDate = tempStartDate;
+            EndDate = tempEndDate;
+
             await SetData();
             return Page();
         }
-
 
         public async Task<IActionResult> OnPostNewEntry()
         {
