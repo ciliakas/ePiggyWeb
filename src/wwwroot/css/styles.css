@@ -189,6 +189,7 @@ body {
     margin-top: 10%;
 }
 
+
 #particles-js canvas {
     display: block;
     vertical-align: bottom;
@@ -245,6 +246,10 @@ body {
     .footer {
         margin-top: 10%;
         padding-top: 5%;
+    }
+    .total-graphs {
+        font-size: 1.1rem;
+        font-weight: bold;
     }
 }
 
