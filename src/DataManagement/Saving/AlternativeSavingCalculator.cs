@@ -17,7 +17,7 @@ namespace ePiggyWeb.DataManagement.Saving
             var entrySuggestions = new List<ISavingSuggestion>();
             var monthlySuggestions = new List<SavingSuggestionByImportance>();
             
-            if (entryList is null)
+            if (entryList.Count == 0)
             {
                 return new CalculationResults(entrySuggestions, monthlySuggestions, 0);              
             }
@@ -57,7 +57,6 @@ namespace ePiggyWeb.DataManagement.Saving
                             break;
                         default:
                             throw new Exception("Unexpected saving type");
-                            break;
                     };
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
 
