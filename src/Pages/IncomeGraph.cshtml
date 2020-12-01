@@ -31,15 +31,15 @@ else
 }
 else
 {
-    <h4 class="text-light">Total Income of this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum())</h4>
+    <h4 class="text-light total-graphs">Total Income of this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum())</h4>
 }
-<div class="row ml-2 mr-2 mt-3 mb-5">
-    <div class="col-sm" id="graphPie">
+<div class="row mt-3 mb-5">
+    <div class="col-lg-6" id="graphPie">
         <div class="spinner-border text-warning loader" role="status">
             <span class="sr-only">Loading...</span>
         </div>
     </div>
-    <div class="col-sm" id="graphColumn">
+    <div class="col-lg-6" id="graphColumn">
         <div class="spinner-border text-danger loader" role="status">
             <span class="sr-only">Loading...</span>
         </div>
@@ -49,6 +49,11 @@ else
 
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    $(window).resize(function () {
+        drawChart();
+    });
+</script>
 <script type="text/javascript">
     // Load google charts
     google.charts.load('current', { 'packages': ['corechart'] });
@@ -69,11 +74,13 @@ else
         var options = {
             'title': 'Income by importance',
             'height': 600,
+            'width': '100%',
             'vAxis': { 'textStyle': { 'color': '#FFF' }, 'gridlines': { 'count': 5 } },
             'backgroundColor': { 'fill': 'transparent' },
             'colors': ['#F44336', '#9C27B0', '#3F51B5', '#2196F3', '#4CAF50'],
+            'legend': { 'position': 'top', 'maxLines': 2},
             'legendTextStyle': { color: '#FFF' },
-            'titleTextStyle': { color: '#FFF' },
+            'titleTextStyle': { color: '#FFF', bold: 'true', fontSize: 16},
             'hAxis': { 'textStyle':{'color': '#FFF'} }
         };
 

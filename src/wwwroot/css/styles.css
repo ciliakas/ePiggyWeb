@@ -10,6 +10,7 @@ a:hover {
     text-align: center;
 }
 
+
 hr {
     width: 60%;
 }
@@ -29,6 +30,7 @@ body {
     background-color: #276dc1;
 }
 
+
 #siteHeader {
     margin: 2% 20% 1%;
     background-color: #276dc1;
@@ -39,9 +41,11 @@ body {
     margin-bottom: 5%;
     color: #f9f7f7;
 }
-.title-image {
-    left: 5%;
-    bottom: 63%;
+
+.title-image {  
+    max-width: 100%;
+    width: 30%;
+    height: auto;
 }
 
 .jumbotron {
@@ -92,7 +96,7 @@ body {
 .testimonial-image {
     width: 10%;
     border-radius: 100%;
-    margin: 20px;
+    margin: 3%;
 }
 
 .testimonial-text {
@@ -101,34 +105,37 @@ body {
 }
 
 .footer {
-    margin-top: 4%;
-    padding-top:5%;
     background-color: #f9f7f7;
     color: #8f8f8f;
+    padding-top: 3%;
+}
+
+.footer-image {
+    margin: 0 10px 0;
 }
 
 /*LOGIN*/
 .login-container {
     padding-top: 5%;
-    width: 35%;
+    max-width: 50%;
     margin-top: 5%;
     margin-bottom: 16%;
     text-align: center;
 }
 
 .login-form-2 {
-    padding: 10%;
+    padding: 5%;
     background: #0062cc;
     box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
 }
 
-    .login-form-2 h3 {
-        text-align: center;
-        color: #fff;
-    }
+.login-form-2 h3 {
+    text-align: center;
+    color: #fff;
+}
 
 .login-container form {
-    padding: 10%;
+    padding: 5%;
 }
 
 .btnSubmit {
@@ -137,12 +144,6 @@ body {
     padding: 1.5%;
     border: none;
     cursor: pointer;
-}
-
-.login-form-1 .btnSubmit {
-    font-weight: 600;
-    color: #fff;
-    background-color: #0062cc;
 }
 
 .login-form-2 .btnSubmit {
@@ -155,17 +156,6 @@ body {
     color: #fff;
     font-weight: 600;
     text-decoration: none;
-}
-
-.login-form-1 .ForgetPwd {
-    color: #0062cc;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.problematic-title {
-    /* font-size: calc([minimum size] + ([maximum size] - [minimum size]) * ((100vw - [minimum viewport width]) / ([maximum viewport width] - [minimum viewport width]))); */
-    font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
 }
 
 .container-error {
@@ -195,9 +185,10 @@ body {
 }
 
 .loader {
-    margin-bottom: 280px;
-    margin-top: 280px;
+    margin-bottom: 10%;
+    margin-top: 10%;
 }
+
 
 #particles-js canvas {
     display: block;
@@ -217,5 +208,55 @@ body {
     z-index: -10;
     top: 0;
     left: 0
+}
+/*tablets (portrait)*/
+@media (max-width: 1024px) {
+
+    .login-container {
+        max-width: 80%;
+        margin-bottom: 25%;
+        margin-top: 12%;
+    }
+
+    .testimonial-image {
+        width: 20%;
+    }
+    .title-image {
+        width: 50%;
+    }
+}
+
+/*smartphones*/
+@media (min-width: 320px) and (max-width: 480px) {
+    .login-container {
+        max-width: 100%;
+        margin-bottom: 40%;
+        margin-top: 20%;
+    }
+
+    .testimonial-text {
+        font-size: 2rem;
+    }
+
+    .testimonial-image {
+        width: 20%;
+    }
+
+    .title-image {
+        width: 80%;
+    }
+
+    #testimonials {
+        margin-top: 10%;
+    }
+
+    .footer {
+        margin-top: 10%;
+        padding-top: 5%;
+    }
+    .total-graphs {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
 }
 
