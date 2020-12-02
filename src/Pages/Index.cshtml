@@ -16,7 +16,9 @@
 }
 
 <div class="container index-Top">
-    <img src="images/mainLogo.PNG" class="title-image mt-2">
+    <div class="container col-md-6 col-lg-4">
+        <img src="images/mainLogo.PNG" class="title-image mt-2" alt="mainLogo">
+    </div>
     @if (User.Identity.IsAuthenticated)
     {
         <h1 class="display-4">Welcome Back!</h1>
