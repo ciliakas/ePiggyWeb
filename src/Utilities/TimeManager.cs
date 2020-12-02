@@ -6,7 +6,12 @@ namespace ePiggyWeb.Utilities
 {
     public static class TimeManager
     {
-        public static DateTime OneMonthAhead { get; }= GetEndOfTheMonth(DateTime.Today.AddMonths(1));
+        public static DateTime OneMonthAhead { get; }= GetEndOfTheMonth(DateTime.UtcNow.AddMonths(1));
+
+        public static bool IsDateThisMonthAndLater(DateTime date)
+        {
+            return (date.Year == DateTime.UtcNow.Year && date.Month >= DateTime.UtcNow.Month) || date.Year > DateTime.UtcNow.Year;
+        }
 
         public static void GetDate(HttpRequest request, out DateTime pageStartDate, out DateTime pageEndDate)
         {
