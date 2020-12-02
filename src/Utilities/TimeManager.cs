@@ -47,8 +47,6 @@ namespace ePiggyWeb.Utilities
             {
                 pageStartDate = startDate;
                 pageEndDate = endDate;
-                response.Cookies.Delete("StartDate");
-                response.Cookies.Delete("EndDate");
                 var cookieOptions = new CookieOptions
                 {
                     Expires = DateTimeOffset.UtcNow.AddMinutes(15)
