@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using Microsoft.AspNetCore.Http;
 
 namespace ePiggyWeb.Utilities
 {
@@ -9,6 +11,54 @@ namespace ePiggyWeb.Utilities
         public static bool IsDateThisMonthAndLater(DateTime date)
         {
             return (date.Year == DateTime.UtcNow.Year && date.Month >= DateTime.UtcNow.Month) || date.Year > DateTime.UtcNow.Year;
+        }
+
+        public static void GetDate(HttpRequest request, out DateTime pageStartDate, out DateTime pageEndDate)
+        {
+            var startDateCookie = request.Cookies["StartDate"];
+            var endDateCookie = request.Cookies["EndDate"];
+
+            if (startDateCookie is null || endDateCookie is null)
+            {
+                var today = DateTime.Now;
+                pageStartDate = new DateTime(today.Year, today.Month, 1);
+                pageEndDate = DateTime.Today;
+            }
+            else
+            {
+                if (DateTime.TryParse(startDateCookie, out var tempStartDate) &&
+                    DateTime.TryParse(endDateCookie, out var tempEndDateTime))
+                {
+                    pageStartDate = tempStartDate;
+                    pageEndDate = tempEndDateTime;
+                }
+                else
+                {
+                    var today = DateTime.Now;
+                    pageStartDate = new DateTime(today.Year, today.Month, 1);
+                    pageEndDate = DateTime.Today;
+                }
+            }
+        }
+
+        public static void SetDate(DateTime startDate, DateTime endDate, ref string errorMessage, HttpResponse response, HttpRequest request, out DateTime pageStartDate, out DateTime pageEndDate)
+        {
+            if (startDate > endDate)
+            {
+                errorMessage = "Start date is bigger than end date!";
+                GetDate(request, out pageStartDate, out pageEndDate);
+            }
+            else
+            {
+                pageStartDate = startDate;
+                pageEndDate = endDate;
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddHours(4)
+                };
+                response.Cookies.Append("StartDate", startDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
+                response.Cookies.Append("EndDate", endDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
+            }
         }
 
         public static int DifferenceInMonths(DateTime laterTime, DateTime earlierTime)
