@@ -54,7 +54,7 @@ namespace ePiggyWeb.Utilities
                 pageEndDate = endDate;
                 var cookieOptions = new CookieOptions
                 {
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+                    Expires = DateTimeOffset.UtcNow.AddHours(4)
                 };
                 response.Cookies.Append("StartDate", startDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
                 response.Cookies.Append("EndDate", endDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
