@@ -99,66 +99,68 @@ else
 <div class="row">
     <div class="col-12 border mt-3 mb-3">
         <form method="post">
+            <input asp-page-handler="Delete" type="submit" class="btn btn-sm btn-danger" value="Delete" />
             @if (Model.Expenses.Any())
             {
-                <table class="table table-hover border-primary table-bordered">
-                    <tr class="table-primary">
-                        <th>
-                            <label asp-for="Expenses.FirstOrDefault().Title"></label>
-                        </th>
-                        <th style="width: 18%">
-                            <label asp-for="Expenses.FirstOrDefault().Amount"></label>
-                        </th>
-                        <th style="width: 10%">
-                            <label asp-for="Expenses.FirstOrDefault().Date"></label>
-                        </th>
-                        <th style="width: 15%">
-                            <label asp-for="Expenses.FirstOrDefault().Importance"></label>
-                        </th>
-                        <th style="width: 5%">
-                            <label asp-for="Expenses.FirstOrDefault().Recurring"></label>
-                        </th>
-                        <th style="width: 15%">
+                <div class="table-responsive-sm">
+            <table class="table table-hover border-primary table-bordered">
+                <tr class="table-primary">
+                    <th scope="col">
+                        <label asp-for="Expenses.FirstOrDefault().Title"></label>
+                    </th>
+                    <th scope="col">
+                        <label asp-for="Expenses.FirstOrDefault().Amount"></label>
+                    </th>
+                    <th scope="col">
+                        <label asp-for="Expenses.FirstOrDefault().Date"></label>
+                    </th>
+                    <th scope="col">
+                        <label asp-for="Expenses.FirstOrDefault().Importance"></label>
+                    </th>
+                    <th scope="col">
+                        <label asp-for="Expenses.FirstOrDefault().Recurring"></label>
+                    </th>
+                    <th scope="col">
 
-                        </th>
+                    </th>
 
+                </tr>
+
+                @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
+                {
+                    <tr class="table-light border-primary">
+                        <td class="border-primary text-nowrap">
+                            @Html.DisplayFor(m => item.Title)
+                        </td>
+                        <td class="border-primary text-nowrap">
+                            @NumberFormatter.FormatCurrency(item.Amount)
+                        </td>
+                        <td class="border-primary text-nowrap">
+                            @item.Date.ToShortDateString()
+                            <!--Html.DisplayFor(m => item.Date)-->
+                        </td>
+                        <td class="border-primary text-nowrap">
+                            @((Importance) item.Importance)
+                        </td>
+                        <td class="border-primary text-nowrap">
+                            @if (item.Recurring)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                        </td>
+                        <td class="border-primary text-nowrap">
+                            <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-success">Edit </a>
+                        </td>
                     </tr>
-
-                    @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
-                    {
-                        <tr class="table-light border-primary">
-                            <td class="border-primary">
-                                @Html.DisplayFor(m => item.Title)
-                            </td>
-                            <td class="border-primary">
-                                @NumberFormatter.FormatCurrency(item.Amount)
-                            </td>
-                            <td class="border-primary">
-                                @item.Date.ToShortDateString()
-                                <!--Html.DisplayFor(m => item.Date)-->
-                            </td>
-                            <td class="border-primary">
-                                @((Importance)item.Importance)
-                            </td>
-                            <td class="border-primary">
-                                @if (item.Recurring)
-                                {
-                                    <i class="fas fa-check text-success"></i>
-                                }
-                            </td>
-                            <td class="border-primary">
-                                <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-success">Edit </a>
-                                <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
-                            </td>
-                        </tr>
+                }
+            </table>
+            </div>
                     }
-                </table>
-            }
-            else
-            {
-                <p>No expenses available</p>
-            }
-        </form>
+                    else
+                    {
+                    <p>No expenses available</p>
+                    }
+            </form>
     </div>
 </div>
 
