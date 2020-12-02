@@ -21,18 +21,18 @@ namespace ePiggyWeb.Pages
         public bool WasException { get; set; }
         public IEntryList Income { get; set; }
 
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
         [StringLength(30)]
         public string Title { get; set; }
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Amount Required.")]
         [BindProperty]
-        [Range(0, 99999999.99)]
+        [Range(0, 99999999.99, ErrorMessage = "Amount out of range!")]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
         [BindProperty]
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Importance Required.")]
         public int Importance { get; set; }
         [BindProperty]
         public bool Recurring { get; set; }

@@ -16,44 +16,9 @@ else
     <div class="container p-0 mt-3">
         <h2 class="text-info">Income</h2>
     </div>
+    <hr class="mt-4 mb-4" />
 
-    <form method="post" asp-page-handler="NewEntry">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input asp-for="Title" type="text" placeholder="Title" value="" />
-        <span asp-validation-for="Title" class="text-danger"></span>
-        <input asp-for="Amount" type="text" placeholder="Amount" value="" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
-        <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
-        <!-- <label class="text-light ml-3">Importance</label>-->
-        <select asp-for="Importance" class="ml-3">
-            <option hidden disabled selected value="">Importance</option>
-            <option value="1">Necessary</option>
-            <option value="2">High</option>
-            <option value="3">Medium</option>
-            <option value="4">Low</option>
-            <option value="5">Unnecessary</option>
-        </select>
-        <span asp-validation-for="Importance" class="text-danger"></span>
-        <label class="text-light ml-3">Is Monthly?</label>
-        <input asp-for="Recurring" type="checkbox" placeholder="" />
-        <input type="submit" value="Add" class="btn btn-primary ml-5" />
-        <input class="btn btn-danger ml-2" type="reset" value="Reset">
-    </form>
-
-    <form method="get" class="mt-5">
-        <input type="hidden" name="handler" value="Filter" />
-        <label class="text-light col-md-4">Period:</label>
-        <div class="row justify-content-center">
-            <input class="col-md-3 col-sm-5 col-5" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
-            <label class="text-light ml-2 mr-2"> - </label>
-            <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
-        </div>
-        <input type="submit" value="Filter" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3" />
-        <p class="text-warning">@Model.ErrorMessage</p>
-    </form>
-}
-
-@if (!ModelState.IsValid)
+    @if (!ModelState.IsValid)
     {
         <div class="container">
             <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
@@ -64,32 +29,98 @@ else
             </div>
         </div>
     }
+  
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addEntryCollapse" aria-expanded="false" aria-controls="collapseExample">
+        Add Income
+    </button>
+    <div class="collapse mt-3" id="addEntryCollapse">
+        <form method="post" asp-page-handler="NewEntry">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="container">
+                <div class="row justify-content-center p-0">
+                    <div class="col-12 col-md-4 col-lg-3 mb-1">
+                        <input asp-for="Title" type="text" placeholder="Title" value="" />
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3 mb-1">
+                        <input asp-for="Amount" type="text" placeholder="Amount" value="" />
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3 mb-1">
+                        <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
+                    </div>
+                </div>
+                <div class="row justify-content-center mb-3">
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <select asp-for="Importance">
+                            <option hidden disabled selected value="">Importance</option>
+                            <option value="1">Necessary</option>
+                            <option value="2">High</option>
+                            <option value="3">Medium</option>
+                            <option value="4">Low</option>
+                            <option value="5">Unnecessary</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <label class="text-light">Is Monthly?</label>
+                        <input asp-for="Recurring" type="checkbox" placeholder="" />
+                    </div>
+                </div>
+                <div class="container col-12 col-md-4 col-lg-3">
+                    <input type="submit" value="Add" class="btn btn-primary" />
+                    <input class="btn btn-danger" type="reset" value="Reset">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="container mt-3">
+        <span asp-validation-for="Title" class="text-danger"></span>
+        <span asp-validation-for="Amount" class="text-danger"></span>
+        <span asp-validation-for="Importance" class="text-danger"></span>
+    </div>
 
-    <div class="row">
-        <div class="col-10 border mt-3 mb-3">
-            <form method="post">
-                @if (Model.Income.Any())
-                {
-                    <table class="table table-hover border-primary table-bordered">
-                        <tr class="table-primary">
-                            <th>
-                                <label asp-for="Income.FirstOrDefault().Title"></label>
-                            </th>
-                            <th style="width: 18%">
-                                <label asp-for="Income.FirstOrDefault().Amount"></label>
-                            </th>
-                            <th style="width: 10%">
-                                <label asp-for="Income.FirstOrDefault().Date"></label>
-                            </th>
-                            <th style="width: 15%">
-                                <label asp-for="Income.FirstOrDefault().Importance"></label>
-                            </th>
-                            <th style="width: 5%">
-                                <label asp-for="Income.FirstOrDefault().Recurring"></label>
-                            </th>
-                            <th style="width: 15%">
 
-                            </th>
+    <hr class="mt-4 mb-4" />
+    <form method="get">
+        <input type="hidden" name="handler" value="Filter" />
+        <label class="text-light col-md-4">Period:</label>
+        <div class="row justify-content-center">
+            <input class="col-md-3 col-sm-5 col-5" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+            <label class="text-light ml-2 mr-2"> - </label>
+            <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+        </div>
+        <input type="submit" value="Filter" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3" />
+        <p class="text-warning">@Model.ErrorMessage</p>
+    </form>
+    <hr class="mt-4 mb-4" />
+    <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum())</h5>
+    <h5 class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome)</h5>
+    <hr class="mt-4 mb-4" />
+}
+
+<div class="row">
+    <div class="col-10 border mt-3 mb-3">
+        <form method="post">
+            @if (Model.Income.Any())
+            {
+                <table class="table table-hover border-primary table-bordered">
+                    <tr class="table-primary">
+                        <th>
+                            <label asp-for="Income.FirstOrDefault().Title"></label>
+                        </th>
+                        <th style="width: 18%">
+                            <label asp-for="Income.FirstOrDefault().Amount"></label>
+                        </th>
+                        <th style="width: 10%">
+                            <label asp-for="Income.FirstOrDefault().Date"></label>
+                        </th>
+                        <th style="width: 15%">
+                            <label asp-for="Income.FirstOrDefault().Importance"></label>
+                        </th>
+                        <th style="width: 5%">
+                            <label asp-for="Income.FirstOrDefault().Recurring"></label>
+                        </th>
+                        <th style="width: 15%">
+
+                        </th>
                     </tr>
                     @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
                     {
@@ -116,19 +147,18 @@ else
                                 <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
                                 <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
                             </td>
-                            </tr>
-                        }
-                    </table>
-                }
-                else
-                {
-                    <p>No income available</p>
-                }
+                        </tr>
+                    }
+                </table>
+            }
+            else
+            {
+                <p>No income available</p>
+            }
         </form>
     </div>
     <div class="col-2 border p-3 mt-3 mb-3">
-        <p class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum())</p>
-        <p class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome)</p>
+        
     </div>
-    </div>
+</div>
 
