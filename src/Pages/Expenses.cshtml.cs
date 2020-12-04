@@ -22,7 +22,7 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
-        [StringLength(30)]
+        [StringLength(25, ErrorMessage = "Too long title!")]
         public string Title { get; set; }
         [Required(ErrorMessage = "Amount Required.")]
         [BindProperty]

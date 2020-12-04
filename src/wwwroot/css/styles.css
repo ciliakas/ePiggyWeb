@@ -216,6 +216,14 @@ body {
     top: 0;
     left: 0
 }
+
+.entry-table-side {
+    vertical-align: middle !important;
+}
+
+.entry-column {
+    text-align: left;
+}
 /*tablets (portrait)*/
 @media (max-width: 1024px) {
 
