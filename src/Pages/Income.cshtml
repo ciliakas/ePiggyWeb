@@ -29,7 +29,7 @@ else
             </div>
         </div>
     }
-  
+
     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addEntryCollapse" aria-expanded="false" aria-controls="collapseExample">
         Add Income
     </button>
@@ -96,6 +96,37 @@ else
     <hr class="mt-4 mb-4" />
 }
 
+<button class="btn btn-danger mb-4" disabled>Delete Selected</button>
+<div class="row justify-content-center">
+    <form method="post">
+        <div class="row justify-content-center">
+            @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
+            {
+                <div class="card border-light mb-3 col-12 col-md-5 col-lg-3 bg-primary" style="max-width: 20rem; min-width: 20rem">
+                    <div class="card-header entry-table-side">
+                        <div class="row justify-content-between">
+                            <input class="col-2 mt-2" type="checkbox" />
+                            <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-warning col-3">Edit </a>
+                        </div>
+                    </div>
+                    <div class="card-body text-light entry-column">
+                        <h5 class="card-title">@Html.DisplayFor(m => item.Title)</h5>
+                        Amount:  @NumberFormatter.FormatCurrency(item.Amount) <br />
+                        Importance: @((Importance)item.Importance) <br />
+                        Recurring: @if (item.Recurring)
+                        {
+                            <i class="fas fa-check text-success"></i>
+                        }
+                    </div>
+                    <div class="card-footer text-light">@item.Date.ToShortDateString()</div>
+                </div>
+            }
+        </div>
+    </form>
+</div>
+
+<!--
+
 <div class="row">
     <div class="col-12 border mt-3 mb-3">
         <form method="post">
@@ -159,3 +190,4 @@ else
     </div>
 </div>
 
+-->
