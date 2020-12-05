@@ -99,29 +99,22 @@ else
 <input asp-page-handler="Delete" type="submit" class="btn btn-danger" value="Delete Selected"/>
 
 <div class="row">
-    <div class="col-12 border mt-3 mb-3">
-       
-            @if (Model.Expenses.Any())
+    <div class="col-12 mt-3 mb-3">
+        @if (Model.Expenses.Any())
             {
-                <table class="table table-hover border-primary table-bordered">
-                    <tr class="table-primary">
-                        <th scope="col">
-
-                        </th>
-                        <th scope="col">
-                            Expenses
-                        </th>
-                        <th scope="col">
-                            Edit
+                <table class="table table-hover border-primary">
+                    <tr class="bg-primary">
+                        <th colspan="3" scope="col">
+                            <h5 class="text-light">Expenses</h5>
                         </th>
                     </tr>
                     @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
                     {
                         <tr class="table-light border-primary">
-                            <td class="border-primary entry-table-side">
+                            <td class="border-primary border entry-table-side">
                                 <input name="chkEntry" type="checkbox" value="@item.Id"/>
                             </td>
-                            <td class="border-primary text-nowrap entry-column">
+                            <td class=" border-right-0 border-primary text-nowrap entry-column">
                                 <div class="row">
                                     <div class="col-12 mb-2">
                                         <strong class="text-info">
@@ -150,9 +143,9 @@ else
 
                                 </div>
                             </td>
-                            <td class="border-primary entry-table-side">
-                                <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-success">Edit </a>
-                                <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
+                            <td class="border-left-0 border-primary entry-table-side">
+                                <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-outline-success"><i class="far fa-edit"></i> </a>
+                                <!--<input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-outline-danger" value="x" />-->
                             </td>
                         </tr>
                     }
