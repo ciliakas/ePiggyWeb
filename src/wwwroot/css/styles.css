@@ -224,6 +224,11 @@ body {
 .entry-column {
     text-align: left;
 }
+
+.bigger {
+    width: 20px;
+    height: 20px;
+}
 /*tablets (portrait)*/
 @media (max-width: 1024px) {
 
