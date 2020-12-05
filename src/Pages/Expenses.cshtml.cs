@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -115,16 +117,33 @@ namespace ePiggyWeb.Pages
         {
             try
             {
+                var selected = Request.Form["chkEntry"].ToString();
+                var selectedList = selected.Split(',');
+                var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();
+
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                await EntryDatabase.DeleteAsync(id, UserId, EntryType.Expense);
+
+                await EntryDatabase.DeleteListAsync(entryIdList, UserId, EntryType.Expense);
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
             }
-            
-            return RedirectToPage("/expenses");
+           
+
+                /* try
+                 {
+                     UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                     await EntryDatabase.DeleteAsync(id, UserId, EntryType.Expense);
+                 }
+                 catch (Exception ex)
+                 {
+                     _logger.LogInformation(ex.ToString());
+                     WasException = true;
+                 }*/
+
+                return RedirectToPage("/expenses");
         }
 
         private async Task SetData()
