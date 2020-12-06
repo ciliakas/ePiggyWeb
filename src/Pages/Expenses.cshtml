@@ -96,15 +96,18 @@ else
 }
 
 <form method="post">
-<input asp-page-handler="Delete" type="submit" class="btn btn-danger" value="Delete Selected"/>
+    <input asp-page-handler="Delete" type="submit" class="btn btn-danger" value="Delete Selected"/>
 
-<div class="row ml-2 mr-2 mt-3 mb-3">
-    <div class="container border col-12 p-0">
-        @if (Model.Expenses.Any())
+    <div class="row ml-2 mr-2 mt-3 mb-3">
+        <div class="container border col-12 p-0">
+            @if (Model.Expenses.Any())
             {
                 <table class="table table-hover mb-0">
                     <tr class="bg-primary">
-                        <th colspan="3" scope="col">
+                        <th class="border-right entry-table-side" scope="col">
+                            <input class="bigger" type="checkbox" onClick="toggle(this)"/><br/>
+                        </th>
+                        <th colspan="2" scope="col">
                             <h5 class="text-light">Expenses</h5>
                         </th>
                     </tr>
@@ -152,75 +155,17 @@ else
                 </table>
             }
        
+        </div>
     </div>
-</div>
 </form>
-<!--
-<div class="row">
-    <div class="col-12 border mt-3 mb-3">
-        <form method="post">
-            <input asp-page-handler="Delete" type="submit" class="btn btn-sm btn-danger" value="Delete" />
-            @if (Model.Expenses.Any())
-            {
-                <div class="table-responsive-sm">
-            <table class="table table-hover border-primary table-bordered">
-                <tr class="table-primary">
-                    <th scope="col">
-                        <label asp-for="Expenses.FirstOrDefault().Title"></label>
-                    </th>
-                    <th scope="col">
-                        <label asp-for="Expenses.FirstOrDefault().Amount"></label>
-                    </th>
-                    <th scope="col">
-                        <label asp-for="Expenses.FirstOrDefault().Date"></label>
-                    </th>
-                    <th scope="col">
-                        <label asp-for="Expenses.FirstOrDefault().Importance"></label>
-                    </th>
-                    <th scope="col">
-                        <label asp-for="Expenses.FirstOrDefault().Recurring"></label>
-                    </th>
-                    <th scope="col">
 
-                    </th>
-
-                </tr>
-
-                @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
-                {
-                    <tr class="table-light border-primary">
-                        <td class="border-primary text-nowrap">
-                            @Html.DisplayFor(m => item.Title)
-                        </td>
-                        <td class="border-primary text-nowrap">
-                            @NumberFormatter.FormatCurrency(item.Amount)
-                        </td>
-                        <td class="border-primary text-nowrap">
-                            @item.Date.ToShortDateString()
-                        </td>
-<td class="border-primary text-nowrap">
-    @((Importance) item.Importance)
-</td>
-<td class="border-primary text-nowrap">
-    @if (item.Recurring)
-    {
-        <i class="fas fa-check text-success"></i>
+    
+<script language="JavaScript">
+    function toggle(source) {
+        checkboxes = document.getElementsByName('chkEntry');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
     }
-</td>
-<td class="border-primary text-nowrap">
-    <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-success">Edit </a>
-</td>
-                    </tr>
-}
-            </table>
-            </div>
-}
-else
-{
-<p>No expenses available</p>
-}
-            </form>
-    </div>
-</div>
--->
+</script>
 
