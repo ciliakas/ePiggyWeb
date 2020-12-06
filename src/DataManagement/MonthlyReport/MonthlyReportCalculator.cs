@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -17,6 +17,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private IEntryList Expenses { get; set; }
         private IEntryList Income { get; set; }
+        private decimal AllSavings { get; set; }
         private IGoalList Goals { get; set; }
 
         private MonthlyReportResult Result { get; set; }
@@ -34,6 +35,8 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
         { 
             Result = await GatherDataAsync();
             CalculateBiggestExpensesCategory();
+            Result.SavedUpGoals = CalculateSavedUpGoals();
+            CalculateGoalReport();
             return Result;
         }
 
@@ -43,12 +46,14 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             var month = new DateTime(today.Year, today.Month, 1);
             var first = month.AddMonths(-1);
             var last = month.AddDays(-1);
-            Debug.WriteLine(first);
-            Debug.WriteLine(last);
+            var expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetSum();
+            var income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetSum();
+            AllSavings = income - expenses;
             Expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetFrom(first).GetTo(last);
             Income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetFrom(first).GetTo(last);
             Goals = await GoalDatabase.ReadListAsync(UserId);
-            return new MonthlyReportResult(Expenses.GetSum(), Income.GetSum(), first, last);
+            var balance = Income.GetSum() - Expenses.GetSum();
+            return new MonthlyReportResult(Expenses.GetSum(), Income.GetSum(), balance, first, last);
 
         }
 
@@ -61,7 +66,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             {
                 var temp = 0M;
                 var expenses = Expenses.GetBy((Importance)i);
-                foreach (var entry in expenses)
+                foreach (var entry in expenses) //not linq since when empty category it crashes
                 {
                     temp += entry.Amount;
                 }
@@ -75,6 +80,46 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             var necessarySum = Expenses.GetBy(Importance.Necessary).Sum(entry => entry.Amount);
             Result.NecessarySum = necessarySum;
             Result.HowMuchBigger = ((sum - necessarySum) / necessarySum * 100);
+        }
+
+        private  List<IGoal> CalculateSavedUpGoals()
+        {
+            return AllSavings >= 0 ? Goals.Where(x => x.Amount <= AllSavings).ToList() : new GoalList();
+        }
+
+        private void CalculateGoalReport()
+        {
+            var savedThisMonth = Income.GetSum() - Expenses.GetSum();
+            if (Goals.Count() < 2 || savedThisMonth <= 0)
+            {
+                Result.HasGoals = false;
+                return;
+            }
+
+            Result.HasGoals = true;
+            var min = decimal.MaxValue;
+            var minGoal = new Goal();
+            var maxGoal = new Goal();
+            var max = 0M;
+            foreach (var item in Goals)
+            {
+                if (item.Amount >= max)
+                {
+                    max = item.Amount;
+                    maxGoal = (Goal)item;
+                }
+
+                if (item.Amount > min || item.Amount <= AllSavings ) continue;
+                min = item.Amount;
+                minGoal = (Goal) item;
+            }
+
+            Result.CheapestGoal = minGoal;
+            Result.MostExpensiveGoal = maxGoal;
+
+            Result.MonthsForCheapestGoal = (int) decimal.Ceiling(minGoal.Amount - AllSavings / savedThisMonth);
+            Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling(maxGoal.Amount - AllSavings / savedThisMonth);
+
         }
     }
 }

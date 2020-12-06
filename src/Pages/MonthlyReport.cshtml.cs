@@ -2,12 +2,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.MonthlyReport;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
 {
+    [Authorize]
     public class MonthlyReportModel : PageModel
     {
         private readonly ILogger<SavingSuggestionsModel> _logger;
