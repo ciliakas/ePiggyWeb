@@ -98,11 +98,11 @@ else
 <form method="post">
 <input asp-page-handler="Delete" type="submit" class="btn btn-danger" value="Delete Selected"/>
 
-<div class="row">
-    <div class="col-12 mt-3 mb-3">
+<div class="row ml-2 mr-2 mt-3 mb-3">
+    <div class="container border col-12 p-0">
         @if (Model.Expenses.Any())
             {
-                <table class="table table-hover border-primary">
+                <table class="table table-hover mb-0">
                     <tr class="bg-primary">
                         <th colspan="3" scope="col">
                             <h5 class="text-light">Expenses</h5>
