@@ -31,7 +31,7 @@ else
     }
 
     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addEntryCollapse" aria-expanded="false" aria-controls="collapseExample">
-        Add Income
+        Add Income<i class="ml-1 fas fa-pencil-alt"></i>
     </button>
     <div class="collapse mt-3" id="addEntryCollapse">
         <form method="post" asp-page-handler="NewEntry">
@@ -87,7 +87,7 @@ else
             <label class="text-light ml-2 mr-2"> - </label>
             <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
-        <input type="submit" value="Filter" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3" />
+        <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr class="mt-4 mb-4" />
