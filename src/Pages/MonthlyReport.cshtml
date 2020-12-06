@@ -53,7 +53,7 @@
     <h3 class="text-light mt-3 mb-3"><span class="text-info"><i class="mr-1 fas fa-money-bill-wave"></i></span>Your expenses:</h3>
     @if (Model.Data.NecessarySum > Model.Data.BiggestCategorySum)
     {
-        <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-award"></i></span>Well done, you've spend most money for the necessary expenses!</h4>
+        <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-award"></i></span>Well done, you've spent most money for the necessary expenses!</h4>
         <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
     }
     else
