@@ -117,8 +117,8 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;
 
-            Result.MonthsForCheapestGoal = (int) decimal.Ceiling(minGoal.Amount - AllSavings / savedThisMonth);
-            Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling(maxGoal.Amount - AllSavings / savedThisMonth);
+            Result.MonthsForCheapestGoal = (int) decimal.Ceiling((minGoal.Amount - AllSavings) / savedThisMonth);
+            Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling((maxGoal.Amount - AllSavings) / savedThisMonth);
 
         }
     }

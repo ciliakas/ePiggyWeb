@@ -62,7 +62,7 @@
         <h4 class="text-warning">@Model.Data.BiggestCategory</h4>
         <h5 class="text-light">It was bigger than Necessary expenses by:</h5>
         <h4 class="text-warning">@Model.Data.HowMuchBigger.ToString("#.##")%</h4>
-        <br/>
+        <br />
         <h5 class="text-light">Necessary expenses sum: </h5>
         <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
         <h5 class="text-light">@Model.Data.BiggestCategory expenses sum:</h5>
@@ -98,15 +98,16 @@
     <div data-aos="fade-up">
         <a class="btn btn-primary" href="/goals"><i class="mr-1 fas fa-bullseye"></i>To Goals</a>
     </div>
+    <hr class="mt-5 mb-5" />
 }
 
-<hr class="mt-5 mb-5" />
+
 @if (Model.Data.HasGoals)
 {
     <div data-aos="fade-up">
         @if (Model.Data.MonthsForCheapestGoal <= 12)
         {
-            <h4><span class="text-warning"><i class="mr-1 fas fa-trophy"></i></span>If you keep it up you'll save up for your goals:</h4>
+            <h4 class="mb-3 text-light"><span class="text-warning"><i class="mr-1 fas fa-trophy"></i></span>If you keep it up you'll save up for your goals:</h4>
         }
         else
         {
