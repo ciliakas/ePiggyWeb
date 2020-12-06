@@ -24,6 +24,7 @@
     <br />
     <hr />
     <form method="get" class="mt-5 mb-5">
+        <input asp-for="Id" type="hidden" value="@Model.Id" />
         <input type="hidden" name="handler" value="Filter" />
         <label class="text-light col-md-4">Period:</label>
         <div class="row justify-content-center">
@@ -31,7 +32,7 @@
             <label class="text-light ml-2 mr-2"> - </label>
             <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
-        <input type="submit" value="Filter" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3" />
+        <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr />
@@ -40,13 +41,13 @@
         <p>
             <label class="text-light">Saving type</label><br/>
             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#minimalSuggestions" aria-expanded="false" aria-controls="minimalSuggestions">
-                Minimal
+                Minimal<i class="ml-1 fas fa-search-minus"></i>
             </button>
             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#regularSuggestions" aria-expanded="false" aria-controls="regularSuggestions">
-                Regular
+                Regular<i class="ml-1 fas fa-search-dollar"></i>
             </button>
             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#maximalSuggestions" aria-expanded="false" aria-controls="maximalSuggestions">
-                Maximal
+                Maximal<i class="ml-1 fas fa-search-plus"></i>
             </button>
         </p><hr />
         <!----------------------------MINIMAL----------------------------------------->
