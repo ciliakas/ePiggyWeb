@@ -1,0 +1,97 @@
+﻿@page
+@using System.Globalization
+@using ePiggyWeb.Utilities
+@model ePiggyWeb.Pages.MonthlyReportModel
+
+@if (Model.WasException)
+{
+    <div class="alert alert-danger" role="alert">
+        Whoops! Something went wrong!
+    </div>
+    <h1 class="text-warning">Example Goals data used:</h1>
+}
+<div data-aos="slide-down">
+
+    <h2 class="text-light mt-5 mb-3">Report</h2>
+    <h5 class="text-light">@Model.Data.Start.ToShortDateString() - @Model.Data.End.ToShortDateString()</h5>
+    <hr class="mt-5 mb-5"/>
+</div>
+<div data-aos="fade-up">
+    <h4 class="text-light">Income of period: </h4>
+    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Income)</h3>
+    <h4 class="text-light">Expenses of period: </h4>
+    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Expenses)</h3>
+
+    <div class="container p-0 mt-3 mb-5">
+        <div class="col-lg-12" id="graph">
+            <div class="spinner-border text-warning loader" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+<hr class="mt-5 mb-5" />
+
+<div data-aos="fade-up">
+    @if (Model.Data.NecessarySum > Model.Data.BiggestCategorySum)
+    {
+        <h3 class="text-light">Well done, you've spend most money for the necessary expenses!<i class="ml-1 fas fa-award fa-4x"></i></h3>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
+    }
+    else
+    {
+        <h5 class="text-light">Biggest Expenses Category: </h5>
+        <h4 class="text-light">@Model.Data.BiggestCategory</h4>
+        <h5 class="text-light">It was bigger than Necessary expenses by:</h5>
+        <h4 class="text-light">@Model.Data.HowMuchBigger.ToString("#.##")%</h4>
+        <br />
+        <h5 class="text-light">Necessary expenses sum: </h5>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
+        <h5 class="text-light">@Model.Data.BiggestCategory expenses sum:</h5>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.BiggestCategorySum)</h5>
+
+    }
+</div>
+<hr class="mt-5 mb-5" />
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    $(window).resize(function () {
+        drawChart();
+    });
+</script>
+<script type="text/javascript">
+    // Load google charts
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Draw the chart and set the chart values
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Type', 'Amount'],
+            ['Expenses', @Model.Data.Expenses.ToString(CultureInfo.InvariantCulture)],
+            ['Income',  @Model.Data.Income.ToString(CultureInfo.InvariantCulture)]
+        ]);
+
+        // Optional; add a title and set the width and height of the chart
+        var options = {
+            'title': 'Income/expenses comparison',
+            'height': 250,
+            'width': '50%',
+            'vAxis': { 'textStyle': { 'color': '#FFF' }},
+            'backgroundColor': { 'fill': 'transparent' },
+            'colors': ['#F44336', '#3F51B5'],
+            'legend': { 'position': 'top', 'maxLines': 2 },
+            'legendTextStyle': { color: '#FFF' },
+            'titleTextStyle': { color: '#FFF', bold: 'true', fontSize: 16 },
+            'hAxis': { 'textStyle': { 'color': '#FFF' } }
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('graph'));
+        chart.draw(data, options);
+    }
+</script>
