@@ -19,7 +19,7 @@ namespace CurrencyAPI
 {
     public class Startup
     {
-        private readonly string ServiceName = "CurrencyAPI";
+        private readonly string ServiceName = "CurrencyConverter";
 
         public Startup(IConfiguration configuration)
         {
