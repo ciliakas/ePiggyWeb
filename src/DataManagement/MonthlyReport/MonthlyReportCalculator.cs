@@ -17,12 +17,14 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private IEntryList Expenses { get; set; }
         private IEntryList Income { get; set; }
+        private decimal Balance { get; set; }
         private decimal AllSavings { get; set; }
         private IGoalList Goals { get; set; }
 
         private MonthlyReportResult Result { get; set; }
 
-
+        private DateTime StartTime { get; set; }
+        private DateTime EndTime { get; set; }
 
         public MonthlyReportCalculator(GoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId)
         {
@@ -44,8 +46,8 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
         {
             var today = DateTime.Today;
             var month = new DateTime(today.Year, today.Month, 1);
-            var first = month.AddMonths(-1);
-            var last = month.AddDays(-1);
+            StartTime = month.AddMonths(-1);
+            EndTime = month.AddDays(-1);
 
             Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
             Income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
@@ -53,12 +55,12 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
             var expensesTotal = Expenses.GetSum();
             var incomeTotal = Income.GetSum();
-            var thisMonthExpenses = Expenses.GetFrom(first).GetTo(last).GetSum();
-            var thisMonthIncome = Income.GetFrom(first).GetTo(last).GetSum();
+            var thisMonthExpenses = Expenses.GetFrom(StartTime).GetTo(EndTime).GetSum();
+            var thisMonthIncome = Income.GetFrom(StartTime).GetTo(EndTime).GetSum();
             AllSavings = incomeTotal - expensesTotal;
-            var balance = thisMonthIncome - thisMonthExpenses;
+            Balance = thisMonthIncome - thisMonthExpenses;
 
-            return new MonthlyReportResult(thisMonthExpenses, thisMonthIncome, balance, first, last);
+            return new MonthlyReportResult(thisMonthExpenses, thisMonthIncome, Balance, StartTime, EndTime);
 
         }
 
@@ -70,14 +72,14 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             foreach (var importance in Enum.GetValues(typeof(Importance)).Cast<Importance>())
             {
                 var temp = 0M;
-                var expenses = Expenses.GetBy((Importance)importance);
+                var expenses = Expenses.GetBy(importance);
                 foreach (var entry in expenses) //not linq since when empty category it crashes
                 {
                     temp += entry.Amount;
                 }
                 if (temp < sum) continue;
                 sum = temp;
-                biggestCategory = (Importance)importance;
+                biggestCategory = importance;
             }
 
             Result.BiggestCategory = biggestCategory;
@@ -99,8 +101,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private void CalculateGoalReport()
         {
-            var savedThisMonth = Income.GetSum() - Expenses.GetSum();
-            if (Goals.Count() < 2 || savedThisMonth <= 0)
+            if (Goals.Count < 2 || Balance <= 0)
             {
                 Result.HasGoals = false;
                 return;
@@ -127,8 +128,8 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;
 
-            Result.MonthsForCheapestGoal = (int) decimal.Ceiling((minGoal.Amount - AllSavings) / savedThisMonth);
-            Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling((maxGoal.Amount - AllSavings) / savedThisMonth);
+            Result.MonthsForCheapestGoal = (int) decimal.Ceiling((minGoal.Amount - AllSavings) / Balance);
+            Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling((maxGoal.Amount - AllSavings) / Balance);
 
         }
     }
