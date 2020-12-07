@@ -2,7 +2,7 @@
 
 namespace CurrencyConverter.Contracts
 {
-    class ErrorDetails
+    public class ErrorDetails
     {
         public string Message { get; set; }
 

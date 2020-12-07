@@ -1,21 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Authentication.ExtendedProtection;
-using System.Threading.Tasks;
+using CurrencyConverter.WebApi.Middleware.ErrorHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
-namespace CurrencyAPI
+namespace CurrencyConverter.WebApi
 {
     public class Startup
     {
@@ -80,6 +72,8 @@ namespace CurrencyAPI
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

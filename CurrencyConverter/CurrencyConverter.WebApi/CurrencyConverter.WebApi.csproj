@@ -13,4 +13,8 @@
   </ItemGroup>
 
 
+<ItemGroup>
+	<ProjectReference Include="..\CurrencyConverter.Contracts\CurrencyConverter.Contracts.csproj" />
+</ItemGroup>
+
 </Project>
