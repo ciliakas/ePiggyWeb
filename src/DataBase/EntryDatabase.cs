@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -14,9 +15,11 @@ namespace ePiggyWeb.DataBase
     public class EntryDatabase
     {
         private PiggyDbContext Database { get; }
+        public string CnStr { get; set; }
         public EntryDatabase(PiggyDbContext database)
         {
             Database = database;
+            CnStr = "Server=51.75.187.147;Database=SmartSaver;User Id=usern;Password=123456789;";
         }
 
         public async Task<int> CreateAsync(IEntry localEntry, int userId, EntryType entryType)
@@ -178,7 +181,45 @@ namespace ePiggyWeb.DataBase
 
         public async Task<IEntryList> ReadListAsync(int userId, EntryType entryType)
         {
-            return await ReadListAsync(x => true, userId, entryType);
+            //return await ReadListAsync(x => true, userId, entryType);
+            var list = new EntryList(entryType);
+
+            var type = entryType == 0 ? "Incomes" : "Expenses";
+
+            string query = "SELECT * FROM " + type + " WHERE UserId =" + userId;
+
+            DataSet MyDataSet = new DataSet();
+            try
+            {
+                System.Data.SqlClient.SqlDataAdapter MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, CnStr);
+
+                MyDataAdapter.Fill(MyDataSet);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            DataTable table = MyDataSet.Tables[0];
+
+            List<IEntry> items = new List<IEntry>();
+            foreach (DataRow row in table.Rows)
+            { 
+                var obj = new Entry
+                {
+                    Id = row.Field<int>("Id"),
+                    Amount = row.Field<decimal>("Amount"),
+                    Date = row.Field<DateTime>("Date"),
+                    Importance = row.Field<int>("Importance"),
+                    Recurring = row.Field<bool>("IsMonthly"),
+                    Title = row.Field<string>("Title"),
+                    UserId = row.Field<int>("UserId")
+                } as IEntry;
+
+                items.Add(obj);
+            }
+            list.AddRange(items);
+            return list;
         }
 
         public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType)
