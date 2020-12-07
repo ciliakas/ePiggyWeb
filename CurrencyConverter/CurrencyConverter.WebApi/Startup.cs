@@ -1,3 +1,4 @@
+using Autofac;
 using CurrencyConverter.WebApi.Middleware.ErrorHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +21,8 @@ namespace CurrencyConverter.WebApi
 
         public IConfiguration Configuration { get; }
 
+        public ILifetimeScope AutofacContainer { get; private set; }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -31,18 +34,22 @@ namespace CurrencyConverter.WebApi
             services.AddSwaggerGen(x =>
             {
                 x.SwaggerDoc("v1", new OpenApiInfo { Title = "Your Service Name API", Version = "v1" });
-                //x.DescribeAllEnumsAsStrings(); obsolete
             });
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.Register(x => Log.Logger).SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseSwagger(c =>
             {
@@ -72,8 +79,6 @@ namespace CurrencyConverter.WebApi
             app.UseRouting();
 
             app.UseAuthorization();
-
-            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

@@ -2,12 +2,12 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace CurrencyConverter.WebApi.Middleware.ErrorHandling
@@ -47,7 +47,7 @@ namespace CurrencyConverter.WebApi.Middleware.ErrorHandling
 
             if (_environment.IsDevelopment())
             {
-                errorMessage = JsonSerializer.Serialize(exception);
+                errorMessage += JsonConvert.SerializeObject(exception, Formatting.Indented);
             }
 
             return context.Response.WriteAsync(new ErrorDetails
@@ -68,8 +68,8 @@ namespace CurrencyConverter.WebApi.Middleware.ErrorHandling
                 exception,
                 $"WebApi exception, Method: {{method}}, Content: {{faultMessage}}",
                 $"{context.Request.Method} {context.Request.GetDisplayUrl()}",
-                JsonSerializer.Serialize(body));
-
+                JsonConvert.SerializeObject(body));
+                
             context.Request.Body.Seek(0, SeekOrigin.Begin);
         }
     }

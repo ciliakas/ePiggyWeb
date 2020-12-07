@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Newtonsoft.Json;
 
 namespace CurrencyConverter.Contracts
 {
@@ -8,8 +8,7 @@ namespace CurrencyConverter.Contracts
 
         public override string ToString()
         {
-            return JsonSerializer.Serialize(this);
-            //return JsonConverter.Se(this, Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }

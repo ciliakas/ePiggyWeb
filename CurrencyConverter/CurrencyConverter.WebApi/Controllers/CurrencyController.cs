@@ -21,6 +21,11 @@ namespace CurrencyConverter.WebApi.Controllers
                 return BadRequest("Lecturer first and last name must be provided");
             }
 
+            if (lecturerFirstName.Equals("Erroras"))
+            {
+                throw new Exception();
+            }
+
             return Ok(new { lectureName = "TOP", lectureTime = DateTime.Now });
         }
     }
