@@ -14,8 +14,8 @@ else
 {
     <br />
     <h2 class="text-info">Goals</h2>
-    <button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal</button>
-    <button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal</button>
+    <button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal<i class="ml-1 fas fa-pencil-alt"></i></button>
+    <button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal<i class="ml-1 fas fa-cloud-download-alt"></i></button>
 }
 
 @if (!ModelState.IsValid)
@@ -125,12 +125,12 @@ else
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
                         <input asp-for="Title" type="text" placeholder="Title*" value="" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
+                    <div class="form-group"><span asp-validation-for="Title" class="text-danger"></span></div>
                     <div class="form-group">
                         <input asp-for="Amount" type="text" placeholder="Amount*" value="" />
-                        <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
+                    <div class="form-group"><span asp-validation-for="Amount" class="text-danger"></span></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
