@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;1,200&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
     <script src="js/particles.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-</head>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" /></head>
 
 <body>
     <div id="particles-js"> </div>
@@ -43,13 +43,17 @@
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Reports
+                    Charts
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" asp-page="/incomeGraph">Income</a>
                     <a class="dropdown-item" asp-page="/expensesGraph">Expenses</a>
+                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" asp-page="/comparisonGraph">Comparison</a>
                 </div>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" asp-page="/monthlyreport">Monthly Report<span class="sr-only">(current)</span></a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">

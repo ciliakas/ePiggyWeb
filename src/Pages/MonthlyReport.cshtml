@@ -1,0 +1,209 @@
+﻿@page
+@using System.Globalization
+@using ePiggyWeb.Utilities
+@model ePiggyWeb.Pages.MonthlyReportModel
+
+@if (Model.WasException)
+{
+    <div class="alert alert-danger" role="alert">
+        Whoops! Something went wrong!
+    </div>
+    <h1 class="text-warning">Example Goals data used:</h1>
+}
+<div data-aos="slide-down">
+
+    <h2 class="text-light mt-5 mb-3">Report</h2>
+    <h5 class="text-light">@Model.Data.Start.ToShortDateString() - @Model.Data.End.ToShortDateString()</h5>
+    <hr class="mt-5 mb-5" />
+</div>
+<div data-aos="fade-up">
+    <h4 class="text-light">Income of period: </h4>
+    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Income)</h3>
+    <h4 class="text-light">Expenses of period: </h4>
+    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Expenses)</h3>
+
+    <div class="container p-0 mt-3 mb-5">
+        <div class="col-lg-12" id="graph">
+            <div class="spinner-border text-warning loader" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+<hr class="mt-5 mb-5" />
+<div data-aos="fade-right">
+    @if (Model.Data.Balance > 0)
+    {
+        <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-piggy-bank"></i></span>You've saved this month:</h4>
+        <h3 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.Balance)</h3>
+    }
+    else if (Model.Data.Balance < 0)
+    {
+        <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-minus-circle"></i></span>Your balance was negative this month:</h4>
+        <h3 class="text-warning">@NumberFormatter.FormatCurrency(Model.Data.Balance)</h3>
+    }
+    else
+    {
+        <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-minus-circle"></i></span>You've spent all you've earned this month</h4>
+    }
+</div>
+<hr class="mt-5 mb-5" />
+
+<div data-aos="fade-up">
+    <h3 class="text-light mt-3 mb-3"><span class="text-info"><i class="mr-1 fas fa-money-bill-wave"></i></span>Your expenses:</h3>
+    @if (Model.Data.BiggestCategorySum == 0)
+    {
+        <h4 class="text-light"><span class="text-success"><i class="fas fa-dollar-sign"></i></span>You did not have any expenses...</h4>
+        <a class="btn btn-primary mt-2" asp-page="/expenses" role="button"><i class="fas fa-hand-holding-usd"></i>To Expenses</a>
+    }else if (Model.Data.NecessarySum >= Model.Data.BiggestCategorySum)
+    {
+        <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-award"></i></span>Well done, you've spent most money for the necessary expenses!</h4>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
+    }
+    else
+    {
+        <h5 class="text-light">Biggest Expenses Category: </h5>
+        <h4 class="text-warning">@Model.Data.BiggestCategory</h4>
+        @if (Model.Data.HowMuchBigger != -1)
+        {
+            <h5 class="text-light">It was bigger than Necessary expenses by:</h5>
+            <h4 class="text-warning">@Model.Data.HowMuchBigger.ToString("#.##")%</h4>
+            <br />
+        }
+        else
+        {
+            <h5 class="text-light">You did not have necessary expenses...</h5>
+            <h4 class="text-warning">Time to plan your expenses?</h4>
+        }
+
+        <h5 class="text-light">Necessary expenses sum: </h5>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
+        <h5 class="text-light">@Model.Data.BiggestCategory expenses sum:</h5>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.BiggestCategorySum)</h5>
+
+    }
+</div>
+
+<hr class="mt-5 mb-5" />
+
+@if (Model.Data.SavedUpGoals.Any())
+{
+    <div data-aos="fade-up">
+        <h4 class="text-light"><span class="text-success"><i class=" mr-1 mb-3 fas fa-check-circle"></i></span>Goals You've already saved up for: </h4>
+    </div>
+    <div class="row ml-3 mr-3 justify-content-center">
+        @foreach (var item in Model.Data.SavedUpGoals)
+        {
+            <div data-aos="fade-right" class="card text-center col-lg-4 col-md-6 text-light bg-primary mb-3">
+                <div class="card-header">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title" title="Title">@item.Title</h5>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" title="Progress">100%</div>
+                    <p class=" mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(item.Amount)</p>
+                </div>
+                <div class="card-footer">
+
+                </div>
+            </div>
+        }
+    </div>
+    <div data-aos="fade-up">
+        <a class="btn btn-primary" href="/goals"><i class="mr-1 fas fa-bullseye"></i>To Goals</a>
+    </div>
+    <hr class="mt-5 mb-5" />
+}
+
+
+@if (Model.Data.HasGoals)
+{
+    <div data-aos="fade-up">
+        @if (Model.Data.MonthsForCheapestGoal <= 12)
+        {
+            <h4 class="mb-3 text-light"><span class="text-warning"><i class="mr-1 fas fa-trophy"></i></span>If you keep it up you'll save up for your goals:</h4>
+        }
+        else
+        {
+            <h4 class="mb-3 text-light"><span class="text-success"><i class="mr-1 fas fa-seedling"></i></span>You'll need review your plan in order to save: </h4>
+            <a asp-page="/savingsuggestions" asp-route-id="@Model.Data.CheapestGoal.Id" class="mb-3 btn btn-primary">Suggestions <i class="ml-1 far fa-list-alt"></i></a>
+        }
+    </div>
+    <div class="row ml-3 mr-3 justify-content-center">
+        <div data-aos="fade-right" class="card text-center col-lg-4 col-md-6 text-light bg-primary mb-3">
+            <div class="card-header">
+                <h5 class="text-light">In @Model.Data.MonthsForCheapestGoal month(s)</h5>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title" title="Title">@Model.Data.CheapestGoal.Title month(s)</h5>
+                <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.CheapestGoal.Amount)</h5>
+            </div>
+            <div class="card-footer">
+
+            </div>
+        </div>
+        <div data-aos="fade-right" class="card text-center col-lg-4 col-md-6 text-light bg-primary mb-3">
+            <div class="card-header">
+                <h5 class="text-light">In @Model.Data.MonthsForMostExpensiveGoal month(s)</h5>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title" title="Title">@Model.Data.MostExpensiveGoal.Title</h5>
+                <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.MostExpensiveGoal.Amount)</h5>
+            </div>
+            <div class="card-footer">
+
+            </div>
+        </div>
+    </div>
+    <hr class="mt-5 mb-5" />
+}
+else
+{
+    <!--<div data-aos="fade-up">
+        <h5 class="mb-3 text-light"><span class="text-warning"><i class="fas fa-exclamation-triangle"></i></span>Goal data unavailable since you have less than 2 goals or your budget is negative... </h5>
+        <a class="btn btn-primary" href="/goals"><i class="mr-1 fas fa-bullseye"></i>To Goals</a>
+    </div>-->
+}
+<div data-aos="fade-up">
+    <button class="btn btn-primary mb-4" disabled>Save as an E-Mail<i class="ml-1 far fa-envelope"></i></button>
+</div>
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    $(window).resize(function () {
+        drawChart();
+    });
+</script>
+<script type="text/javascript">
+    // Load google charts
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Draw the chart and set the chart values
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Type', 'Amount'],
+            ['Expenses', @Model.Data.Expenses.ToString(CultureInfo.InvariantCulture)],
+            ['Income',  @Model.Data.Income.ToString(CultureInfo.InvariantCulture)]
+        ]);
+
+        // Optional; add a title and set the width and height of the chart
+        var options = {
+            'title': 'Income/expenses comparison',
+            'height': 250,
+            'width': '50%',
+            'vAxis': { 'textStyle': { 'color': '#FFF' }},
+            'backgroundColor': { 'fill': 'transparent' },
+            'colors': ['#F44336', '#3F51B5'],
+            'legend': { 'position': 'top', 'maxLines': 2 },
+            'legendTextStyle': { color: '#FFF' },
+            'titleTextStyle': { color: '#FFF', bold: 'true', fontSize: 16 },
+            'hAxis': { 'textStyle': { 'color': '#FFF' } }
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('graph'));
+        chart.draw(data, options);
+    }
+</script>
