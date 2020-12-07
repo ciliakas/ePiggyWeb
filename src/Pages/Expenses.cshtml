@@ -16,121 +16,159 @@ else
     <div class="container p-0 mt-3">
         <h2 class="text-info">Expenses</h2>
     </div>
+    <hr class="mt-4 mb-4" />
 
-    <form method="post" asp-page-handler="NewEntry">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input asp-for="Title" type="text" placeholder="Title" value="" />
-        <span asp-validation-for="Title" class="text-danger"></span>
-        <input asp-for="Amount" type="text" placeholder="Amount" value="" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
-        <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
-        <select asp-for="Importance" class="ml-3">
-            <option hidden disabled selected value="">Importance</option>
-            <option value="1">Necessary</option>
-            <option value="2">High</option>
-            <option value="3">Medium</option>
-            <option value="4">Low</option>
-            <option value="5">Unnecessary</option>
-        </select>
-        <span asp-validation-for="Importance" class="text-danger"></span>
-        <label class="text-light ml-3">Is Monthly?</label>
-        <input asp-for="Recurring" type="checkbox" placeholder="" />
-        <input type="submit" value="Add" class="btn btn-primary ml-5" />
-        <input class="btn btn-danger ml-2" type="reset" value="Reset">
-    </form>
-
-    <form method="get" class="mt-5">
-        <input type="hidden" name="handler" value="Filter" />
-        <label class="text-light">Period:</label>
-        <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
-        <label class="text-light"> - </label>
-        <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
-        <input type="submit" value="Filter" class="btn btn-warning ml-5" />
-        <p class="text-warning">@Model.ErrorMessage</p>
-    </form>
-}
-
-
-@if (!ModelState.IsValid)
-{
-    <div class="container">
-        <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-            <strong>Holy guacamole!</strong> Expense was not added, because wrong info was provided.
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    @if (!ModelState.IsValid)
+    {
+        <div class="container">
+            <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                <strong>Holy guacamole!</strong> Expense was not added, because wrong info was provided.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         </div>
-    </div>
-}
-
-<div class="row">
-    <div class="col-10 border mt-3 mb-3">
-        <form method="post">
-            @if (Model.Expenses.Any())
-            {
-                <table class="table table-hover border-primary table-bordered">
-                    <tr class="table-primary">
-                        <th>
-                            <label asp-for="Expenses.FirstOrDefault().Title"></label>
-                        </th>
-                        <th style="width: 18%">
-                            <label asp-for="Expenses.FirstOrDefault().Amount"></label>
-                        </th>
-                        <th style="width: 10%">
-                            <label asp-for="Expenses.FirstOrDefault().Date"></label>
-                        </th>
-                        <th style="width: 15%">
-                            <label asp-for="Expenses.FirstOrDefault().Importance"></label>
-                        </th>
-                        <th style="width: 5%">
-                            <label asp-for="Expenses.FirstOrDefault().Recurring"></label>
-                        </th>
-                        <th style="width: 15%">
-
-                        </th>
-
-                    </tr>
-
-                    @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
-                    {
-                        <tr class="table-light border-primary">
-                            <td class="border-primary">
-                                @Html.DisplayFor(m => item.Title)
-                            </td>
-                            <td class="border-primary">
-                                @NumberFormatter.FormatCurrency(item.Amount)
-                            </td>
-                            <td class="border-primary">
-                                @item.Date.ToShortDateString()
-                                <!--Html.DisplayFor(m => item.Date)-->
-                            </td>
-                            <td class="border-primary">
-                                @((Importance)item.Importance)
-                            </td>
-                            <td class="border-primary">
-                                @if (item.Recurring)
-                                {
-                                    <i class="fas fa-check text-success"></i>
-                                }
-                            </td>
-                            <td class="border-primary">
-                                <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-success">Edit </a>
-                                <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
-                            </td>
-                        </tr>
-                    }
-                </table>
-            }
-            else
-            {
-                <p>No expenses available</p>
-            }
+    }
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addEntryCollapse" aria-expanded="false" aria-controls="collapseExample">
+        Add Expense<i class=" ml-1 fas fa-pencil-alt"></i>
+    </button>
+    <div class="collapse mt-3" id="addEntryCollapse">
+        <form method="post" asp-page-handler="NewEntry">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="container">
+                <div class="row justify-content-center p-0">
+                    <div class="col-12 col-md-4 col-lg-3 mb-1">
+                        <input asp-for="Title" type="text" placeholder="Title" value="" />
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3 mb-1">
+                        <input asp-for="Amount" type="text" placeholder="Amount" value="" />
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3 mb-1">
+                        <input asp-for="Date" type="date" value="@DateTime.Now.ToShortDateString()" />
+                    </div>
+                </div>
+                <div class="row justify-content-center mb-3">
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <select asp-for="Importance">
+                            <option hidden disabled selected value="">Importance</option>
+                            <option value="1">Necessary</option>
+                            <option value="2">High</option>
+                            <option value="3">Medium</option>
+                            <option value="4">Low</option>
+                            <option value="5">Unnecessary</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <label class="text-light">Is Monthly?</label>
+                        <input asp-for="Recurring" type="checkbox" placeholder="" />
+                    </div>
+                </div>
+                <div class="container col-12 col-md-4 col-lg-3">
+                    <input type="submit" value="Add" class="btn btn-primary" />
+                    <input class="btn btn-danger" type="reset" value="Reset">
+                </div>
+            </div>
         </form>
     </div>
-    <div class="col-2 border p-3 mt-3 mb-3">
-        <p class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</p>
-        <p class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses)</p>
+    <div class="container mt-3">
+        <span asp-validation-for="Title" class="text-danger"></span>
+        <span asp-validation-for="Amount" class="text-danger"></span>
+        <span asp-validation-for="Importance" class="text-danger"></span>
     </div>
-</div>
 
+    <hr class="mt-4 mb-4" />
+    <form method="get">
+        <input type="hidden" name="handler" value="Filter" />
+        <label class="text-light col-md-4">Period:</label>
+        <div class="row justify-content-center">
+            <input class="col-md-3 col-sm-5 col-5" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+            <label class="text-light ml-2 mr-2"> - </label>
+            <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+        </div>
+        <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
+        <p class="text-warning">@Model.ErrorMessage</p>
+    </form>
+    <hr class="mt-4 mb-4" />
+    <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</h5>
+    <h5 class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses)</h5>
+    <hr class="mt-4 mb-4" />
+
+}
+
+<form method="post">
+    <div class="row ml-2 mr-2">
+        <button asp-page-handler="Delete" type="submit" class="btn btn-danger">Delete Selected <i class="fas fa-trash-alt"></i></button>
+    </div>
+    <div class="row ml-2 mr-2 mt-3 mb-3">
+        <div class="container border col-12 p-0">
+            @if (Model.Expenses.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <tr class="bg-primary">
+                            <th class="border-right entry-table-side" scope="col">
+                                <input class="bigger" type="checkbox" onClick="toggle(this)"/><br/>
+                            </th>
+                            <th colspan="2" scope="col">
+                                <h5 class="text-light">Expenses</h5>
+                            </th>
+                        </tr>
+                        @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
+                        {
+                            <tr class="table-light border-primary">
+                                <td class="border-primary border entry-table-side">
+                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id"/>
+                                </td>
+                                <td class=" border-right-0 border-primary text-nowrap entry-column">
+                                    <div class="row">
+                                        <div class="col-12 mb-2">
+                                            <strong class="text-info">
+                                                @Html.DisplayFor(m => item.Title)
+                                            </strong>
+                                        </div>
+                                        <div class="col-12 col-md-5 col-lg-4">
+                                            <span class="text-info">Amount:</span>
+                                            @NumberFormatter.FormatCurrency(item.Amount)
+                                        </div>
+                                        <div class="col-12 col-md-3 col-lg-2">
+                                            <span class="text-info">Date: </span>
+                                            @item.Date.ToShortDateString()
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <span class="text-info">Importance: </span>
+                                            @((Importance) item.Importance)
+                                        </div>
+                                        <div class="col-12 col-md-4 col-lg-2">
+                                            <span class="text-info">Recurring: </span>
+                                            @if (item.Recurring)
+                                            {
+                                                <i class="fas fa-check text-success"></i>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </td>
+                                <td class="border-primary border-left-0 entry-table-side">
+                                    <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-outline-success"><i class="far fa-edit"></i> </a>
+                                    <!--<input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-outline-danger" value="x" />-->
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+</form>
+
+    
+<script language="JavaScript">
+    function toggle(source) {
+        checkboxes = document.getElementsByName('chkEntry');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>
 
