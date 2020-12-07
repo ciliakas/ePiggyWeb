@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyConverter.WebApi", "CurrencyConverter.WebApi\CurrencyConverter.WebApi.csproj", "{BF3AED2B-CD31-47AA-8287-4B35088A650E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.Contracts", "CurrencyConverter.Contracts\CurrencyConverter.Contracts.csproj", "{D1D6F6FD-F7AB-4CA3-9EA2-824F40053C19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyConverter.Contracts", "CurrencyConverter.Contracts\CurrencyConverter.Contracts.csproj", "{D1D6F6FD-F7AB-4CA3-9EA2-824F40053C19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.Domain", "CurrencyConverter.Domain\CurrencyConverter.Domain.csproj", "{D553CD23-E938-44AB-B248-080DA8418186}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.Services", "CurrencyConverter.Services\CurrencyConverter.Services.csproj", "{E337F8BB-5469-498D-B033-978D6A7339E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{D1D6F6FD-F7AB-4CA3-9EA2-824F40053C19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1D6F6FD-F7AB-4CA3-9EA2-824F40053C19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1D6F6FD-F7AB-4CA3-9EA2-824F40053C19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D553CD23-E938-44AB-B248-080DA8418186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D553CD23-E938-44AB-B248-080DA8418186}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D553CD23-E938-44AB-B248-080DA8418186}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D553CD23-E938-44AB-B248-080DA8418186}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E337F8BB-5469-498D-B033-978D6A7339E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E337F8BB-5469-498D-B033-978D6A7339E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E337F8BB-5469-498D-B033-978D6A7339E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E337F8BB-5469-498D-B033-978D6A7339E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

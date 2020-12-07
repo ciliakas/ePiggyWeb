@@ -1,4 +1,5 @@
 using Autofac;
+using CurrencyConverter.Services.Services;
 using CurrencyConverter.WebApi.Middleware.ErrorHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,6 +41,7 @@ namespace CurrencyConverter.WebApi
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.Register(x => Log.Logger).SingleInstance();
+            builder.RegisterType<CurrencyService>().As<ICurrencyService>().InstancePerDependency();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

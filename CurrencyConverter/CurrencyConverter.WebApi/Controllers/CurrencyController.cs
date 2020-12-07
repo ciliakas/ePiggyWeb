@@ -1,17 +1,24 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using CurrencyConverter.Contracts.Outgoing;
+using CurrencyConverter.Services.Mapper;
+using CurrencyConverter.Services.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyConverter.WebApi.Controllers
 {
-    //[Route("api/[controller]")]
-    //[ApiController]
     public class CurrencyController : ControllerBase
     {
 
-        [Microsoft.AspNetCore.Mvc.HttpGet]
-        [Microsoft.AspNetCore.Mvc.Route("schedule")]
-        [ProducesResponseType(200)]
+        private readonly ICurrencyService _scheduleService;
+
+        public CurrencyController(ICurrencyService scheduleService)
+        {
+            _scheduleService = scheduleService;
+        }
+
+        [HttpGet]
+        [Route("schedule")]
+        [ProducesResponseType(typeof(CurrencyDto), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetScheduleByName([FromQuery] string lecturerFirstName, string lecturerLastName)
@@ -21,12 +28,29 @@ namespace CurrencyConverter.WebApi.Controllers
                 return BadRequest("Lecturer first and last name must be provided");
             }
 
-            if (lecturerFirstName.Equals("Erroras"))
-            {
-                throw new Exception();
-            }
+            var schedule = _scheduleService.GetCurrencyByName(lecturerFirstName, lecturerLastName).ToDto();
 
-            return Ok(new { lectureName = "TOP", lectureTime = DateTime.Now });
+            return Ok(schedule);
         }
+
+        //[Microsoft.AspNetCore.Mvc.HttpGet]
+        //[Microsoft.AspNetCore.Mvc.Route("schedule")]
+        //[ProducesResponseType(200)]
+        //[ProducesResponseType(400)]
+        //[ProducesResponseType(404)]
+        //public async Task<IActionResult> GetScheduleByName([FromQuery] string lecturerFirstName, string lecturerLastName)
+        //{
+        //    if (string.IsNullOrEmpty(lecturerFirstName) || string.IsNullOrEmpty(lecturerLastName))
+        //    {
+        //        return BadRequest("Lecturer first and last name must be provided");
+        //    }
+
+        //    if (lecturerFirstName.Equals("Erroras"))
+        //    {
+        //        throw new Exception();
+        //    }
+
+        //    return Ok(new { lectureName = "TOP", lectureTime = DateTime.Now });
+        //}
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\CurrencyConverter.Contracts\CurrencyConverter.Contracts.csproj" />
+		<ProjectReference Include="..\CurrencyConverter.Services\CurrencyConverter.Services.csproj" />
 	</ItemGroup>
 
 </Project>
