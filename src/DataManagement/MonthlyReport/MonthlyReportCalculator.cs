@@ -46,14 +46,19 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             var month = new DateTime(today.Year, today.Month, 1);
             var first = month.AddMonths(-1);
             var last = month.AddDays(-1);
-            var expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetSum();
-            var income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetSum();
-            AllSavings = income - expenses;
-            Expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetFrom(first).GetTo(last);
-            Income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetFrom(first).GetTo(last);
+
+            Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+            Income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
             Goals = await GoalDatabase.ReadListAsync(UserId);
-            var balance = Income.GetSum() - Expenses.GetSum();
-            return new MonthlyReportResult(Expenses.GetSum(), Income.GetSum(), balance, first, last);
+
+            var expensesTotal = Expenses.GetSum();
+            var incomeTotal = Income.GetSum();
+            var thisMonthExpenses = Expenses.GetFrom(first).GetTo(last).GetSum();
+            var thisMonthIncome = Income.GetFrom(first).GetTo(last).GetSum();
+            AllSavings = incomeTotal - expensesTotal;
+            var balance = thisMonthIncome - thisMonthExpenses;
+
+            return new MonthlyReportResult(thisMonthExpenses, thisMonthIncome, balance, first, last);
 
         }
 
@@ -62,27 +67,32 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
             var biggestCategory = (Importance) enumCount;
             var sum = 0m;
-            for (var i = enumCount; i > (int) Importance.Necessary; i--)
+            foreach (var importance in Enum.GetValues(typeof(Importance)).Cast<Importance>())
             {
                 var temp = 0M;
-                var expenses = Expenses.GetBy((Importance)i);
+                var expenses = Expenses.GetBy((Importance)importance);
                 foreach (var entry in expenses) //not linq since when empty category it crashes
                 {
                     temp += entry.Amount;
                 }
                 if (temp < sum) continue;
                 sum = temp;
-                biggestCategory = (Importance)i;
+                biggestCategory = (Importance)importance;
             }
 
             Result.BiggestCategory = biggestCategory;
             Result.BiggestCategorySum = sum;
             var necessarySum = Expenses.GetBy(Importance.Necessary).Sum(entry => entry.Amount);
             Result.NecessarySum = necessarySum;
+            if (necessarySum == 0)
+            {
+                Result.HowMuchBigger = -1;
+                return;
+            }
             Result.HowMuchBigger = ((sum - necessarySum) / necessarySum * 100);
         }
 
-        private  List<IGoal> CalculateSavedUpGoals()
+        private List<IGoal> CalculateSavedUpGoals()
         {
             return AllSavings >= 0 ? Goals.Where(x => x.Amount <= AllSavings).ToList() : new GoalList();
         }

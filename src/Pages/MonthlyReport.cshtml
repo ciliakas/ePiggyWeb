@@ -51,7 +51,11 @@
 
 <div data-aos="fade-up">
     <h3 class="text-light mt-3 mb-3"><span class="text-info"><i class="mr-1 fas fa-money-bill-wave"></i></span>Your expenses:</h3>
-    @if (Model.Data.NecessarySum > Model.Data.BiggestCategorySum)
+    @if (Model.Data.BiggestCategorySum == 0)
+    {
+        <h4 class="text-light"><span class="text-success"><i class="fas fa-dollar-sign"></i></span>You did not have any expenses...</h4>
+        <a class="btn btn-primary mt-2" asp-page="/expenses" role="button"><i class="fas fa-hand-holding-usd"></i>To Expenses</a>
+    }else if (Model.Data.NecessarySum >= Model.Data.BiggestCategorySum)
     {
         <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-award"></i></span>Well done, you've spent most money for the necessary expenses!</h4>
         <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
@@ -60,9 +64,18 @@
     {
         <h5 class="text-light">Biggest Expenses Category: </h5>
         <h4 class="text-warning">@Model.Data.BiggestCategory</h4>
-        <h5 class="text-light">It was bigger than Necessary expenses by:</h5>
-        <h4 class="text-warning">@Model.Data.HowMuchBigger.ToString("#.##")%</h4>
-        <br />
+        @if (Model.Data.HowMuchBigger != -1)
+        {
+            <h5 class="text-light">It was bigger than Necessary expenses by:</h5>
+            <h4 class="text-warning">@Model.Data.HowMuchBigger.ToString("#.##")%</h4>
+            <br />
+        }
+        else
+        {
+            <h5 class="text-light">You did not have necessary expenses...</h5>
+            <h4 class="text-warning">Time to plan your expenses?</h4>
+        }
+
         <h5 class="text-light">Necessary expenses sum: </h5>
         <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
         <h5 class="text-light">@Model.Data.BiggestCategory expenses sum:</h5>
