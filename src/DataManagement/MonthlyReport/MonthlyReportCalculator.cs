@@ -34,7 +34,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
         }
 
         public async Task<MonthlyReportResult> Calculate()
-        { 
+        {
             Result = await GatherDataAsync();
             CalculateBiggestExpensesCategory();
             Result.SavedUpGoals = CalculateSavedUpGoals();
@@ -67,16 +67,12 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
         private void CalculateBiggestExpensesCategory()
         {
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
-            var biggestCategory = (Importance) enumCount;
+            var biggestCategory = (Importance)enumCount;
             var sum = 0m;
             foreach (var importance in Enum.GetValues(typeof(Importance)).Cast<Importance>())
             {
-                var temp = 0M;
                 var expenses = Expenses.GetBy(importance);
-                foreach (var entry in expenses) //not linq since when empty category it crashes
-                {
-                    temp += entry.Amount;
-                }
+                var temp = expenses.Sum(entry => entry.Amount);
                 if (temp < sum) continue;
                 sum = temp;
                 biggestCategory = importance;
@@ -120,15 +116,15 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
                     maxGoal = (Goal)item;
                 }
 
-                if (item.Amount > min || item.Amount <= AllSavings ) continue;
+                if (item.Amount > min || item.Amount <= AllSavings) continue;
                 min = item.Amount;
-                minGoal = (Goal) item;
+                minGoal = (Goal)item;
             }
 
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;
 
-            Result.MonthsForCheapestGoal = (int) decimal.Ceiling((minGoal.Amount - AllSavings) / Balance);
+            Result.MonthsForCheapestGoal = (int)decimal.Ceiling((minGoal.Amount - AllSavings) / Balance);
             Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling((maxGoal.Amount - AllSavings) / Balance);
 
         }
