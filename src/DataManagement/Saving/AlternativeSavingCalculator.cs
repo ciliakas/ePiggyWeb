@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
+using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
@@ -12,15 +13,12 @@ namespace ePiggyWeb.DataManagement.Saving
         private static decimal MaximalSavingValue { get; } = 0.1M;
         private static decimal MinimalSavingValue { get; } = 0.5M;
 
-        public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType = SavingType.Regular)
+        public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType, IConfiguration configuration)
         {
             var entrySuggestions = new List<ISavingSuggestion>();
             var monthlySuggestions = new List<SavingSuggestionByImportance>();
-            
-            if (entryList is null)
-            {
-                return new CalculationResults(entrySuggestions, monthlySuggestions, 0);              
-            }
+            var expensesRandomList = EntryList.RandomList(configuration, EntryType.Expense);
+            var generateRandomData = false;
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
  
@@ -30,13 +28,19 @@ namespace ePiggyWeb.DataManagement.Saving
             var averagesOfAmountByImportanceDefault = new decimal[enumCount];
             var entryAmounts = new int[enumCount];
 
+            if (entryList.Count == 0)
+            {
+                generateRandomData = true;              
+            }
+
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
-                var expenses = entryList.GetBy((Importance)i);
+                var expenses = !generateRandomData ? entryList.GetBy((Importance)i) : expensesRandomList.GetBy((Importance)i);
+
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
                 {
-                    var amountAfterSaving = 0M;
+                    decimal amountAfterSaving;
                     switch (savingType)
                     {
                         case SavingType.Minimal:
@@ -57,8 +61,7 @@ namespace ePiggyWeb.DataManagement.Saving
                             break;
                         default:
                             throw new Exception("Unexpected saving type");
-                            break;
-                    };
+                    }
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
 
                     sumsOfAmountByImportanceAdjusted[i - 1] += amountAfterSaving;
@@ -68,9 +71,16 @@ namespace ePiggyWeb.DataManagement.Saving
                 }
             }
             var timesToRepeatSaving = 0;
+            var firstTimeThroughWhile = true;
             var approximateSavedAmount = startingBalance;
             while (goal.Amount > approximateSavedAmount)
             {
+                if(!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
+                {
+                    var entrySuggestionsEmpty = new List<ISavingSuggestion>();
+                    return new CalculationResults(entrySuggestionsEmpty, monthlySuggestions, 0);
+                }
+                firstTimeThroughWhile = false;
                 for (var i = enumCount; i > (int)Importance.Necessary; i--)
                 {
                     if (entryAmounts[i - 1] != 0)
@@ -92,7 +102,8 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 monthlySuggestions.Add(new SavingSuggestionByImportance(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
-            return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving);
+            return !generateRandomData ? new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving)
+                                       : new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving * -1);
         }
     }
 }
