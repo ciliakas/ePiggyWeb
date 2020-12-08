@@ -186,23 +186,17 @@ namespace ePiggyWeb.DataBase
 
             var type = entryType == 0 ? "Incomes" : "Expenses";
 
-            string query = "SELECT * FROM " + type + " WHERE UserId =" + userId;
+            var query = "SELECT * FROM " + type + " WHERE UserId =" + userId;
 
-            DataSet MyDataSet = new DataSet();
-            try
-            {
-                System.Data.SqlClient.SqlDataAdapter MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, CnStr);
+            var MyDataSet = new DataSet();
 
-                MyDataAdapter.Fill(MyDataSet);
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            var MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, CnStr);
 
-            DataTable table = MyDataSet.Tables[0];
+            MyDataAdapter.Fill(MyDataSet);
 
-            List<IEntry> items = new List<IEntry>();
+            var table = MyDataSet.Tables[0];
+
+            var items = new List<IEntry>();
             foreach (DataRow row in table.Rows)
             { 
                 var obj = new Entry
