@@ -35,13 +35,12 @@ namespace ePiggyWeb.DataManagement.Saving
 
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
-                IEntryList expenses;
-                expenses = !generateRandomData ? entryList.GetBy((Importance)i) : expensesRandomList.GetBy((Importance)i);
+                var expenses = !generateRandomData ? entryList.GetBy((Importance)i) : expensesRandomList.GetBy((Importance)i);
 
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
                 {
-                    var amountAfterSaving = 0M;
+                    decimal amountAfterSaving;
                     switch (savingType)
                     {
                         case SavingType.Minimal:
