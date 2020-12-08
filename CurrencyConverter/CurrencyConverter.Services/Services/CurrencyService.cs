@@ -1,7 +1,6 @@
 ﻿using System;
 using CurrencyConverter.Domain;
 
-
 namespace CurrencyConverter.Services.Services
 {
     public class CurrencyService : ICurrencyService
