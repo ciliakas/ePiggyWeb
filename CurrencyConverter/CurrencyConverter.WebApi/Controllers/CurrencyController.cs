@@ -43,11 +43,11 @@ namespace CurrencyConverter.WebApi.Controllers
 
         [HttpGet]
         [Route("list")]
-        [ProducesResponseType(typeof(IList<CurrencyDto>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<CurrencyDto>), 200)]
         public async Task<IActionResult> GetCurrencyList()
         {
             var temp = _currencyService.GetCurrencyList();
-            IList<CurrencyDto> list = temp.Select(currency => currency.ToDto()).ToList();
+            IEnumerable<CurrencyDto> list = temp.Select(currency => currency.ToDto()).ToArray();
             return Ok(list);
         }
 
@@ -71,6 +71,17 @@ namespace CurrencyConverter.WebApi.Controllers
             }
 
             return Ok(rate);
+        }
+
+
+        [HttpGet]
+        [Route("symbols")]
+        [ProducesResponseType(typeof(IList<CurrencyDto>), 200)]
+        public async Task<IActionResult> GetCurrencySymbolList()
+        {
+            var temp = _currencyService.GetCurrencySymbolList();
+            IList<CurrencyDto> list = temp.Select(currency => currency.ToDto()).ToList();
+            return Ok(list);
         }
     }
 }

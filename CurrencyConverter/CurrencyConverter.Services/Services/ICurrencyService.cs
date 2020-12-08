@@ -7,10 +7,10 @@ namespace CurrencyConverter.Services.Services
     {
         public Currency GetCurrencyByCode(string code);
 
-        public IList<Currency> GetCurrencyList();
+        public IEnumerable<Currency> GetCurrencyList();
 
         public decimal? GetCustomRate(string currencyCode1, string currencyCode2);
 
-        //public 
+        public IList<Currency> GetCurrencySymbolList();
     }
 }
