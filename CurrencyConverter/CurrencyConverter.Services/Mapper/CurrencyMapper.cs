@@ -7,7 +7,7 @@ namespace CurrencyConverter.Services.Mapper
     {
         public static CurrencyDto ToDto(this Currency from)
         {
-            return new CurrencyDto { CurrencyName = from.CurrencyName, CurrencySymbol = from.CurrencySymbol, CurrencyDate = from.CurrencyDate };
+            return new CurrencyDto { Code = from.Code, Symbol = from.Symbol, Rate = from.Rate };
         }
     }
 

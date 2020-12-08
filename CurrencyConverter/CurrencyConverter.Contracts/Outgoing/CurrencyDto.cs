@@ -4,10 +4,10 @@ namespace CurrencyConverter.Contracts.Outgoing
 {
     public class CurrencyDto
     {
-        public string CurrencyName { get; set; }
+        public string Code { get; set; }
 
-        public char CurrencySymbol { get; set; }
+        public string Symbol { get; set; }
 
-        public DateTime CurrencyDate { get; set; }
+        public decimal Rate { get; set; }
     }
 }

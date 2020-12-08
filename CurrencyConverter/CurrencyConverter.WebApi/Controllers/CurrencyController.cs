@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CurrencyConverter.Contracts.Outgoing;
 using CurrencyConverter.Services.Mapper;
@@ -10,37 +12,56 @@ namespace CurrencyConverter.WebApi.Controllers
     public class CurrencyController : ControllerBase
     {
 
-        private readonly ICurrencyService _scheduleService;
+        private readonly ICurrencyService _currencyService;
 
-        public CurrencyController(ICurrencyService scheduleService)
+        public CurrencyController(ICurrencyService currencyService)
         {
-            _scheduleService = scheduleService;
+            _currencyService = currencyService;
         }
 
         [HttpGet]
-        [Route("schedule")]
+        [Route("list")]
         [ProducesResponseType(typeof(CurrencyDto), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetScheduleByName([FromQuery] string lecturerFirstName, string lecturerLastName)
+        public async Task<IActionResult> GetCurrencyByCode([FromQuery] string code)
         {
-            if (string.IsNullOrEmpty(lecturerFirstName) || string.IsNullOrEmpty(lecturerLastName))
+            if (string.IsNullOrEmpty(code))
             {
-                return BadRequest("Lecturer first and last name must be provided");
+                return BadRequest("Currency code must be provided");
             }
 
-            var schedule = _scheduleService.GetCurrencyByName(lecturerFirstName, lecturerLastName).ToDto();
+            var currency = _currencyService.GetCurrencyByCode(code).ToDto();
 
-            return Ok(schedule);
+            return Ok(currency);
         }
 
         [HttpGet]
         [Route("currency")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(IList<CurrencyDto>), 200)]
         public async Task<IActionResult> GetCurrencyList()
         {
-            var list = new List<string> {"Euro", "Dollar"};
+            //var list = new List<string> {"Euro", "Dollar"};
+            var temp = _currencyService.GetCurrencyList();
+            IList<CurrencyDto> list = temp.Select(currency => currency.ToDto()).ToList();
             return Ok(list);
+        }
+
+        [HttpGet]
+        [Route("rate")]
+        [ProducesResponseType(typeof(decimal), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetCustomRate([FromQuery] string currencyCode1, string currencyCode2)
+        {
+            if (string.IsNullOrEmpty(currencyCode1) || string.IsNullOrEmpty(currencyCode2))
+            {
+                return BadRequest("Currency code must be provided");
+            }
+
+            var rate = _currencyService.GetCustomRate(currencyCode1, currencyCode2);
+
+            return Ok(rate);
         }
     }
 }
