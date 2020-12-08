@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
-    public class AlternativeSavingCalculator : PageModel
+    public class AlternativeSavingCalculator
     {
         private static decimal RegularSavingValue { get; } = 0.25M;
         private static decimal MaximalSavingValue { get; } = 0.1M;
@@ -37,14 +36,7 @@ namespace ePiggyWeb.DataManagement.Saving
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
                 IEntryList expenses;
-                if (!generateRandomData)
-                {
-                    expenses = entryList.GetBy((Importance)i);
-                }
-                else
-                {
-                    expenses = expensesRandomList.GetBy((Importance)i);
-                }
+                expenses = !generateRandomData ? entryList.GetBy((Importance)i) : expensesRandomList.GetBy((Importance)i);
 
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)
@@ -70,7 +62,7 @@ namespace ePiggyWeb.DataManagement.Saving
                             break;
                         default:
                             throw new Exception("Unexpected saving type");
-                    };
+                    }
                     entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
 
                     sumsOfAmountByImportanceAdjusted[i - 1] += amountAfterSaving;
@@ -86,7 +78,6 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 if(!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
                 {
-                    //TODO: inform user that his data is "incorrect" for calculations
                     var entrySuggestionsEmpty = new List<ISavingSuggestion>();
                     return new CalculationResults(entrySuggestionsEmpty, monthlySuggestions, 0);
                 }
@@ -112,15 +103,8 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 monthlySuggestions.Add(new SavingSuggestionByImportance(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
             }
-            if (!generateRandomData)
-            {
-                return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving);
-            }
-            else
-            {
-                return new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving * -1);
-            }
-            
+            return !generateRandomData ? new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving)
+                                       : new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving * -1);
         }
     }
 }
