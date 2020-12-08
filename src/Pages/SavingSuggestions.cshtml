@@ -142,17 +142,17 @@
         </div>
         <!----------------------------REGULAR----------------------------------------->
         <div class="collapse" id="regularSuggestions" data-parent="#SavingType">
-            @if (Model.MinimalSuggestions.TimesToRepeatSaving == 0)
+            @if (Model.RegularSuggestions.TimesToRepeatSaving == 0)
             {
                 <h3 class="text-light">You can't save up using this type!</h3>
             }
             else
             {
 
-                @if (Model.MinimalSuggestions.TimesToRepeatSaving < 0)
+                @if (Model.RegularSuggestions.TimesToRepeatSaving < 0)
                 {
                     <h4 class="text-warning">Example Data used, since You don't have enough entries!</h4>
-                    Model.MinimalSuggestions.TimesToRepeatSaving *= -1;
+                    Model.RegularSuggestions.TimesToRepeatSaving *= -1;
                 }
                 <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.RegularSuggestions.TimesToRepeatSaving months</span></h4>
                 <hr />
@@ -233,17 +233,17 @@
         </div>
         <!----------------------------MAXIMAL----------------------------------------->
         <div class="collapse" id="maximalSuggestions" data-parent="#SavingType">
-            @if (Model.MinimalSuggestions.TimesToRepeatSaving == 0)
+            @if (Model.MaximalSuggestions.TimesToRepeatSaving == 0)
             {
                 <h3 class="text-light">You can't save up using this type!</h3>
             }
             else
             {
 
-                @if (Model.MinimalSuggestions.TimesToRepeatSaving < 0)
+                @if (Model.MaximalSuggestions.TimesToRepeatSaving < 0)
                 {
                     <h4 class="text-warning">Example Data used, since You don't have enough entries!</h4>
-                    Model.MinimalSuggestions.TimesToRepeatSaving *= -1;
+                    Model.MaximalSuggestions.TimesToRepeatSaving *= -1;
                 }
                 <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MaximalSuggestions.TimesToRepeatSaving months</span></h4>
                 <hr />
