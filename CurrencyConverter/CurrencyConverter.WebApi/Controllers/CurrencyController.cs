@@ -20,7 +20,7 @@ namespace CurrencyConverter.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("list")]
+        [Route("currency")]
         [ProducesResponseType(typeof(CurrencyDto), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -31,17 +31,21 @@ namespace CurrencyConverter.WebApi.Controllers
                 return BadRequest("Currency code must be provided");
             }
 
-            var currency = _currencyService.GetCurrencyByCode(code).ToDto();
+            var currency = _currencyService.GetCurrencyByCode(code);
 
-            return Ok(currency);
+            if (currency is null)
+            {
+                return new BadRequestResult();
+            }
+
+            return Ok(currency.ToDto());
         }
 
         [HttpGet]
-        [Route("currency")]
+        [Route("list")]
         [ProducesResponseType(typeof(IList<CurrencyDto>), 200)]
         public async Task<IActionResult> GetCurrencyList()
         {
-            //var list = new List<string> {"Euro", "Dollar"};
             var temp = _currencyService.GetCurrencyList();
             IList<CurrencyDto> list = temp.Select(currency => currency.ToDto()).ToList();
             return Ok(list);
@@ -60,6 +64,11 @@ namespace CurrencyConverter.WebApi.Controllers
             }
 
             var rate = _currencyService.GetCustomRate(currencyCode1, currencyCode2);
+
+            if (rate is null)
+            {
+                return new BadRequestResult();
+            }
 
             return Ok(rate);
         }

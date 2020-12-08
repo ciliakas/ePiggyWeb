@@ -9,7 +9,7 @@ namespace CurrencyConverter.Services.Services
 
         public IList<Currency> GetCurrencyList();
 
-        public decimal GetCustomRate(string currencyCode1, string currencyCode2);
+        public decimal? GetCustomRate(string currencyCode1, string currencyCode2);
 
         //public 
     }
