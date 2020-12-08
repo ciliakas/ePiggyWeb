@@ -17,7 +17,7 @@ namespace CurrencyConverter.Services.Services
 
         private IEnumerable<Currency> GetECBList()
         {
-            IList<Currency> list = new List<Currency> { new Currency { Name = "", Code = "EUR", Rate = 1, Symbol = null } };
+            IList<Currency> list = new List<Currency> { new Currency { Code = "EUR", Rate = 1 } };
 
             var doc = new XmlDocument();
             doc.Load(@"http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml");
@@ -30,9 +30,7 @@ namespace CurrencyConverter.Services.Services
                 if (node.Attributes == null) continue;
                 var rate = new Currency
                 {
-                    Name = "",
                     Code = node.Attributes["currency"].Value,
-                    Symbol = null,
                     Rate = decimal.Parse(node.Attributes["rate"].Value, NumberStyles.Any, new CultureInfo("en-Us"))
                 };
                 list.Add(rate);
@@ -49,7 +47,7 @@ namespace CurrencyConverter.Services.Services
             var list =
                 from ecbCurrency in ecbList
                 join symbolCurrency in symbolList on ecbCurrency.Code equals symbolCurrency.Code
-                select new Currency{ Name = symbolCurrency.Name, Code = symbolCurrency.Code, Symbol = symbolCurrency.Symbol, Rate = ecbCurrency.Rate }; //produces flat sequence
+                select new Currency { Name = symbolCurrency.Name, Code = symbolCurrency.Code, Symbol = symbolCurrency.Symbol, Rate = ecbCurrency.Rate }; //produces flat sequence
 
 
             return list;
@@ -68,7 +66,7 @@ namespace CurrencyConverter.Services.Services
                 return null;
             }
 
-            var rate = decimal.Round(currency2.Rate / currency1.Rate,4);
+            var rate = decimal.Round(currency2.Rate / currency1.Rate, 4);
 
             return rate;
         }
@@ -96,13 +94,7 @@ namespace CurrencyConverter.Services.Services
                         symbol.Add(tempStr);
                     }
                 }
-                var rate = new Currency
-                {
-                    Name = node.InnerText,
-                    Code = node.Attributes["code"].Value,
-                    Symbol = symbol,
-                    Rate = 0
-                };
+                var rate = new Currency { Name = node.InnerText, Code = node.Attributes["code"].Value, Symbol = symbol };
                 list.Add(rate);
             }
 
