@@ -14,11 +14,13 @@ else
 {
     <form method="get" class="mt-5">
         <input type="hidden" name="handler" value="Filter" />
-        <label class="text-light">Period:</label>
-        <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
-        <label class="text-light"> - </label>
-        <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
-        <input type="submit" value="Filter" class="btn btn-warning ml-5" />
+        <label class="text-light col-md-4">Period:</label>
+        <div class="row justify-content-center">
+            <input class="col-md-3 col-sm-5 col-5" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+            <label class="text-light ml-2 mr-2"> - </label>
+            <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+        </div>
+        <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
 }
@@ -32,11 +34,11 @@ else
 }
 else
 {
-    <h4 class="text-light">This period: Income: @NumberFormatter.FormatCurrency(Model.Income) / Expenses: @NumberFormatter.FormatCurrency(Model.Expenses)</h4>
-    <h4 class="text-light">Balance: @NumberFormatter.FormatCurrency(Model.Income - Model.Expenses)</h4>
+    <h4 class="text-light total-graphs">This period: Income: @NumberFormatter.FormatCurrency(Model.Income) / Expenses: @NumberFormatter.FormatCurrency(Model.Expenses)</h4>
+    <h4 class="text-light total-graphs">Balance: @NumberFormatter.FormatCurrency(Model.Income - Model.Expenses)</h4>
 }
 <div class="container p-0 mt-3 mb-5">
-    <div class="col-12" id="graph">
+    <div class="col-lg-12" id="graph">
         <div class="spinner-border text-warning loader" role="status">
             <span class="sr-only">Loading...</span>
         </div>
@@ -47,6 +49,11 @@ else
 
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    $(window).resize(function () {
+        drawChart();
+    });
+</script>
 <script type="text/javascript">
     // Load google charts
     google.charts.load('current', { 'packages': ['corechart'] });
@@ -64,11 +71,13 @@ else
         var options = {
             'title': 'Income/expenses comparison',
             'height': 600,
+            'width': '100%',
             'vAxis': { 'textStyle': { 'color': '#FFF' }},
             'backgroundColor': { 'fill': 'transparent' },
             'colors': ['#F44336', '#3F51B5'],
+            'legend': { 'position': 'top', 'maxLines': 2 },
             'legendTextStyle': { color: '#FFF' },
-            'titleTextStyle': { color: '#FFF' },
+            'titleTextStyle': { color: '#FFF', bold: 'true', fontSize: 16 },
             'hAxis': { 'textStyle': { 'color': '#FFF' } }
         };
 

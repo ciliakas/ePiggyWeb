@@ -10,6 +10,7 @@ a:hover {
     text-align: center;
 }
 
+
 hr {
     width: 60%;
 }
@@ -24,9 +25,19 @@ html, body {
 }
 
 body {
+    /*Code to make footer stay always at the bottom of page*/
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column; /*END of that code*/
     font-family: Montserrat;
     text-align: center;
     background-color: #276dc1;
+}
+
+.content {
+    flex: 1;
+    /*Code to make footer stay always at the bottom of page*/
+    /*!!!THIS METHOD NOT COMPATIBLE WITH CHROME 27; IE 8;  OPERA 12; SAFARI 8.0*/
 }
 
 #siteHeader {
@@ -39,9 +50,10 @@ body {
     margin-bottom: 5%;
     color: #f9f7f7;
 }
+
 .title-image {
-    left: 5%;
-    bottom: 63%;
+    max-width: 100%;
+    height: auto;
 }
 
 .jumbotron {
@@ -90,9 +102,9 @@ body {
 }
 
 .testimonial-image {
-    width: 10%;
+    max-width: 15%;
     border-radius: 100%;
-    margin: 20px;
+    margin: 3%;
 }
 
 .testimonial-text {
@@ -101,34 +113,36 @@ body {
 }
 
 .footer {
-    margin-top: 4%;
-    padding-top:5%;
     background-color: #f9f7f7;
     color: #8f8f8f;
+    padding-top: 3%;
+}
+
+.footer-image {
+    margin: 0 10px 0;
 }
 
 /*LOGIN*/
 .login-container {
     padding-top: 5%;
-    width: 35%;
     margin-top: 5%;
     margin-bottom: 16%;
     text-align: center;
 }
 
 .login-form-2 {
-    padding: 10%;
+    padding: 5%;
     background: #0062cc;
     box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
 }
 
-    .login-form-2 h3 {
-        text-align: center;
-        color: #fff;
-    }
+.login-form-2 h3 {
+    text-align: center;
+    color: #fff;
+}
 
 .login-container form {
-    padding: 10%;
+    padding: 5%;
 }
 
 .btnSubmit {
@@ -137,12 +151,6 @@ body {
     padding: 1.5%;
     border: none;
     cursor: pointer;
-}
-
-.login-form-1 .btnSubmit {
-    font-weight: 600;
-    color: #fff;
-    background-color: #0062cc;
 }
 
 .login-form-2 .btnSubmit {
@@ -155,17 +163,6 @@ body {
     color: #fff;
     font-weight: 600;
     text-decoration: none;
-}
-
-.login-form-1 .ForgetPwd {
-    color: #0062cc;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.problematic-title {
-    /* font-size: calc([minimum size] + ([maximum size] - [minimum size]) * ((100vw - [minimum viewport width]) / ([maximum viewport width] - [minimum viewport width]))); */
-    font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
 }
 
 .container-error {
@@ -195,9 +192,10 @@ body {
 }
 
 .loader {
-    margin-bottom: 280px;
-    margin-top: 280px;
+    margin-bottom: 10%;
+    margin-top: 10%;
 }
+
 
 #particles-js canvas {
     display: block;
@@ -217,5 +215,31 @@ body {
     z-index: -10;
     top: 0;
     left: 0
+}
+
+.entry-table-side {
+    vertical-align: middle !important;
+}
+
+.entry-column {
+    text-align: left;
+}
+
+.bigger {
+    width: 20px;
+    height: 20px;
+}
+
+/*tablets (portrait)*/
+@media (max-width: 1024px) {
+  
+}
+
+/*smartphones*/
+@media (min-width: 320px) and (max-width: 480px) {
+    
+    .testimonial-text {
+        font-size: 2rem;
+    }
 }
 
