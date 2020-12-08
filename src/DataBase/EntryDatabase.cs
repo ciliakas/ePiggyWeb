@@ -196,10 +196,8 @@ namespace ePiggyWeb.DataBase
 
             var table = MyDataSet.Tables[0];
 
-            var items = new List<IEntry>();
-            foreach (DataRow row in table.Rows)
-            { 
-                var obj = new Entry
+            var items = (from DataRow row in table.Rows
+                select new Entry 
                 {
                     Id = row.Field<int>("Id"),
                     Amount = row.Field<decimal>("Amount"),
@@ -208,10 +206,8 @@ namespace ePiggyWeb.DataBase
                     Recurring = row.Field<bool>("IsMonthly"),
                     Title = row.Field<string>("Title"),
                     UserId = row.Field<int>("UserId")
-                } as IEntry;
+                } as IEntry).ToList();
 
-                items.Add(obj);
-            }
             list.AddRange(items);
             return list;
         }
