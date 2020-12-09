@@ -29,6 +29,11 @@ namespace ePiggyWeb.Pages
         public string PasswordConfirm { get; set; }
 
         public string ErrorMessage = "";
+        
+        [BindProperty]
+        public int Currency { get; set; }
+        [BindProperty] 
+        public bool Recalculate { get; set; }
 
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
@@ -73,7 +78,19 @@ namespace ePiggyWeb.Pages
                 _logger.LogInformation(ex.ToString());
                 return Page();
             }
-           
+        }
+
+        //public async Task<IActionResult> OnPostCurrency()
+        public IActionResult OnPostCurrency()
+        {
+            //bool ar perskaiciuoti - Recalculate
+            //int su valiutos pasirinkimu - Currency
+            /*
+             <option value="1">EUR</option>
+             <option value="2">USD</option>
+            pvz.: pasirinkus eur grazina 1, pasirinkus usd grazina 1 ir tt.
+             */
+            return Redirect("/index");
         }
 
         public async Task<IActionResult> OnPostDeleteAccount()
