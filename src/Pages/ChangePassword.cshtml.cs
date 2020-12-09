@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -35,6 +36,9 @@ namespace ePiggyWeb.Pages
         [BindProperty] 
         public bool Recalculate { get; set; }
 
+        [BindProperty]
+        public List<string> CurrencyOptions { get; set; }
+
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
         public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger)
@@ -51,6 +55,8 @@ namespace ePiggyWeb.Pages
             {
                 return RedirectToPage("/index");
             }
+            //currency options nuskaitymo simuliacija
+            CurrencyOptions = new List<string>() { "EUR", "USD", "GBP", "RUB", "TestChange" };
             return Page();
         }
 
