@@ -21,16 +21,16 @@ namespace ePiggyWeb.Pages
 
         public async Task OnGet()
         {
-            var currencyConverter = new CurrencyConverter(HttpClient);
-            var list = await currencyConverter.GetList(); 
-            var sb = new StringBuilder();
+            //var currencyConverter = new CurrencyConverter(HttpClient);
+            //var list = await currencyConverter.GetList(); 
+            //var sb = new StringBuilder();
 
-            foreach (var currency in list)
-            {
-                sb.AppendLine(currency.GetSymbol());
-            }
+            //foreach (var currency in list)
+            //{
+            //    sb.AppendLine(currency.GetSymbol());
+            //}
 
-            @ViewData["IncomeList"] = sb.ToString();
+            //@ViewData["IncomeList"] = sb.ToString();
         }
     }
 }
