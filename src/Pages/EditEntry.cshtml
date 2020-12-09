@@ -22,9 +22,7 @@
     <input asp-for="Entry.Id" type="hidden" />
     <input asp-for="Entry.UserId" type="hidden" />
     <input class="mt-2" asp-for="Title" type="text" />
-    <span asp-validation-for="Title" class="text-danger"></span>
     <input class="mt-2" asp-for="Entry.Amount" type="text" />
-    <span asp-validation-for="Entry.Amount" class="text-danger"></span>
     <input class="mt-2" asp-for="Entry.Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />
     @if (Model.EntryTypeInt == 1)
     {
@@ -48,7 +46,6 @@
             <option value="5">Unnecessary</option>
         </select>
     }
-    <span asp-validation-for="Entry.Importance" class="text-danger"></span>
     <label class="text-light ml-3">Is Monthly?</label>
     @if (@Model.Entry.Recurring)
     {
@@ -59,9 +56,13 @@
         <input class="mt-2" asp-for="Entry.Recurring" type="checkbox" />
     }
     <br />
+    <div class="row justify-content-center">
+        <span asp-validation-for="Title" class="text-danger"></span>
+        <span asp-validation-for="Entry.Amount" class="text-danger"></span>
+        <span asp-validation-for="Entry.Importance" class="text-danger"></span>
+    </div>
     <input type="submit" value="Save" class="btn btn-primary mt-2" />
     <input asp-page-handler="Cancel" class="btn btn-danger ml-2 mt-2" type="submit" value="Cancel">
-
     <br />
     <div class="container p-0 mt-5 mb-4">
         <h4 class="text-info">Quotes by famous people</h4>
