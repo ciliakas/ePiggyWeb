@@ -18,32 +18,47 @@
 <!--Base values are taken from already existing Entry-->
 <form method="post" class="mb-5">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="EntryTypeInt"  type="hidden"/>
-    <input asp-for="Entry.Id" type="hidden"/>
+    <input asp-for="EntryTypeInt" type="hidden" />
+    <input asp-for="Entry.Id" type="hidden" />
     <input asp-for="Entry.UserId" type="hidden" />
-    <input asp-for="Title" type="text"  />
+    <input class="mt-2" asp-for="Title" type="text" />
     <span asp-validation-for="Title" class="text-danger"></span>
-    <input asp-for="Entry.Amount" type="text"  />
+    <input class="mt-2" asp-for="Entry.Amount" type="text" />
     <span asp-validation-for="Entry.Amount" class="text-danger"></span>
-    <input asp-for="Entry.Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />
-    <select asp-for="Entry.Importance" class="ml-3">
-        <option hidden disabled selected value="@Model.Entry.Importance">@((Importance)Model.Entry.Importance)</option>
-        <option value="1">Necessary</option>
-        <option value="2">High</option>
-        <option value="3">Medium</option>
-        <option value="4">Low</option>
-        <option value="5">Unnecessary</option>
-    </select>
+    <input class="mt-2" asp-for="Entry.Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />
+    @if (Model.EntryTypeInt == 1)
+    {
+        <select class="mt-2" asp-for="Entry.Importance" class="ml-3">
+            <option hidden disabled selected value="@Model.Entry.Importance">@((Attainability)Model.Entry.Importance)</option>
+            <option value="1">Regularly</option>
+            <option value="2">Often</option>
+            <option value="3">Sometimes</option>
+            <option value="4">Rarely</option>
+            <option value="5">Exceptionally</option>
+        </select>
+    }
+    else
+    {
+        <select class="mt-2" asp-for="Entry.Importance" class="ml-3">
+            <option hidden disabled selected value="@Model.Entry.Importance">@((Importance)Model.Entry.Importance)</option>
+            <option value="1">Necessary</option>
+            <option value="2">High</option>
+            <option value="3">Medium</option>
+            <option value="4">Low</option>
+            <option value="5">Unnecessary</option>
+        </select>
+    }
     <span asp-validation-for="Entry.Importance" class="text-danger"></span>
     <label class="text-light ml-3">Is Monthly?</label>
     @if (@Model.Entry.Recurring)
     {
-        <input asp-for="Entry.Recurring" type="checkbox" checked />
+        <input class="mt-2" asp-for="Entry.Recurring" type="checkbox" checked />
     }
     else
     {
-        <input asp-for="Entry.Recurring" type="checkbox" />
+        <input class="mt-2" asp-for="Entry.Recurring" type="checkbox" />
     }
+    <br />
     <input type="submit" value="Save" class="btn btn-primary ml-5" />
     <input asp-page-handler="Cancel" class="btn btn-danger ml-2" type="submit" value="Cancel">
 
@@ -51,7 +66,7 @@
     <div class="container p-0 mt-5 mb-4">
         <h4 class="text-info">Quotes by famous people</h4>
     </div>
-    
+
     <!--Bootstrap cards just to fill space-->
     <div class="card-deck mt-2 mb-5">
         <div class="card">
