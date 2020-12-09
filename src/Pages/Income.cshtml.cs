@@ -1,19 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Net;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -30,7 +23,7 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
-        [StringLength(30)]
+        [StringLength(25, ErrorMessage = "Too long title!")]
         public string Title { get; set; }
         [Required(ErrorMessage = "Amount Required.")]
         [BindProperty]
