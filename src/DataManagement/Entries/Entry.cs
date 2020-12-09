@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Goals;
@@ -10,7 +11,9 @@ namespace ePiggyWeb.DataManagement.Entries
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        [StringLength(25, ErrorMessage = "Too long title!")]
         public string Title {get; set; }
+        [Range(0, 99999999.99, ErrorMessage = "Amount out of range!")]
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
         public bool Recurring { get; set; }

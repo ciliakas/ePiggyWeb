@@ -24,11 +24,9 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
-        [StringLength(25, ErrorMessage = "Too long title!")]
         public string Title { get; set; }
         [Required(ErrorMessage = "Amount Required.")]
         [BindProperty]
-        [Range(0, 99999999.99, ErrorMessage = "Amount out of range!")]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
