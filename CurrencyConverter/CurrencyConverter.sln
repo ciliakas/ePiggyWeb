@@ -7,9 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyConverter.WebApi", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyConverter.Contracts", "CurrencyConverter.Contracts\CurrencyConverter.Contracts.csproj", "{D1D6F6FD-F7AB-4CA3-9EA2-824F40053C19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.Domain", "CurrencyConverter.Domain\CurrencyConverter.Domain.csproj", "{D553CD23-E938-44AB-B248-080DA8418186}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyConverter.Domain", "CurrencyConverter.Domain\CurrencyConverter.Domain.csproj", "{D553CD23-E938-44AB-B248-080DA8418186}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.Services", "CurrencyConverter.Services\CurrencyConverter.Services.csproj", "{E337F8BB-5469-498D-B033-978D6A7339E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyConverter.Services", "CurrencyConverter.Services\CurrencyConverter.Services.csproj", "{E337F8BB-5469-498D-B033-978D6A7339E6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0DD6D3B6-92CD-4507-B14C-F02A49EF0C2C}"
+	ProjectSection(SolutionItems) = preProject
+		SymbolSheet.xml = SymbolSheet.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

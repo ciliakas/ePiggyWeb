@@ -68,11 +68,11 @@ namespace ePiggyWeb.Pages
                 stb.AppendLine(str);
             }
 
-            var a = Char.ConvertFromUtf32(76);
+            var a = Char.ConvertFromUtf32(8378);
 
             //var symbol = ChrW(&H20B1);
 
-            @ViewData["IncomeList"] = stb.ToString();
+            @ViewData["IncomeList"] = a.ToString();
         }
     }
 }

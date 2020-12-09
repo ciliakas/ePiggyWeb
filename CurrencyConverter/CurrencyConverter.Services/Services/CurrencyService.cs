@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using CurrencyConverter.Domain;
 
@@ -18,16 +20,18 @@ namespace CurrencyConverter.Services.Services
         private IEnumerable<Currency> GetECBList()
         {
             IList<Currency> list = new List<Currency> { new Currency { Code = "EUR", Rate = 1 } };
-
             var doc = new XmlDocument();
             doc.Load(@"http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml");
-
             var nodes = doc.SelectNodes("//*[@currency]");
 
-            if (nodes == null) return list;
+            if (nodes is null)
+            {
+                return list;
+            }
+
             foreach (XmlNode node in nodes)
             {
-                if (node.Attributes == null) continue;
+                if (node.Attributes is null) continue;
                 var rate = new Currency
                 {
                     Code = node.Attributes["currency"].Value,
@@ -47,15 +51,14 @@ namespace CurrencyConverter.Services.Services
             var list =
                 from ecbCurrency in ecbList
                 join symbolCurrency in symbolList on ecbCurrency.Code equals symbolCurrency.Code
-                select new Currency { Name = symbolCurrency.Name, Code = symbolCurrency.Code, Symbol = symbolCurrency.Symbol, Rate = ecbCurrency.Rate }; //produces flat sequence
-
+                select new Currency { Name = symbolCurrency.Name, Code = symbolCurrency.Code, Symbol = symbolCurrency.Symbol, Rate = ecbCurrency.Rate };
 
             return list;
         }
 
         public decimal? GetCustomRate(string currencyCode1, string currencyCode2)
         {
-            var list = GetCurrencyList();
+            var list = GetECBList();
 
             var currencies = list as Currency[] ?? list.ToArray();
             var currency1 = currencies.FirstOrDefault(x => x.Code == currencyCode1);
@@ -74,17 +77,22 @@ namespace CurrencyConverter.Services.Services
 
         public IList<Currency> GetCurrencySymbolList()
         {
-            IList<Currency> list = new List<Currency>();
-
+            var assembly = Assembly.GetExecutingAssembly();
             var doc = new XmlDocument();
-            doc.Load(@"https://gist.githubusercontent.com/bzerangue/5484121/raw/9ded4c5e91a395c76d4a5ccbe8688272c7ea0ed6/currency-symbols.xml");
+            using var stream = assembly.GetManifestResourceStream("CurrencyConverter.Services.SymbolSheet.xml");
+            doc.Load(stream ?? throw new InvalidOperationException());
 
             var nodes = doc.SelectNodes("//*[@code]");
+            IList<Currency> list = new List<Currency>();
 
-            if (nodes == null) return list;
+            if (nodes is null)
+            {
+                return list;
+            }
+
             foreach (XmlNode node in nodes)
             {
-                if (node.Attributes == null) continue;
+                if (node.Attributes is null) continue;
                 var symbolString = node.Attributes["unicode-decimal"].Value.Split(',');
                 IList<int> symbol = new List<int>();
                 foreach (var str in symbolString)

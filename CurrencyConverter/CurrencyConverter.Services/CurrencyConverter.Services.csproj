@@ -10,4 +10,8 @@
 		<ProjectReference Include="..\CurrencyConverter.Domain\CurrencyConverter.Domain.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<EmbeddedResource Include="..\Resources\SymbolSheet.xml" />
+	</ItemGroup>
+
 </Project>
