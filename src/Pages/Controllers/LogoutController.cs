@@ -10,6 +10,8 @@ namespace ePiggyWeb.Pages.Controllers
         public async Task<IActionResult> LogoutTask()
         {
             await HttpContext.SignOutAsync();
+            Response.Cookies.Delete("StartDate");
+            Response.Cookies.Delete("EndDate");
             return Redirect("/Index");
         }
     }

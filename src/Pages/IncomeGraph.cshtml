@@ -14,11 +14,12 @@ else
 {
     <form method="get" class="mt-5">
         <input type="hidden" name="handler" value="Filter" />
-        <label class="text-light">Period:</label>
-        <input for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
-        <label class="text-light"> - </label>
-        <input for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
-        <input type="submit" value="Filter" class="btn btn-warning ml-5" />
+        <label class="text-light col-md-4">Period:</label>
+        <div class="row justify-content-center">
+            <input class="col-md-3 col-sm-5 col-5" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+            <label class="text-light ml-2 mr-2"> - </label>
+            <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" /></div>
+        <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
 }
@@ -62,17 +63,17 @@ else
     // Draw the chart and set the chart values
     function drawChart() {
         var data = google.visualization.arrayToDataTable([
-            ['Importance', 'Amount'],
-            ['Necessary', @Model.Income.GetBy(Importance.Necessary).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['High', @Model.Income.GetBy(Importance.High).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['Medium', @Model.Income.GetBy(Importance.Medium).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['Low', @Model.Income.GetBy(Importance.Low).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['Unnecessary', @Model.Income.GetBy(Importance.Unnecessary).GetSum().ToString(CultureInfo.InvariantCulture)]
+            ['Attainability', 'Amount'],
+            ['Regularly', @Model.Income.GetBy(Importance.Necessary).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Often', @Model.Income.GetBy(Importance.High).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Sometimes', @Model.Income.GetBy(Importance.Medium).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Rarely', @Model.Income.GetBy(Importance.Low).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Exceptionally', @Model.Income.GetBy(Importance.Unnecessary).GetSum().ToString(CultureInfo.InvariantCulture)]
         ]);
 
         // Optional; add a title and set the width and height of the chart
         var options = {
-            'title': 'Income by importance',
+            'title': 'Income by attainability',
             'height': 600,
             'width': '100%',
             'vAxis': { 'textStyle': { 'color': '#FFF' }, 'gridlines': { 'count': 5 } },

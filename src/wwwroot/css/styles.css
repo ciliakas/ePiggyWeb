@@ -25,11 +25,20 @@ html, body {
 }
 
 body {
+    /*Code to make footer stay always at the bottom of page*/
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column; /*END of that code*/
     font-family: Montserrat;
     text-align: center;
     background-color: #276dc1;
 }
 
+.content {
+    flex: 1;
+    /*Code to make footer stay always at the bottom of page*/
+    /*!!!THIS METHOD NOT COMPATIBLE WITH CHROME 27; IE 8;  OPERA 12; SAFARI 8.0*/
+}
 
 #siteHeader {
     margin: 2% 20% 1%;
@@ -42,9 +51,8 @@ body {
     color: #f9f7f7;
 }
 
-.title-image {  
+.title-image {
     max-width: 100%;
-    width: 30%;
     height: auto;
 }
 
@@ -94,7 +102,7 @@ body {
 }
 
 .testimonial-image {
-    width: 10%;
+    max-width: 15%;
     border-radius: 100%;
     margin: 3%;
 }
@@ -117,7 +125,6 @@ body {
 /*LOGIN*/
 .login-container {
     padding-top: 5%;
-    max-width: 50%;
     margin-top: 5%;
     margin-bottom: 16%;
     text-align: center;
@@ -209,54 +216,30 @@ body {
     top: 0;
     left: 0
 }
+
+.entry-table-side {
+    vertical-align: middle !important;
+}
+
+.entry-column {
+    text-align: left;
+}
+
+.bigger {
+    width: 20px;
+    height: 20px;
+}
+
 /*tablets (portrait)*/
 @media (max-width: 1024px) {
-
-    .login-container {
-        max-width: 80%;
-        margin-bottom: 25%;
-        margin-top: 12%;
-    }
-
-    .testimonial-image {
-        width: 20%;
-    }
-    .title-image {
-        width: 50%;
-    }
+  
 }
 
 /*smartphones*/
 @media (min-width: 320px) and (max-width: 480px) {
-    .login-container {
-        max-width: 100%;
-        margin-bottom: 40%;
-        margin-top: 20%;
-    }
-
+    
     .testimonial-text {
         font-size: 2rem;
-    }
-
-    .testimonial-image {
-        width: 20%;
-    }
-
-    .title-image {
-        width: 80%;
-    }
-
-    #testimonials {
-        margin-top: 10%;
-    }
-
-    .footer {
-        margin-top: 10%;
-        padding-top: 5%;
-    }
-    .total-graphs {
-        font-size: 1.1rem;
-        font-weight: bold;
     }
 }
 

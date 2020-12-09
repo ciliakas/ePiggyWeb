@@ -1,12 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -21,18 +28,18 @@ namespace ePiggyWeb.Pages
         public bool WasException { get; set; }
         public IEntryList Income { get; set; }
 
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
         [StringLength(30)]
         public string Title { get; set; }
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Amount Required.")]
         [BindProperty]
-        [Range(0, 99999999.99)]
+        [Range(0, 99999999.99, ErrorMessage = "Amount out of range!")]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
         [BindProperty]
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Importance Required.")]
         public int Importance { get; set; }
         [BindProperty]
         public bool Recurring { get; set; }
@@ -59,31 +66,22 @@ namespace ePiggyWeb.Pages
 
         public async Task OnGet()
         {
-            var today = DateTime.Now;
-            StartDate = new DateTime(today.Year, today.Month, 1);
-            EndDate = DateTime.Today;
+            TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
+            StartDate = tempStartDate;
+            EndDate = tempEndDate;
+
             await SetData();
         }
-
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            if (startDate > endDate)
-            {
-                ErrorMessage = "Start date is bigger than end date!";
-                var today = DateTime.Now;
-                StartDate = new DateTime(today.Year, today.Month, 1);
-                EndDate = DateTime.Today;
-            }
-            else
-            {
-                StartDate = startDate;
-                EndDate = endDate;
-            }
+            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request,out var tempStartDate, out var tempEndDate);
+            StartDate = tempStartDate;
+            EndDate = tempEndDate;
+
             await SetData();
             return Page();
         }
-
 
         public async Task<IActionResult> OnPostNewEntry()
         {
