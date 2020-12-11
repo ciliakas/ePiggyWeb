@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -52,6 +53,8 @@ namespace ePiggyWeb.Pages
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
 
+        public int PageSize = 20;
+
         public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration)
         {
             EntryDatabase = entryDatabase;
@@ -59,12 +62,13 @@ namespace ePiggyWeb.Pages
             Configuration = configuration;
         }
 
-        public async Task OnGet()
+        public async Task OnGet(int page = 1)
         {
             TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
             StartDate = tempStartDate;
             EndDate = tempEndDate;
-            await SetData();
+            await SetData(page);
+           // Debug.WriteLine("\n\n\n\n\n" + page);
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
@@ -137,13 +141,13 @@ namespace ePiggyWeb.Pages
                 return RedirectToPage("/expenses");
         }
 
-        private async Task SetData()
+        private async Task SetData(int page = 1)
         {
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+                Expenses = (IEntryList) (entryList.GetFrom(StartDate).GetTo(EndDate)).Skip((page-1) * PageSize).Take(PageSize);
                 AllExpenses = entryList.GetSum();
             }
             catch (Exception ex)
