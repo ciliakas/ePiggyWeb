@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -22,6 +21,7 @@ namespace ePiggyWeb.Pages
         private readonly ILogger<ExpensesModel> _logger;
         public bool WasException { get; set; }
         public IEntryList Expenses { get; set; }
+        public IEnumerable<IEntry> ExpensesToDisplay { get; set; }
 
         [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
@@ -53,7 +53,12 @@ namespace ePiggyWeb.Pages
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
 
-        public int PageSize = 20;
+        [BindProperty(SupportsGet = true)]
+        public int CurrentPage { get; set; } = 1;  
+        public int PageSize = 10;
+        public int TotalPages => (int) Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
+        public bool ShowPrevious => CurrentPage > 1;
+        public bool ShowNext => CurrentPage < TotalPages;
 
         public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration)
         {
@@ -62,13 +67,12 @@ namespace ePiggyWeb.Pages
             Configuration = configuration;
         }
 
-        public async Task OnGet(int page = 1)
+        public async Task OnGet()
         {
             TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
             StartDate = tempStartDate;
             EndDate = tempEndDate;
-            await SetData(page);
-           // Debug.WriteLine("\n\n\n\n\n" + page);
+            await SetData();
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
@@ -141,20 +145,22 @@ namespace ePiggyWeb.Pages
                 return RedirectToPage("/expenses");
         }
 
-        private async Task SetData(int page = 1)
+        private async Task SetData()
         {
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = (IEntryList) (entryList.GetFrom(StartDate).GetTo(EndDate)).Skip((page-1) * PageSize).Take(PageSize);
-                AllExpenses = entryList.GetSum();
+                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);//If we want to remove this I need to get total amount of these as well as their sum
+                ExpensesToDisplay = Expenses.OrderByDescending(x=> x.Date).Skip((CurrentPage - 1) * PageSize).Take(PageSize);//I think this should be done by backend?
+                AllExpenses = Expenses.GetSum();
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
                 Expenses = EntryList.RandomList(Configuration, EntryType.Expense);
+                ExpensesToDisplay = Expenses;
                 AllExpenses = Expenses.GetSum();
             }
         }
