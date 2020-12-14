@@ -55,7 +55,7 @@ namespace ePiggyWeb.Pages
 
         [BindProperty(SupportsGet = true)]
         public int CurrentPage { get; set; } = 1;
-        public int PageSize = 10;
+        public const int PageSize = 10;
         public int TotalPages => (int)Math.Ceiling(decimal.Divide(Income.Count, PageSize));
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
