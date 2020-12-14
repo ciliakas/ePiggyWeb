@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="6.0.0" />
+		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="Serilog" Version="2.10.1-dev-01256" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00905" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\CurrencyConverter.Contracts\CurrencyConverter.Contracts.csproj" />
+		<ProjectReference Include="..\CurrencyConverter.Services\CurrencyConverter.Services.csproj" />
+	</ItemGroup>
+
+</Project>
