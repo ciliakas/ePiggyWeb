@@ -112,7 +112,7 @@ namespace ePiggyWeb.Pages
             
         }
 
-        public async Task<IActionResult> OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDelete()
         {
             try
             {
