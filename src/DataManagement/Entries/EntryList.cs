@@ -17,13 +17,19 @@ namespace ePiggyWeb.DataManagement.Entries
             EntryType = entryType;
         }
 
+        public EntryList(IEnumerable<IEntry> entryList)
+        {
+            if (entryList is null) throw new ArgumentException();
+            AddRange(entryList);
+        }
+
         private EntryList(EntryType entryType, IEnumerable<IEntry> entryList)
         {
             EntryType = entryType;
-            if (entryList is null) return;
+            if (entryList is null) throw new ArgumentException();
             AddRange(entryList);
         }
-        
+
         public IEntryList GetBy(Importance importance)
         {
             return new EntryList(EntryType, this.Where(x => x.Importance == (int)importance).ToList());
@@ -52,6 +58,11 @@ namespace ePiggyWeb.DataManagement.Entries
         public IEntryList GetUntilToday()
         {
             return new EntryList(EntryType, this.Where(x => x.Date <= DateTime.Today).ToList());
+        }
+
+        public IEntryList GetPage(int pageNumber, int pageSize)
+        {
+            return new EntryList(EntryType, this.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList());
         }
 
         public DateTime GetOldestEntryDate()
