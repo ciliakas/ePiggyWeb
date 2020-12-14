@@ -152,7 +152,7 @@ namespace ePiggyWeb.Pages
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);//If we want to remove this I need to get total amount of these as well as their sum
-                ExpensesToDisplay = Expenses.OrderByDescending(x=> x.Date).Skip((CurrentPage - 1) * PageSize).Take(PageSize);//I think this should be done by backend?
+                ExpensesToDisplay = Expenses.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
                 AllExpenses = Expenses.GetSum();
             }
             catch (Exception ex)

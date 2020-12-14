@@ -17,6 +17,7 @@ namespace ePiggyWeb.DataManagement.Entries
         public IEntryList GetTo(DateTime dateTime);
         public IEntryList GetBy(bool recurring);
         public IEntryList GetUntilToday();
+        public IEntryList GetPage(int pageNumber, int pageSize);
         public DateTime GetOldestEntryDate();
         public DateTime GetNewestEntryDate();
         public decimal GetSum();
