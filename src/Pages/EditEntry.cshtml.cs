@@ -15,8 +15,10 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public Entry Entry { get; set; }
 
-        [Required(ErrorMessage = "Required")]
+
+        [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
+        [StringLength(25, ErrorMessage = "Too long title!")]
         public string Title { get; set; }
 
         [BindProperty]

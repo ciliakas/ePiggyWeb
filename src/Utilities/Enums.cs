@@ -13,6 +13,16 @@
         Low,
         Unnecessary
     }
+
+    public enum Attainability
+    {
+        Regularly = 1,
+        Often,
+        Sometimes,
+        Rarely,
+        Exceptionally
+    }
+
     public enum SavingType
     {
         Maximal,
