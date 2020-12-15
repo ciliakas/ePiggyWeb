@@ -75,7 +75,7 @@ namespace ePiggyWeb.DataBase
 
             if (sqlConnection.State == ConnectionState.Closed)
             {
-                await sqlConnection.OpenAsync();
+                sqlConnection.Open();
             }
 
             var sqlCommand = new SqlCommand("UPDATE Goals SET Price = @Price, Title = @Title WHERE Id = @Id AND UserId = @UserId", sqlConnection);
@@ -84,7 +84,7 @@ namespace ePiggyWeb.DataBase
             sqlCommand.Parameters.AddWithValue("@UserId", userId);
             sqlCommand.Parameters.AddWithValue("@Price", newGoal.Amount);
             sqlCommand.Parameters.AddWithValue("@Title", newGoal.Title);
-            await sqlCommand.ExecuteNonQueryAsync();
+            sqlCommand.ExecuteNonQuery();
 
             sqlConnection.Close();
             return true;
