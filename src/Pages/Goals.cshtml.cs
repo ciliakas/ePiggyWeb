@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
@@ -19,10 +20,10 @@ namespace ePiggyWeb.Pages
     public class GoalsModel : PageModel
     {
         private readonly ILogger<GoalsModel> _logger;
-        public bool WasException { get; set; }
-        public Lazy<InternetParser> InternetParser;
-        public IGoalList Goals { get; set; }
-        public decimal Savings { get; set; }
+        public bool WasException { get; private set; }
+        private readonly Lazy<InternetParser> _internetParser;
+        public IGoalList Goals { get; private set; }
+        public decimal Savings { get; private set; }
         private int UserId { get; set; }
 
         [Required(ErrorMessage = "Required")]
@@ -39,15 +40,20 @@ namespace ePiggyWeb.Pages
         private EntryDatabase EntryDatabase { get; }
         private HttpClient HttpClient { get; }
         private IConfiguration Configuration { get; }
+        private UserDatabase UserDatabase { get; }
+        private CurrencyConverter CurrencyConverter { get; }
+        public string CurrencySymbol { get; private set; }
 
-        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration)
+        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
             _logger = logger;
             HttpClient = httpClient;
-            InternetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
+            _internetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
             Configuration = configuration;
+            UserDatabase = userDatabase;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task OnGet()
@@ -72,6 +78,17 @@ namespace ePiggyWeb.Pages
                 Goals = GoalList.RandomList(Configuration);
                 Savings = 0;
             }
+            finally
+            {
+                await SetCurrency();
+            }
+        }
+
+        private async Task SetCurrency()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var userModel = await UserDatabase.GetUserAsync(UserId);
+            CurrencySymbol = await CurrencyConverter.GetCurrencySymbol(userModel.Currency);
         }
 
         public async Task<IActionResult> OnPostNewGoal()
@@ -108,7 +125,7 @@ namespace ePiggyWeb.Pages
                 }
 
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var temp = await InternetParser.Value.ReadPriceFromCamel(Title);
+                var temp = await _internetParser.Value.ReadPriceFromCamel(Title);
                 await GoalDatabase.CreateAsync(temp, UserId);
             }
             catch (Exception ex)
