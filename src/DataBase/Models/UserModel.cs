@@ -10,7 +10,8 @@ namespace ePiggyWeb.DataBase.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-
+        [StringLength(3)]
+        public string Currency { get; set; }
     }
 
 }
