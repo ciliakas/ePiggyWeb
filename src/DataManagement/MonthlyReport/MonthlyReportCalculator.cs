@@ -104,22 +104,34 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             }
 
             Result.HasGoals = true;
-            var min = decimal.MaxValue;
-            var minGoal = new Goal();
-            var maxGoal = new Goal();
-            var max = 0M;
-            foreach (var item in Goals)
-            {
-                if (item.Amount >= max)
-                {
-                    max = item.Amount;
-                    maxGoal = (Goal)item;
-                }
+           
+          
 
-                if (item.Amount > min || item.Amount <= AllSavings) continue;
-                min = item.Amount;
-                minGoal = (Goal)item;
+            var maxGoal = Goals.Aggregate((expensive, next) => next.Amount >= expensive.Amount ? next : expensive);
+            var minGoal = Goals.Aggregate((cheapest, next) => (next.Amount <= cheapest.Amount && next.Amount >= AllSavings)  ? next : cheapest);
+
+            if (maxGoal.Amount < AllSavings && minGoal.Amount < AllSavings)
+            {
+                Result.HasGoals = false;
+                return;
             }
+            // var max = 0;
+            // var min = decimal.MaxValue;
+            // var minGoal = new Goal();
+            // var maxGoal = new Goal();
+
+            /* foreach (var item in Goals)
+             {
+                 if (item.Amount >= max)
+                 {
+                     max = item.Amount;
+                     maxGoal = (Goal)item;
+                 }
+
+                 if (item.Amount > min || item.Amount <= AllSavings) continue;
+                 min = item.Amount;
+                 minGoal = (Goal)item;
+             }*/
 
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;
