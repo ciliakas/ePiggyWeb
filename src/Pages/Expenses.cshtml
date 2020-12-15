@@ -108,17 +108,17 @@ else
                     <table class="table table-hover mb-0">
                         <tr class="bg-primary">
                             <th class="border-right entry-table-side" scope="col">
-                                <input class="bigger" type="checkbox" onClick="toggle(this)"/><br/>
+                                <input class="bigger" type="checkbox" onClick="toggle(this)" /><br />
                             </th>
                             <th colspan="2" scope="col">
                                 <h5 class="text-light">Expenses</h5>
                             </th>
                         </tr>
-                        @foreach (var item in Model.Expenses.OrderByDescending(x => x.Date))
+                        @foreach (var item in Model.ExpensesToDisplay)
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary border entry-table-side">
-                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id"/>
+                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id" />
                                 </td>
                                 <td class=" border-right-0 border-primary text-nowrap entry-column">
                                     <div class="row">
@@ -162,12 +162,24 @@ else
         </div>
     </div>
 </form>
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item  @(!Model.ShowPrevious ? "disabled" : "")">
+            <a class="page-link" asp-page="/expenses" asp-route-CurrentPage="@(Model.CurrentPage - 1)">Previous</a>
+        </li>
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(Model.CurrentPage == i? "active": "")"><a class="page-link" asp-page="/expenses" asp-route-CurrentPage="@i">@i</a></li>
+        }
+        <li class="page-item @(!Model.ShowNext? "disabled":"")"><a class="page-link" asp-page="/expenses" asp-route-CurrentPage="@(Model.CurrentPage + 1)">Next</a></li>
+    </ul>
+</nav>
 
-    
+
 <script language="JavaScript">
     function toggle(source) {
         checkboxes = document.getElementsByName('chkEntry');
-        for(var i=0, n=checkboxes.length;i<n;i++) {
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
             checkboxes[i].checked = source.checked;
         }
     }

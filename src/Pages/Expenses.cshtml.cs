@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
@@ -21,6 +22,7 @@ namespace ePiggyWeb.Pages
         private readonly ILogger<ExpensesModel> _logger;
         public bool WasException { get; set; }
         public IEntryList Expenses { get; set; }
+        public IEnumerable<IEntry> ExpensesToDisplay { get; set; }
 
         [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
@@ -51,6 +53,12 @@ namespace ePiggyWeb.Pages
 
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
+        [BindProperty(SupportsGet = true)]
+        public int CurrentPage { get; set; } = 1;
+        public int PageSize = 10;
+        public int TotalPages => (int)Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
+        public bool ShowPrevious => CurrentPage > 1;
+        public bool ShowNext => CurrentPage < TotalPages;
         private UserDatabase UserDatabase { get; }
         private CurrencyConverter CurrencyConverter { get; }
         public string CurrencySymbol { get; private set; }
@@ -116,7 +124,7 @@ namespace ePiggyWeb.Pages
             
         }
 
-        public async Task<IActionResult> OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDelete()
         {
             try
             {
@@ -155,14 +163,16 @@ namespace ePiggyWeb.Pages
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
-                AllExpenses = entryList.GetSum();
+                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);//If we want to remove this I need to get total amount of these as well as their sum
+                ExpensesToDisplay = Expenses.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
+                AllExpenses = Expenses.GetSum();
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
                 Expenses = EntryList.RandomList(Configuration, EntryType.Expense);
+                ExpensesToDisplay = Expenses;
                 AllExpenses = Expenses.GetSum();
             }
         }
