@@ -88,17 +88,17 @@
     <h3 class="text-light mt-3 mb-3"><span class="text-warning"><i class="mr-1 fas fa-coins"></i></span>Your Income:</h3>
     @if (Model.Data.DifferenceInIncome == 0)
     {
-        <h4 class="text-light"><span class="text-info"><i class="mr-1 fas fa-balance-scale"></i></span>Your income stayed the same as previous month.</h4>
+        <h4 class="text-light"><i class="mr-1 fas fa-balance-scale"></i>Your income stayed the same as previous month.</h4>
     }
     else if (Model.Data.DifferenceInIncome > 0)
     {
         <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-star"></i></span>Well done, your income increased!</h4>
-        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome)</h5>
+        <h5 class="text-light">By <span class="text-warning">@NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome)</span></h5>
     }
     else
     {
         <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-heart-broken"></i></span>You've earned less this month than previous one...</h4>
-        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome * -1)</h5>
+        <h5 class="text-light">By<span class="text-warning"> @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome * -1)</span></h5>
     }
 </div>
 <hr class="mt-5 mb-5" />
