@@ -160,12 +160,6 @@ namespace ePiggyWeb.DataBase
 
         public async Task<IEntry> ReadAsync(int id, int userId, EntryType entryType)
         {
-            IEntryModel dbEntry = entryType switch
-            {
-                EntryType.Income => await Database.Incomes.FirstOrDefaultAsync(
-                    x => x.Id == id && x.UserId == userId),
-                _ => await Database.Expenses.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId)
-            };
             return await ReadAsync(x => x.Id == id && x.UserId == userId, entryType);
         }
 
