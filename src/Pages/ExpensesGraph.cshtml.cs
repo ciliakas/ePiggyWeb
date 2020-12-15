@@ -1,6 +1,7 @@
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
@@ -27,19 +28,31 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
+        private UserDatabase UserDatabase { get; }
+        private CurrencyConverter CurrencyConverter { get; }
+        public string CurrencySymbol { get; private set; }
 
-        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger, IConfiguration configuration)
+        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
             Configuration = configuration;
+            UserDatabase = userDatabase;
+            CurrencyConverter = currencyConverter;
         }
         public async Task OnGet()
         {
             TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
             StartDate = tempStartDate;
             EndDate = tempEndDate;
+            await SetCurrency();
             await SetData();
+        }
+        private async Task SetCurrency()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var userModel = await UserDatabase.GetUserAsync(UserId);
+            CurrencySymbol = await CurrencyConverter.GetCurrencySymbol(userModel.Currency);
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
