@@ -149,21 +149,21 @@ namespace ePiggyWeb.DataBase
             {
                 foreach (var goal in goals)
                 {
-                    goal.Price = decimal.Round(goal.Price * rate, 2);
+                    goal.Price *= rate;
                 }
             }
             if (incomes != null)
             {
                 foreach (var income in incomes)
                 {
-                    income.Amount = decimal.Round(income.Amount * rate, 2);
+                    income.Amount *= rate;
                 }
             }
             if (expenses != null)
             {
                 foreach (var expense in expenses)
                 {
-                    expense.Amount = decimal.Round(expense.Amount * rate, 2);
+                    expense.Amount *= rate;
                 }
             }
 

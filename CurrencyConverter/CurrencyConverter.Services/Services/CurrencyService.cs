@@ -69,7 +69,7 @@ namespace CurrencyConverter.Services.Services
                 return null;
             }
 
-            var rate = decimal.Round(currency2.Rate / currency1.Rate, 4);
+            var rate = currency2.Rate / currency1.Rate;
 
             return rate;
         }
