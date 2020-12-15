@@ -33,6 +33,22 @@ namespace ePiggyWeb.CurrencyAPI
             return currency;
         }
 
+
+        public async Task<string> GetCurrencySymbol(string code)
+        {
+            Currency currency;
+            try
+            {
+                currency = await GetCurrency(code);
+            }
+            catch (Exception)
+            {
+                return code;
+            }
+            return currency.GetSymbol();
+        }
+
+
         public async Task<IList<Currency>> GetList()
         {
             var message = await SendRequest(ConnectionString + ListRoute);
