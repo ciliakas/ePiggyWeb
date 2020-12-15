@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
 using Microsoft.AspNetCore.Authorization;
 using ePiggyWeb.Utilities;
@@ -53,8 +51,8 @@ namespace ePiggyWeb.Pages
 
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
-        public UserDatabase UserDatabase { get; }
-        public CurrencyConverter CurrencyConverter { get; }
+        private UserDatabase UserDatabase { get; }
+        private CurrencyConverter CurrencyConverter { get; }
         public string CurrencySymbol { get; private set; }
         public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter)
         {
@@ -67,13 +65,18 @@ namespace ePiggyWeb.Pages
 
         public async Task OnGet()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var userModel = await UserDatabase.GetUserAsync(UserId);
-            CurrencySymbol = await CurrencyConverter.GetCurrencySymbol(userModel.Currency);
             TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
             StartDate = tempStartDate;
             EndDate = tempEndDate;
+            await SetCurrency();
             await SetData();
+        }
+
+        private async Task SetCurrency()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var userModel = await UserDatabase.GetUserAsync(UserId);
+            CurrencySymbol = await CurrencyConverter.GetCurrencySymbol(userModel.Currency);
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
