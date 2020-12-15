@@ -31,17 +31,17 @@ namespace ePiggyWeb.Pages
         public string PasswordConfirm { get; set; }
 
         public string ErrorMessage = "";
-        
+
         [BindProperty]
         public string Currency { get; set; }
-        [BindProperty] 
+        [BindProperty]
         public bool Recalculate { get; set; }
 
         [BindProperty]
         public List<string> CurrencyOptions { get; private set; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        private CurrencyConverter CurrencyConverter { get;}
+        private CurrencyConverter CurrencyConverter { get; }
         public UserModel UserModel { get; private set; }
 
         public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter)
@@ -49,8 +49,8 @@ namespace ePiggyWeb.Pages
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
             EmailSender = emailSenderSettings.Value;
-             _logger = logger;
-             CurrencyConverter = currencyConverter;
+            _logger = logger;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task<IActionResult> OnGet()
@@ -97,11 +97,9 @@ namespace ePiggyWeb.Pages
                     await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                     return RedirectToPage("/index");
                 }
-                else
-                {
-                    ErrorMessage = "Passwords did not match!";
-                    return Page();
-                }
+
+                ErrorMessage = "Passwords did not match!";
+                return Page();
             }
             catch (Exception ex)
             {
@@ -110,21 +108,19 @@ namespace ePiggyWeb.Pages
             }
         }
 
-        //public async Task<IActionResult> OnPostCurrency()
         public async Task<IActionResult> OnPostCurrency()
         {
-            //bool ar perskaiciuoti - Recalculate
-            //int su valiutos pasirinkimu - Currency
-            /*
-             <option value="1">EUR</option>
-             <option value="2">USD</option>
-            pvz.: pasirinkus eur grazina 1, pasirinkus usd grazina 1 ir tt.
-             */
-
-
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            //UserModel = await UserDatabase.GetUserAsync(userId);
-            await UserDatabase.ChangeCurrency(userId, Currency);
+            if (Recalculate)
+            {
+                var currentCurrencyCode = (await UserDatabase.GetUserAsync(userId)).Currency;
+                var rate = await CurrencyConverter.GetRate(currentCurrencyCode, Currency);
+                await UserDatabase.ChangeCurrency(userId, Currency, rate);
+            }
+            else
+            {
+                await UserDatabase.ChangeCurrency(userId, Currency);
+            }
             return Redirect("/ChangePassword");
         }
 
