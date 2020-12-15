@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.MonthlyReport;
 using Microsoft.AspNetCore.Authorization;
@@ -23,19 +24,32 @@ namespace ePiggyWeb.Pages
 
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
+        private UserDatabase UserDatabase { get; }
+        private CurrencyConverter CurrencyConverter { get; }
+        public string CurrencySymbol { get; private set; }
 
-        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase)
+        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, UserDatabase userDatabase, CurrencyConverter currencyConverter)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
+            UserDatabase = userDatabase;
+            CurrencyConverter = currencyConverter;
         }
         public async Task<IActionResult> OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var monthlyReportCalculator = new MonthlyReportCalculator(GoalDatabase, EntryDatabase, UserId);
             Data = await monthlyReportCalculator.Calculate();
+            await SetCurrency();
             return Page();
+        }
+
+        private async Task SetCurrency()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var userModel = await UserDatabase.GetUserAsync(UserId);
+            CurrencySymbol = await CurrencyConverter.GetCurrencySymbol(userModel.Currency);
         }
 
     }

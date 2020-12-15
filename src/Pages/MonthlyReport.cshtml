@@ -18,9 +18,9 @@
 </div>
 <div data-aos="fade-up">
     <h4 class="text-light">Income of period: </h4>
-    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Income)</h3>
+    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Income, Model.CurrencySymbol)</h3>
     <h4 class="text-light">Expenses of period: </h4>
-    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Expenses)</h3>
+    <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Expenses, Model.CurrencySymbol)</h3>
 
     <div class="container p-0 mt-3 mb-5">
         <div class="col-lg-12" id="graph">
@@ -35,12 +35,12 @@
     @if (Model.Data.Balance > 0)
     {
         <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-piggy-bank"></i></span>You've saved this month:</h4>
-        <h3 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.Balance)</h3>
+        <h3 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.Balance, Model.CurrencySymbol)</h3>
     }
     else if (Model.Data.Balance < 0)
     {
         <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-minus-circle"></i></span>Your balance was negative this month:</h4>
-        <h3 class="text-warning">@NumberFormatter.FormatCurrency(Model.Data.Balance)</h3>
+        <h3 class="text-warning">@NumberFormatter.FormatCurrency(Model.Data.Balance, Model.CurrencySymbol)</h3>
     }
     else
     {
@@ -58,7 +58,7 @@
     }else if (Model.Data.NecessarySum >= Model.Data.BiggestCategorySum)
     {
         <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-award"></i></span>Well done, you've spent most money for the necessary expenses!</h4>
-        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum, Model.CurrencySymbol)</h5>
     }
     else
     {
@@ -77,9 +77,9 @@
         }
 
         <h5 class="text-light">Necessary expenses sum: </h5>
-        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum)</h5>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum, Model.CurrencySymbol)</h5>
         <h5 class="text-light">@Model.Data.BiggestCategory expenses sum:</h5>
-        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.BiggestCategorySum)</h5>
+        <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.BiggestCategorySum, Model.CurrencySymbol)</h5>
 
     }
 </div>
@@ -93,12 +93,12 @@
     else if (Model.Data.DifferenceInIncome > 0)
     {
         <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-star"></i></span>Well done, your income increased!</h4>
-        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome)</h5>
+        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome, Model.CurrencySymbol)</h5>
     }
     else
     {
         <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-heart-broken"></i></span>You've earned less this month than previous one...</h4>
-        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome * -1)</h5>
+        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome * -1, Model.CurrencySymbol)</h5>
     }
 </div>
 <hr class="mt-5 mb-5" />
@@ -117,7 +117,7 @@
                 <div class="card-body">
                     <h5 class="card-title" title="Title">@item.Title</h5>
                     <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" title="Progress">100%</div>
-                    <p class=" mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(item.Amount)</p>
+                    <p class=" mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)</p>
                 </div>
                 <div class="card-footer">
 
@@ -152,7 +152,7 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title" title="Title">@Model.Data.CheapestGoal.Title month(s)</h5>
-                <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.CheapestGoal.Amount)</h5>
+                <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.CheapestGoal.Amount, Model.CurrencySymbol)</h5>
             </div>
             <div class="card-footer">
 
@@ -164,7 +164,7 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title" title="Title">@Model.Data.MostExpensiveGoal.Title</h5>
-                <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.MostExpensiveGoal.Amount)</h5>
+                <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.MostExpensiveGoal.Amount, Model.CurrencySymbol)</h5>
             </div>
             <div class="card-footer">
 
