@@ -48,27 +48,21 @@ namespace ePiggyWeb.Utilities
             stringPrice = stringPrice?.Substring(1).Trim();
             if (stringPrice == null)
             {
-                return Goal.CreateLocalGoal(itemName, 0);
+                throw new Exception("Item not found.");
             }
 
-            try
+            var decimalPrice = Convert.ToDecimal(stringPrice, System.Globalization.CultureInfo.InvariantCulture);
+            decimalPrice = _cnv(decimalPrice);
+            if (_isTooLong(25, name))
             {
-                var decimalPrice = Convert.ToDecimal(stringPrice, System.Globalization.CultureInfo.InvariantCulture);
-                decimalPrice = _cnv(decimalPrice);
-                if (_isTooLong(30, name))
-                {
-                    itemName = WebUtility.UrlDecode(itemName);
-                    name = itemName;
-                }
+                itemName = WebUtility.UrlDecode(itemName);
+                name = itemName;
+            }
 
-                var temp = Goal.CreateLocalGoal(name, decimalPrice);
-                return temp;
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            var temp = Goal.CreateLocalGoal(name, decimalPrice);
+            return temp;
             
+
         }
     }
 }

@@ -153,11 +153,11 @@ else
                 </div>
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
+                    <div class="form-group mb-1">
                         <input asp-for="Title" type="text" placeholder="Title*" value="" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
-                    <p class="text-primary">Enter exact name of item for more precise pricing! :)</p>
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                    <p class="text-primary mt-3">Enter exact name of item for more precise pricing! :)</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

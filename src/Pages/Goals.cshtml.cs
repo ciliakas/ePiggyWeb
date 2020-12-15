@@ -20,6 +20,7 @@ namespace ePiggyWeb.Pages
     {
         private readonly ILogger<GoalsModel> _logger;
         public bool WasException { get; set; }
+        public bool WasExceptionParse { get; set; }
         public Lazy<InternetParser> InternetParser;
         public IGoalList Goals { get; set; }
         public decimal Savings { get; set; }
@@ -27,7 +28,7 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
-        [StringLength(30)]
+        [StringLength(25)]
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Required")]
@@ -114,7 +115,15 @@ namespace ePiggyWeb.Pages
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
-                WasException = true;
+                if (ex.Message == "Item not found.")
+                {
+                    WasExceptionParse = true;
+                }
+                else
+                {
+                    WasException = true;
+                }
+                
             }
             return RedirectToPage("/goals");
 
