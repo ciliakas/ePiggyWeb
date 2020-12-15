@@ -38,12 +38,12 @@ namespace ePiggyWeb.Pages
         public bool Recalculate { get; set; }
 
         [BindProperty]
-        public List<string> CurrencyOptions { get; set; }
-
+        public List<string> CurrencyOptions { get; private set; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        private CurrencyConverter CurrencyConverter { get; set; }
-        public UserModel UserModel { get; set; }
+        private CurrencyConverter CurrencyConverter { get;}
+        public UserModel UserModel { get; private set; }
+
         public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
@@ -59,17 +59,29 @@ namespace ePiggyWeb.Pages
             {
                 return RedirectToPage("/index");
             }
-            //currency options nuskaitymo simuliacija
-            // Should probably do some backup thing, if the api doesn't work, it currently throws an exception if it doesn't
+
+            await SetCurrency();
+            return Page();
+        }
+
+        private async Task SetCurrency()
+        {
+            //Some alert could be displayed that failed to get currency list
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             UserModel = await UserDatabase.GetUserAsync(userId);
-            var currencyList = await CurrencyConverter.GetList();
             CurrencyOptions = new List<string>();
-            foreach (var currency in currencyList)
+            try
             {
-                CurrencyOptions.Add(currency.Code);
+                var currencyList = await CurrencyConverter.GetList();
+                foreach (var currency in currencyList)
+                {
+                    CurrencyOptions.Add(currency.Code);
+                }
             }
-            return Page();
+            catch (Exception)
+            {
+                CurrencyOptions.Add(UserModel.Currency);
+            }
         }
 
         public async Task<IActionResult> OnPost()
