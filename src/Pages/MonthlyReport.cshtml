@@ -83,7 +83,24 @@
 
     }
 </div>
-
+<hr class="mt-5 mb-5" />
+<div data-aos="fade-up">
+    <h3 class="text-light mt-3 mb-3"><span class="text-warning"><i class="mr-1 fas fa-coins"></i></span>Your Income:</h3>
+    @if (Model.Data.DifferenceInIncome == 0)
+    {
+        <h4 class="text-light"><span class="text-info"><i class="mr-1 fas fa-balance-scale"></i></span>Your income stayed the same as previous month.</h4>
+    }
+    else if (Model.Data.DifferenceInIncome > 0)
+    {
+        <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-star"></i></span>Well done, your income increased!</h4>
+        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome)</h5>
+    }
+    else
+    {
+        <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-heart-broken"></i></span>You've earned less this month than previous one...</h4>
+        <h5 class="text-light">By @NumberFormatter.FormatCurrency(Model.Data.DifferenceInIncome * -1)</h5>
+    }
+</div>
 <hr class="mt-5 mb-5" />
 
 @if (Model.Data.SavedUpGoals.Any())
@@ -129,18 +146,21 @@
         }
     </div>
     <div class="row ml-3 mr-3 justify-content-center">
-        <div data-aos="fade-right" class="card text-center col-lg-4 col-md-6 text-light bg-primary mb-3">
-            <div class="card-header">
-                <h5 class="text-light">In @Model.Data.MonthsForCheapestGoal month(s)</h5>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title" title="Title">@Model.Data.CheapestGoal.Title month(s)</h5>
-                <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.CheapestGoal.Amount)</h5>
-            </div>
-            <div class="card-footer">
+        @if (Model.Data.MonthsForCheapestGoal > 0)
+        {
+            <div data-aos="fade-right" class="card text-center col-lg-4 col-md-6 text-light bg-primary mb-3">
+                <div class="card-header">
+                    <h5 class="text-light">In @Model.Data.MonthsForCheapestGoal month(s)</h5>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title" title="Title">@Model.Data.CheapestGoal.Title month(s)</h5>
+                    <h5 class="mt-2 card-text" title="Price">Price: @NumberFormatter.FormatCurrency(@Model.Data.CheapestGoal.Amount)</h5>
+                </div>
+                <div class="card-footer">
 
+                </div>
             </div>
-        </div>
+        }
         <div data-aos="fade-right" class="card text-center col-lg-4 col-md-6 text-light bg-primary mb-3">
             <div class="card-header">
                 <h5 class="text-light">In @Model.Data.MonthsForMostExpensiveGoal month(s)</h5>
@@ -164,7 +184,7 @@ else
     </div>-->
 }
 <div data-aos="fade-up">
-    <button class="btn btn-primary mb-4" disabled>Save as an E-Mail<i class="ml-1 far fa-envelope"></i></button>
+    <a asp-page="/index" class="btn btn-primary mb-4">Back to Main Page</a>
 </div>
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>

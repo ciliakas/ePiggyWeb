@@ -11,14 +11,10 @@ namespace ePiggyWeb.DataBase
 {
     public class UserDatabase
     {
-        public event EventHandler<UserModel> LoggedIn;
+        public event EventHandler<UserModel>? LoggedIn, Registered, Deleted;
 
         public delegate void RegisterEvent(object? sender, UserModel user);
-
-        public event RegisterEvent Registered;
         //public event EventHandler<UserModel> Registered;
-
-        public event EventHandler<UserModel> Deleted;
 
         private PiggyDbContext Database { get; }
         public UserDatabase(PiggyDbContext database)
@@ -48,9 +44,9 @@ namespace ePiggyWeb.DataBase
 
         public async Task<int> AuthenticateAsync(string email, string pass)
         {
-            var user = await GetUserAsync(email);
+            var user = await Database.Users.FirstOrDefaultAsync(x => x.Email == email);
 
-            if (user == null)
+            if (user is null)
             {
                 //User couldn't be found
                 return -1;
@@ -63,7 +59,7 @@ namespace ePiggyWeb.DataBase
             }
 
             LoggedIn?.Invoke(this, user);
-
+            
             return user.Id;
         }
 
@@ -71,7 +67,7 @@ namespace ePiggyWeb.DataBase
         {
             var user = await Database.Users.FirstOrDefaultAsync(a => a.Email == email);
 
-            if (user == null)
+            if (user is null)
             {
                 return false;
             }
@@ -99,6 +95,7 @@ namespace ePiggyWeb.DataBase
         public async Task<bool> DeleteUserAsync(Expression<Func<UserModel, bool>> filter)
         {
             var user = await Database.Users.FirstOrDefaultAsync(filter);
+
             if (user is null)
             {
                 return false;
@@ -131,6 +128,50 @@ namespace ePiggyWeb.DataBase
         public async Task<UserModel> GetUserAsync(Expression<Func<UserModel, bool>> filter)
         {
             return await Database.Users.FirstOrDefaultAsync(filter);
+        }
+
+        public async Task ChangeCurrency(int userId, string currencyCode)
+        {
+            var user = await Database.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            //user.Currency = currencyCode;
+
+            await Database.SaveChangesAsync();
+        }
+
+        public async Task ChangeCurrency(int userId, string currencyCode, decimal rate)
+        {
+            var user = await Database.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            var goals = await Database.Goals.Where(x => x.UserId == userId).ToListAsync();
+            var incomes = await Database.Incomes.Where(x => x.UserId == userId).ToListAsync();
+            var expenses = await Database.Expenses.Where(x => x.UserId == userId).ToListAsync();
+
+            if (goals != null)
+            {
+                foreach (var goal in goals)
+                {
+                    goal.Price = decimal.Round(goal.Price * rate, 2);
+                }
+            }
+            if (incomes != null)
+            {
+                foreach (var income in incomes)
+                {
+                    income.Amount = decimal.Round(income.Amount * rate, 2);
+                }
+            }
+            if (expenses != null)
+            {
+                foreach (var expense in expenses)
+                {
+                    expense.Amount = decimal.Round(expense.Amount * rate, 2);
+                }
+            }
+
+            //user.Currency = currencyCode;
+
+            await Database.SaveChangesAsync();
         }
     }
 }

@@ -75,7 +75,7 @@
             <li class="nav-item">
             @if (User.Identity.IsAuthenticated)
             {
-                <li class="nav-item"><a asp-page="/changePassword" class="btn btn-primary">@User.FindFirst(ClaimTypes.Email).Value</a></li>
+                <li class="nav-item"><a asp-page="/changePassword" class="btn btn-primary">@User.FindFirst(ClaimTypes.Email).Value<i class="ml-1 fas fa-user-edit"></i></a></li>
                 <li class="nav-item">
                     <form method="post" asp-controller="Logout" asp-action="LogoutTask"><button class="btn btn-primary">Logout</button></form>
                 </li>

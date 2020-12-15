@@ -51,12 +51,12 @@ else
                 <div class="row justify-content-center mb-3">
                     <div class="col-12 col-md-3 col-lg-2">
                         <select asp-for="Importance">
-                            <option hidden disabled selected value="">Importance</option>
-                            <option value="1">Necessary</option>
-                            <option value="2">High</option>
-                            <option value="3">Medium</option>
-                            <option value="4">Low</option>
-                            <option value="5">Unnecessary</option>
+                            <option hidden disabled selected value="">Attainability</option>
+                            <option value="1">Regularly</option>
+                            <option value="2">Often</option>
+                            <option value="3">Sometimes</option>
+                            <option value="4">Rarely</option>
+                            <option value="5">Exceptionally</option>
                         </select>
                     </div>
                     <div class="col-12 col-md-3 col-lg-2">
@@ -96,98 +96,91 @@ else
     <hr class="mt-4 mb-4" />
 }
 
-<button class="btn btn-danger mb-4" disabled>Delete Selected</button>
-<div class="row justify-content-center">
-    <form method="post">
-        <div class="row justify-content-center">
-            @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
-            {
-                <div class="card border-light mb-3 col-12 col-md-5 col-lg-3 bg-primary" style="max-width: 20rem; min-width: 20rem">
-                    <div class="card-header entry-table-side">
-                        <div class="row justify-content-between">
-                            <input class="col-2 mt-2" type="checkbox" />
-                            <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-warning col-3">Edit </a>
-                        </div>
-                    </div>
-                    <div class="card-body text-light entry-column">
-                        <h5 class="card-title">@Html.DisplayFor(m => item.Title)</h5>
-                        Amount:  @NumberFormatter.FormatCurrency(item.Amount) <br />
-                        Importance: @((Importance)item.Importance) <br />
-                        Recurring: @if (item.Recurring)
-                        {
-                            <i class="fas fa-check text-success"></i>
-                        }
-                    </div>
-                    <div class="card-footer text-light">@item.Date.ToShortDateString()</div>
-                </div>
-            }
-        </div>
-    </form>
-</div>
-
-<!--
-
-<div class="row">
-    <div class="col-12 border mt-3 mb-3">
-        <form method="post">
+<form method="post">
+    <div class="row ml-2 mr-2">
+        <button asp-page-handler="Delete" type="submit" class="btn btn-danger">Delete Selected <i class="fas fa-trash-alt"></i></button>
+    </div>
+    <div class="row ml-2 mr-2 mt-3 mb-3">
+        <div class="container border col-12 p-0">
             @if (Model.Income.Any())
             {
-                <table class="table table-hover border-primary table-bordered">
-                    <tr class="table-primary">
-                        <th>
-                            <label asp-for="Income.FirstOrDefault().Title"></label>
-                        </th>
-                        <th style="width: 18%">
-                            <label asp-for="Income.FirstOrDefault().Amount"></label>
-                        </th>
-                        <th style="width: 10%">
-                            <label asp-for="Income.FirstOrDefault().Date"></label>
-                        </th>
-                        <th style="width: 15%">
-                            <label asp-for="Income.FirstOrDefault().Importance"></label>
-                        </th>
-                        <th style="width: 5%">
-                            <label asp-for="Income.FirstOrDefault().Recurring"></label>
-                        </th>
-                        <th style="width: 15%">
-
-                        </th>
-                    </tr>
-                    @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
-                    {
-                        <tr class="table-light border-primary">
-                            <td class="border-primary">
-                                @Html.DisplayFor(m => item.Title)
-                            </td>
-                            <td class="border-primary">
-                                @NumberFormatter.FormatCurrency(item.Amount)
-                            </td>
-                            <td class="border-primary">
-                                @item.Date.ToShortDateString()
-                            </td>
-                            <td class="border-primary">
-                                @((Importance)item.Importance)
-                            </td>
-                            <td class="border-primary">
-                                @if (item.Recurring)
-                                {
-                                    <i class="fas fa-check text-success"></i>
-                                }
-                            </td>
-                            <td class="border-primary">
-                                <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-success">Edit </a>
-                                <input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-danger" value="Delete" />
-                            </td>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <tr class="bg-primary">
+                            <th class="border-right entry-table-side" scope="col">
+                                <input class="bigger" type="checkbox" onClick="toggle(this)" /><br />
+                            </th>
+                            <th colspan="2" scope="col">
+                                <h5 class="text-light">Expenses</h5>
+                            </th>
                         </tr>
-                    }
-                </table>
-            }
-            else
-            {
-                <p>No income available</p>
-            }
-        </form>
-    </div>
-</div>
+                        @foreach (var item in Model.IncomeToDisplay)
+                        {
+                            <tr class="table-light border-primary">
+                                <td class="border-primary border entry-table-side">
+                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id" />
+                                </td>
+                                <td class=" border-right-0 border-primary text-nowrap entry-column">
+                                    <div class="row">
+                                        <div class="col-12 mb-2">
+                                            <strong class="text-info">
+                                                @Html.DisplayFor(m => item.Title)
+                                            </strong>
+                                        </div>
+                                        <div class="col-12 col-md-5 col-lg-4">
+                                            <span class="text-info">Amount:</span>
+                                            @NumberFormatter.FormatCurrency(item.Amount)
+                                        </div>
+                                        <div class="col-12 col-md-3 col-lg-2">
+                                            <span class="text-info">Date: </span>
+                                            @item.Date.ToShortDateString()
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <span class="text-info">Attainability: </span>
+                                            @((Attainability) item.Importance)
+                                        </div>
+                                        <div class="col-12 col-md-4 col-lg-2">
+                                            <span class="text-info">Recurring: </span>
+                                            @if (item.Recurring)
+                                            {
+                                                <i class="fas fa-check text-success"></i>
+                                            }
+                                        </div>
 
--->
+                                    </div>
+                                </td>
+                                <td class="border-primary border-left-0 entry-table-side">
+                                    <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="1" class="btn btn-sm btn-outline-success"><i class="far fa-edit"></i> </a>
+                                    <!--<input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-outline-danger" value="x" />-->
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+</form>
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item  @(!Model.ShowPrevious ? "disabled" : "")">
+            <a class="page-link" asp-page="/income" asp-route-CurrentPage="@(Model.CurrentPage - 1)">Previous</a>
+        </li>
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(Model.CurrentPage == i? "active": "")"><a class="page-link" asp-page="/income" asp-route-CurrentPage="@i">@i</a></li>
+        }
+        <li class="page-item @(!Model.ShowNext? "disabled":"")"><a class="page-link" asp-page="/income" asp-route-CurrentPage="@(Model.CurrentPage + 1)">Next</a></li>
+    </ul>
+</nav>
+
+<script language="JavaScript">
+    function toggle(source) {
+        checkboxes = document.getElementsByName('chkEntry');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>
+

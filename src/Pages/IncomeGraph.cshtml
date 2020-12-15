@@ -63,17 +63,17 @@ else
     // Draw the chart and set the chart values
     function drawChart() {
         var data = google.visualization.arrayToDataTable([
-            ['Importance', 'Amount'],
-            ['Necessary', @Model.Income.GetBy(Importance.Necessary).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['High', @Model.Income.GetBy(Importance.High).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['Medium', @Model.Income.GetBy(Importance.Medium).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['Low', @Model.Income.GetBy(Importance.Low).GetSum().ToString(CultureInfo.InvariantCulture)],
-            ['Unnecessary', @Model.Income.GetBy(Importance.Unnecessary).GetSum().ToString(CultureInfo.InvariantCulture)]
+            ['Attainability', 'Amount'],
+            ['Regularly', @Model.Income.GetBy(Importance.Necessary).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Often', @Model.Income.GetBy(Importance.High).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Sometimes', @Model.Income.GetBy(Importance.Medium).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Rarely', @Model.Income.GetBy(Importance.Low).GetSum().ToString(CultureInfo.InvariantCulture)],
+            ['Exceptionally', @Model.Income.GetBy(Importance.Unnecessary).GetSum().ToString(CultureInfo.InvariantCulture)]
         ]);
 
         // Optional; add a title and set the width and height of the chart
         var options = {
-            'title': 'Income by importance',
+            'title': 'Income by attainability',
             'height': 600,
             'width': '100%',
             'vAxis': { 'textStyle': { 'color': '#FFF' }, 'gridlines': { 'count': 5 } },

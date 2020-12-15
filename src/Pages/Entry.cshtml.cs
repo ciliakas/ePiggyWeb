@@ -1,45 +1,39 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using ePiggyWeb.DataBase;
-using ePiggyWeb.DataBase.Models;
-using ePiggyWeb.DataManagement.Entries;
-using ePiggyWeb.DataManagement.Goals;
-using ePiggyWeb.Utilities;
+using ePiggyWeb.CurrencyAPI;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace ePiggyWeb.Pages
 {
     public class EntryModel : PageModel
     {
-        private EntryDatabase EntryDatabase { get; }
-        private GoalDatabase GoalDatabase { get; }
-        private UserDatabase UserDatabase { get; }
-        private EmailSender EmailSender { get; }
-        private IConfiguration Configuration { get; }
-        private int UserId { get; set; }
-        public EntryModel(EntryDatabase entryDatabase, GoalDatabase goalDatabase,UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings, IConfiguration configuration)
-        {
-            EntryDatabase = entryDatabase;
-            GoalDatabase = goalDatabase;
-            UserDatabase = userDatabase;
-            EmailSender = emailSenderSettings.Value;
-            Configuration = configuration;
-            UserDatabase.Deleted += OnDeleteUser;
-        }
 
-        private async void OnDeleteUser(object sender, UserModel user)
+        private HttpClient HttpClient { get; }
+        private IConfiguration Configuration { get; }
+
+        public EntryModel(HttpClient httpClient, IConfiguration configuration)
         {
-            await EmailSender.SendFarewellEmailAsync(user.Email);
+            HttpClient = httpClient;
+            Configuration = configuration;
         }
 
         public async Task OnGet()
         {
-            //@ViewData["EntryList"] = EntryList.RandomList(Configuration, EntryType.Expense);
-            @ViewData["IncomeList"] = EntryList.RandomList(Configuration, EntryType.Income);
-            @ViewData["ExpenseList"] = EntryList.RandomList(Configuration, EntryType.Expense);
-            @ViewData["GoalList"] = GoalList.RandomList(Configuration);
+            var currencyConverter = new CurrencyConverter(HttpClient, Configuration);
+            var list = await currencyConverter.GetList();
+            var sb = new StringBuilder();
 
+            foreach (var currency in list)
+            {
+                sb.AppendLine(currency.ToString());
+            }
+
+            @ViewData["IncomeList"] = sb.ToString();
         }
     }
 }

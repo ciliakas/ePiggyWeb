@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -29,22 +31,40 @@ namespace ePiggyWeb.Pages
         public string PasswordConfirm { get; set; }
 
         public string ErrorMessage = "";
+        
+        [BindProperty]
+        public int Currency { get; set; }
+        [BindProperty] 
+        public bool Recalculate { get; set; }
+
+        [BindProperty]
+        public List<string> CurrencyOptions { get; set; }
 
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger)
+        private CurrencyConverter CurrencyConverter { get; set; }
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
             EmailSender = emailSenderSettings.Value;
              _logger = logger;
+             CurrencyConverter = currencyConverter;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToPage("/index");
+            }
+            //currency options nuskaitymo simuliacija
+            // Should probably do some backup thing, if the api doesn't work, it currently throws an exception if it doesn't
+            var currencyList = await CurrencyConverter.GetList();
+            CurrencyOptions = new List<string>();
+            foreach (var currency in currencyList)
+            {
+                CurrencyOptions.Add(currency.Code);
             }
             return Page();
         }
@@ -73,7 +93,19 @@ namespace ePiggyWeb.Pages
                 _logger.LogInformation(ex.ToString());
                 return Page();
             }
-           
+        }
+
+        //public async Task<IActionResult> OnPostCurrency()
+        public IActionResult OnPostCurrency()
+        {
+            //bool ar perskaiciuoti - Recalculate
+            //int su valiutos pasirinkimu - Currency
+            /*
+             <option value="1">EUR</option>
+             <option value="2">USD</option>
+            pvz.: pasirinkus eur grazina 1, pasirinkus usd grazina 1 ir tt.
+             */
+            return Redirect("/index");
         }
 
         public async Task<IActionResult> OnPostDeleteAccount()
