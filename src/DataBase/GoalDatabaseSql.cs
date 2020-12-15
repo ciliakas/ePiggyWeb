@@ -97,7 +97,6 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteAsync(int id, int userId)
         {
-            //return await DeleteAsync(x => x.Id == id && x.UserId == userId);
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
             if (sqlConnection.State == ConnectionState.Closed)
