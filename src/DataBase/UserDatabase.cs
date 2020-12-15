@@ -11,10 +11,8 @@ namespace ePiggyWeb.DataBase
 {
     public class UserDatabase
     {
+        private const string DefaultCurrency = "EUR";
         public event EventHandler<UserModel>? LoggedIn, Registered, Deleted;
-
-        public delegate void RegisterEvent(object? sender, UserModel user);
-        //public event EventHandler<UserModel> Registered;
 
         private PiggyDbContext Database { get; }
         public UserDatabase(PiggyDbContext database)
@@ -33,7 +31,7 @@ namespace ePiggyWeb.DataBase
             var salt = HashingProcessor.CreateSalt();
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
 
-            var user = new UserModel { Email = email, Password = passwordHash, Salt = salt };
+            var user = new UserModel { Email = email, Password = passwordHash, Salt = salt , Currency = DefaultCurrency};
             Database.Add(user);
             await Database.SaveChangesAsync();
 
@@ -134,7 +132,7 @@ namespace ePiggyWeb.DataBase
         {
             var user = await Database.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
-            //user.Currency = currencyCode;
+            user.Currency = currencyCode;
 
             await Database.SaveChangesAsync();
         }
@@ -169,7 +167,7 @@ namespace ePiggyWeb.DataBase
                 }
             }
 
-            //user.Currency = currencyCode;
+            user.Currency = currencyCode;
 
             await Database.SaveChangesAsync();
         }

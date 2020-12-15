@@ -33,7 +33,7 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
         
         [BindProperty]
-        public int Currency { get; set; }
+        public string Currency { get; set; }
         [BindProperty] 
         public bool Recalculate { get; set; }
 
@@ -43,6 +43,7 @@ namespace ePiggyWeb.Pages
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
         private CurrencyConverter CurrencyConverter { get; set; }
+        public UserModel UserModel { get; set; }
         public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
@@ -60,6 +61,8 @@ namespace ePiggyWeb.Pages
             }
             //currency options nuskaitymo simuliacija
             // Should probably do some backup thing, if the api doesn't work, it currently throws an exception if it doesn't
+            var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            UserModel = await UserDatabase.GetUserAsync(userId);
             var currencyList = await CurrencyConverter.GetList();
             CurrencyOptions = new List<string>();
             foreach (var currency in currencyList)
@@ -96,7 +99,7 @@ namespace ePiggyWeb.Pages
         }
 
         //public async Task<IActionResult> OnPostCurrency()
-        public IActionResult OnPostCurrency()
+        public async Task<IActionResult> OnPostCurrency()
         {
             //bool ar perskaiciuoti - Recalculate
             //int su valiutos pasirinkimu - Currency
@@ -105,7 +108,12 @@ namespace ePiggyWeb.Pages
              <option value="2">USD</option>
             pvz.: pasirinkus eur grazina 1, pasirinkus usd grazina 1 ir tt.
              */
-            return Redirect("/index");
+
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            //UserModel = await UserDatabase.GetUserAsync(userId);
+            await UserDatabase.ChangeCurrency(userId, Currency);
+            return Redirect("/ChangePassword");
         }
 
         public async Task<IActionResult> OnPostDeleteAccount()
