@@ -14,23 +14,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ePiggyWeb.DataBase
 {
-    public class GoalDatabaseWithSql
+    public class GoalDatabaseSql
     {
         private PiggyDbContext Database { get; }
-        public string CnStr { get; set; }
-        public GoalDatabaseWithSql(PiggyDbContext database)
+        public GoalDatabaseSql(PiggyDbContext database)
         {
             Database = database;
-            CnStr = "Server=51.75.187.147;Database=SmartSaver;User Id=usern;Password=123456789;";
         }
 
         public async Task<int> CreateAsync(IGoal goal, int userid)
         {
-            //var dbGoal = new GoalModel(goal, userid);
-            //await Database.AddAsync(dbGoal);
-            //await Database.SaveChangesAsync();
-            //return dbGoal.Id;
-
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
             if (sqlConnection.State == ConnectionState.Closed)
@@ -40,12 +33,12 @@ namespace ePiggyWeb.DataBase
 
             var dbGoal = new GoalModel(goal, userid);
 
-            var sqlCommand = new SqlCommand("INSERT INTO Goals(UserId, Price, Title) VALUES (@UserId, @Price, @Title)", sqlConnection);
+            var sqlCommand = new SqlCommand("INSERT INTO Goals(UserId, Price, Title) VALUES (@UserId, @Price, @Title);SELECT CAST(scope_identity() AS int);", sqlConnection);
             sqlCommand.CommandType = CommandType.Text;
             sqlCommand.Parameters.AddWithValue("@UserId", dbGoal.UserId);
             sqlCommand.Parameters.AddWithValue("@Price", dbGoal.Price);
             sqlCommand.Parameters.AddWithValue("@Title", dbGoal.Title);
-            sqlCommand.ExecuteNonQuery();
+            dbGoal.Id = (int)sqlCommand.ExecuteScalar();
 
             sqlConnection.Close();
             return dbGoal.Id;
@@ -85,24 +78,16 @@ namespace ePiggyWeb.DataBase
                 await sqlConnection.OpenAsync();
             }
 
-
-            var sqlCommand = new SqlCommand("UPDATE Goals SET Price = " + newGoal.Amount + "Title = " + newGoal.Title +"  WHERE Id = " + id + "AND UserId = " + userId, sqlConnection);
+            var sqlCommand = new SqlCommand("UPDATE Goals SET Price = @Price, Title = @Title WHERE Id = @Id AND UserId = @UserId", sqlConnection);
             sqlCommand.CommandType = CommandType.Text;
+            sqlCommand.Parameters.AddWithValue("@Id", id);
+            sqlCommand.Parameters.AddWithValue("@UserId", userId);
+            sqlCommand.Parameters.AddWithValue("@Price", newGoal.Amount);
+            sqlCommand.Parameters.AddWithValue("@Title", newGoal.Title);
             await sqlCommand.ExecuteNonQueryAsync();
 
             sqlConnection.Close();
             return true;
-            
-            /*
-             var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-            if (dbGoal == null)
-            {
-                throw new Exception("Couldn't find goal id: " + id + " in database");
-            }
-            dbGoal.Edit(newGoal);
-            await Database.SaveChangesAsync();
-            return true;
-            */
         }
 
         public async Task<bool> DeleteAsync(IGoal goal)
@@ -117,13 +102,14 @@ namespace ePiggyWeb.DataBase
 
             if (sqlConnection.State == ConnectionState.Closed)
             {
-                await sqlConnection.OpenAsync();
+                sqlConnection.Open();
             }
 
-
-            var sqlCommand = new SqlCommand("DELETE FROM Goals WHERE Id = " + id + "AND UserId = " + userId, sqlConnection);
+            var sqlCommand = new SqlCommand("DELETE FROM Goals WHERE Id = @Id AND UserId = @UserId", sqlConnection);
             sqlCommand.CommandType = CommandType.Text;
-            await sqlCommand.ExecuteNonQueryAsync();
+            sqlCommand.Parameters.AddWithValue("@Id", id);
+            sqlCommand.Parameters.AddWithValue("@UserId", userId);
+            sqlCommand.ExecuteNonQuery();
 
             sqlConnection.Close();
             return true;
@@ -184,14 +170,11 @@ namespace ePiggyWeb.DataBase
 
         public async Task<IGoalList> ReadListAsync(int userId)
         {
-            //return await ReadListAsync(x => x.UserId == userId);
             var list = new GoalList();
-
+            var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
             var query = "SELECT * FROM Goals WHERE UserId =" + userId;
-
             var MyDataSet = new DataSet();
-
-            var MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, CnStr);
+            var MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, sqlConnection);
 
             MyDataAdapter.Fill(MyDataSet);
 
@@ -201,7 +184,7 @@ namespace ePiggyWeb.DataBase
                 select new Goal
                 {
                     Id = row.Field<int>("Id"),
-                    Amount = row.Field<decimal>("Amount"),
+                    Amount = row.Field<decimal>("Price"),
                     Title = row.Field<string>("Title"),
                     UserId = row.Field<int>("UserId")
                 } as IGoal).ToList();
