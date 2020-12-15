@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -20,6 +22,7 @@ namespace ePiggyWeb.Pages
         private readonly ILogger<IncomeModel> _logger;
         public bool WasException { get; set; }
         public IEntryList Income { get; set; }
+        public IEnumerable<IEntry> IncomeToDisplay { get; set; }
 
         [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
@@ -49,6 +52,13 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
+
+        [BindProperty(SupportsGet = true)]
+        public int CurrentPage { get; set; } = 1;
+        public const int PageSize = 10;
+        public int TotalPages => (int)Math.Ceiling(decimal.Divide(Income.Count, PageSize));
+        public bool ShowPrevious => CurrentPage > 1;
+        public bool ShowNext => CurrentPage < TotalPages;
 
         public IncomesModel(EntryDatabase entryDatabase, ILogger<IncomeModel> logger, IConfiguration configuration)
         {
@@ -102,20 +112,25 @@ namespace ePiggyWeb.Pages
             return RedirectToPage("/income");
         }
 
-        public async Task<IActionResult> OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDelete()
         {
             try
             {
+                var selected = Request.Form["chkEntry"].ToString();
+                var selectedList = selected.Split(',');
+                var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();
+
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                await EntryDatabase.DeleteAsync(id, UserId, EntryType.Income);
+
+                await EntryDatabase.DeleteListAsync(entryIdList, UserId, EntryType.Income);
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
+
             }
             return RedirectToPage("/income");
-
         }
 
         private async Task SetData()
@@ -125,6 +140,7 @@ namespace ePiggyWeb.Pages
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
                 Income = entryList.GetFrom(StartDate).GetTo(EndDate);
+                IncomeToDisplay = Income.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
                 AllIncome = entryList.GetSum();
             }
             catch (Exception ex)
@@ -132,6 +148,7 @@ namespace ePiggyWeb.Pages
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
                 Income = EntryList.RandomList(Configuration, EntryType.Income);
+                IncomeToDisplay = Income;
                 AllIncome = Income.GetSum();
             }
 
