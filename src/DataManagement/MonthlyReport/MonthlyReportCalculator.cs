@@ -60,7 +60,12 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             AllSavings = incomeTotal - expensesTotal;
             Balance = thisMonthIncome - thisMonthExpenses;
 
-            return new MonthlyReportResult(thisMonthExpenses, thisMonthIncome, Balance, StartTime, EndTime);
+            var previousMonthStart = StartTime.AddMonths(-1);
+            var previousMonthEnd = StartTime.AddDays(-1);
+            var previousMonthIncome = Income.GetFrom(previousMonthStart).GetTo(previousMonthEnd).GetSum();
+            var differenceInIncome = thisMonthIncome - previousMonthIncome;
+
+            return new MonthlyReportResult(thisMonthExpenses, thisMonthIncome, differenceInIncome, Balance, StartTime, EndTime);
 
         }
 
