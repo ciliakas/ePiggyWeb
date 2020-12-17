@@ -53,6 +53,8 @@ namespace ePiggyWeb.Pages
             CurrencyConverter = currencyConverter;
         }
 
+        // Memory cache - absolute until midnight 
+
         public async Task<IActionResult> OnGet()
         {
             if (!User.Identity.IsAuthenticated)
@@ -66,6 +68,7 @@ namespace ePiggyWeb.Pages
 
         private async Task SetCurrency()
         {
+
             //Some alert could be displayed that failed to get currency list
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             UserModel = await UserDatabase.GetUserAsync(userId);
