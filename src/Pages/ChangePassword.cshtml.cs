@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
@@ -43,17 +45,17 @@ namespace ePiggyWeb.Pages
         private EmailSender EmailSender { get; }
         private CurrencyConverter CurrencyConverter { get; }
         public UserModel UserModel { get; private set; }
+        private IMemoryCache Cache { get; }
 
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter)
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
             EmailSender = emailSenderSettings.Value;
             _logger = logger;
             CurrencyConverter = currencyConverter;
+            Cache = cache;
         }
-
-        // Memory cache - absolute until midnight 
 
         public async Task<IActionResult> OnGet()
         {
@@ -68,18 +70,29 @@ namespace ePiggyWeb.Pages
 
         private async Task SetCurrency()
         {
-
-            //Some alert could be displayed that failed to get currency list
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             UserModel = await UserDatabase.GetUserAsync(userId);
             CurrencyOptions = new List<string>();
+            if (Cache.TryGetValue(CacheKeys.CurrencyList, out List<string> cachedCurrencyList))
+            {
+                CurrencyOptions.AddRange(cachedCurrencyList);
+                return;
+            }
+
             try
             {
                 var currencyList = await CurrencyConverter.GetList();
-                foreach (var currency in currencyList)
-                {
-                    CurrencyOptions.Add(currency.Code);
-                }
+                var currencyCodeList = currencyList.Select(currency => currency.Code).ToList();
+
+                var options = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15))
+                    .SetAbsoluteExpiration(TimeManager.RefreshTime());
+
+                Cache.Set(CacheKeys.CurrencyList, currencyCodeList, options);
+                CurrencyOptions.AddRange(currencyCodeList);
+
+                //Also set user currency 
+                var userCurrency = currencyList.First(x => x.Code == UserModel.Currency);
+                Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
             }
             catch (Exception)
             {

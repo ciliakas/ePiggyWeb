@@ -8,7 +8,7 @@ namespace ePiggyWeb.Utilities
     {
         public static DateTime OneMonthAhead { get; }= GetEndOfTheMonth(DateTime.UtcNow.AddMonths(1));
 
-        public static DateTime LocalRefreshTime()
+        public static DateTime RefreshTime()
         {
             var time = DateTime.UtcNow;
 
@@ -19,7 +19,7 @@ namespace ePiggyWeb.Utilities
 
             time = ChangeHour(time, 16);
 
-            return time.ToLocalTime();
+            return time;
         }
 
         public static bool IsDateThisMonthAndLater(DateTime date)
