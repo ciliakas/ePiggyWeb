@@ -9,6 +9,7 @@ using ePiggyWeb.DataManagement.Saving;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -44,8 +45,10 @@ namespace ePiggyWeb.Pages
         private UserDatabase UserDatabase { get; }
         private CurrencyConverter CurrencyConverter { get; }
         public string CurrencySymbol { get; private set; }
+        public decimal CurrencyRate { get; set; }
+        private IMemoryCache Cache { get; }
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter)
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
@@ -53,6 +56,7 @@ namespace ePiggyWeb.Pages
             Configuration = configuration;
             UserDatabase = userDatabase;
             CurrencyConverter = currencyConverter;
+            Cache = cache;
         }
         public async Task OnGet(int id)
         {
@@ -66,9 +70,26 @@ namespace ePiggyWeb.Pages
 
         private async Task SetCurrency()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var userModel = await UserDatabase.GetUserAsync(UserId);
-            CurrencySymbol = await CurrencyConverter.GetCurrencySymbol(userModel.Currency);
+            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
+            {
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var userModel = await UserDatabase.GetUserAsync(UserId);
+                try
+                {
+                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
+                }
+                catch (Exception)
+                {
+                    CurrencySymbol = userModel.Currency;
+                    CurrencyRate = 1;
+                    return;
+                }
+            }
+
+            CurrencySymbol = userCurrency.GetSymbol();
+            CurrencyRate = userCurrency.Rate;
+            var options = CacheKeys.DefaultCurrencyCacheOptions();
+            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
