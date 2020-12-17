@@ -76,6 +76,23 @@ namespace ePiggyWeb.Pages
             if (Cache.TryGetValue(CacheKeys.CurrencyList, out List<string> cachedCurrencyList))
             {
                 CurrencyOptions.AddRange(cachedCurrencyList);
+                //Check if user's currency is cached
+                if (Cache.TryGetValue(CacheKeys.UserCurrency, out Currency cachedCurrency))
+                {
+                    if (UserModel.Currency.Equals(cachedCurrency.Code)) return;
+                }
+
+                //If we the code gets here, it means that we don't have the the correct user currency cached
+                try
+                {
+                    var userCurrency = await CurrencyConverter.GetCurrency(UserModel.Currency);
+                    var options = CacheKeys.DefaultCurrencyCacheOptions();
+                    Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogInformation(e.ToString());
+                }
                 return;
             }
 
@@ -84,8 +101,7 @@ namespace ePiggyWeb.Pages
                 var currencyList = await CurrencyConverter.GetList();
                 var currencyCodeList = currencyList.Select(currency => currency.Code).ToList();
 
-                var options = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15))
-                    .SetAbsoluteExpiration(TimeManager.RefreshTime());
+                var options = CacheKeys.DefaultCurrencyCacheOptions();
 
                 Cache.Set(CacheKeys.CurrencyList, currencyCodeList, options);
                 CurrencyOptions.AddRange(currencyCodeList);
@@ -124,6 +140,7 @@ namespace ePiggyWeb.Pages
             }
         }
 
+        // We need to set up error handling here
         public async Task<IActionResult> OnPostCurrency()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
@@ -137,6 +154,7 @@ namespace ePiggyWeb.Pages
             {
                 await UserDatabase.ChangeCurrency(userId, Currency);
             }
+            Cache.Remove(CacheKeys.UserCurrency);
             return Redirect("/ChangePassword");
         }
 
