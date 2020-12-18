@@ -27,7 +27,33 @@ namespace ePiggyWeb.CurrencyAPI
             UserDatabase = userDatabase;
         }
 
-        public async Task<IEntryList> ConvertEntryList(IEntryList entryList,int userId)
+        public async Task<Tuple<IList<Currency>, Exception>> GetCurrencyList(int userId)
+        {
+            if (!Cache.TryGetValue(CacheKeys.CurrencyList, out IList<Currency> currencyList))
+            {
+                try
+                {
+                    currencyList = await CurrencyApiAgent.GetList();
+                }
+                catch (Exception apiException)
+                {
+                    try
+                    {
+                        var userModel = await UserDatabase.GetUserAsync(userId);
+                        var userCurrency = new Currency { Code = userModel.Currency };
+                        return new Tuple<IList<Currency>, Exception>(new List<Currency> { userCurrency }, apiException);
+                    }
+                    catch (Exception dbException)
+                    {
+                        return new Tuple<IList<Currency>, Exception>(new List<Currency>(), dbException);
+                    }
+                }
+            }
+
+            return new Tuple<IList<Currency>, Exception>(currencyList, null);
+        }
+
+        public async Task<IEntryList> ConvertEntryList(IEntryList entryList, int userId)
         {
             var (userCurrency, exception) = await GetUserCurrency(userId);
             //Error check
@@ -35,11 +61,11 @@ namespace ePiggyWeb.CurrencyAPI
             //Temporary while no currency is saved
             foreach (var entry in entryList)
             {
-                if(entry.Currency is null || entry.Currency == "currency") entry.Currency = "EUR";
+                if (entry.Currency is null || entry.Currency == "currency") entry.Currency = "EUR";
             }
 
             var containsForeignCurrency = entryList.Any(x => x.Currency != userCurrency.Code);
-            if(!containsForeignCurrency) return entryList;
+            if (!containsForeignCurrency) return entryList;
 
             var currencyList = await CurrencyApiAgent.GetList();
             //Error check
@@ -65,7 +91,7 @@ namespace ePiggyWeb.CurrencyAPI
                 }
                 catch (Exception ex)
                 {
-                    return new Tuple<Currency, Exception>(new Currency{Code = "EUR", Rate = 1, SymbolString = "EUR"}, ex);
+                    return new Tuple<Currency, Exception>(new Currency { Code = "EUR", Rate = 1, SymbolString = "EUR" }, ex);
                 }
 
                 try
