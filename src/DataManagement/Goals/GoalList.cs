@@ -28,7 +28,7 @@ namespace ePiggyWeb.DataManagement.Goals
             {
                 var sec = thing.GetChildren();
                 var configurationSections = sec as IConfigurationSection[] ?? sec.ToArray();
-                IGoal goal = Goal.CreateLocalGoal(configurationSections.Last().Value, decimal.Parse(configurationSections.First().Value));
+                IGoal goal = Goal.CreateLocalGoal(configurationSections.Last().Value, decimal.Parse(configurationSections.First().Value), "EUR");
                 list.Add(goal);
             }
 

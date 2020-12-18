@@ -48,7 +48,7 @@ namespace ePiggyWeb.Utilities
             stringPrice = stringPrice?.Substring(1).Trim();
             if (stringPrice == null)
             {
-                return Goal.CreateLocalGoal(itemName, 0);
+                return Goal.CreateLocalGoal(itemName, 0, "EUR");
             }
 
             try
@@ -61,7 +61,7 @@ namespace ePiggyWeb.Utilities
                     name = itemName;
                 }
 
-                var temp = Goal.CreateLocalGoal(name, decimalPrice);
+                var temp = Goal.CreateLocalGoal(name, decimalPrice, "EUR");
                 return temp;
             }
             catch(Exception ex)

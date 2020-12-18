@@ -109,7 +109,7 @@ namespace ePiggyWeb.DataManagement.Entries
             {
                 var amount = random.Next(50, 500);
                 var importance = random.Next(minImportance, maxImportance);
-                IEntry entry = Entry.CreateLocalEntry(thing.Value, amount, DateTime.UtcNow, false, importance);
+                IEntry entry = Entry.CreateLocalEntry(thing.Value, amount, DateTime.UtcNow, false, importance, "EUR");
                 list.Add(entry);
             }
 

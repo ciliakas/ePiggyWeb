@@ -100,7 +100,7 @@ namespace ePiggyWeb.Pages
                 }
 
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
+                var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, "EUR");
                 await EntryDatabase.CreateAsync(entry, UserId, EntryType.Income);
             }
             catch (Exception ex)

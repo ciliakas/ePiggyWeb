@@ -98,7 +98,7 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100);
+                Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100, "EUR");
                 Savings = 0;
             }
 

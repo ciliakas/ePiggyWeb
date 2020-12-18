@@ -85,7 +85,7 @@ namespace ePiggyWeb.Pages
                 }
 
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var temp = Goal.CreateLocalGoal(Title, Amount);
+                var temp = Goal.CreateLocalGoal(Title, Amount, "EUR");
                 await GoalDatabase.CreateAsync(temp, UserId);
             }
             catch (Exception ex)
@@ -142,7 +142,7 @@ namespace ePiggyWeb.Pages
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 decimal.TryParse(amount, out var parsedAmount);
                 var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring: false,
-                    importance: 1);
+                    importance: 1, "EUR");
                 await GoalDatabase.MoveGoalToExpensesAsync(id, UserId, entry);
                 return RedirectToPage("/expenses");
             }
