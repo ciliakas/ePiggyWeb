@@ -61,18 +61,18 @@ namespace ePiggyWeb.Pages
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
         private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        private CurrencyApiAgent CurrencyApiAgent { get; }
         public string CurrencySymbol { get; private set; }
         public decimal CurrencyRate { get; set; }
         private IMemoryCache Cache { get; }
 
-        public IncomesModel(EntryDatabase entryDatabase, ILogger<IncomeModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public IncomesModel(EntryDatabase entryDatabase, ILogger<IncomeModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
             Configuration = configuration;
             UserDatabase = userDatabase;
-            CurrencyConverter = currencyConverter;
+            CurrencyApiAgent = currencyApiAgent;
             Cache = cache;
         }
 
@@ -93,7 +93,7 @@ namespace ePiggyWeb.Pages
                 var userModel = await UserDatabase.GetUserAsync(UserId);
                 try
                 {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
+                    userCurrency = await CurrencyApiAgent.GetCurrency(userModel.Currency);
                 }
                 catch (Exception)
                 {

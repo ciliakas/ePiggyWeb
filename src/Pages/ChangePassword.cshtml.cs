@@ -43,18 +43,18 @@ namespace ePiggyWeb.Pages
         public List<string> CurrencyOptions { get; private set; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        private CurrencyApiAgent CurrencyApiAgent { get; }
         public UserModel UserModel { get; private set; }
         private IMemoryCache Cache { get; }
         public bool FailedToGetCurrencyList { get; set; }
 
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
             EmailSender = emailSenderSettings.Value;
             _logger = logger;
-            CurrencyConverter = currencyConverter;
+            CurrencyApiAgent = currencyApiAgent;
             Cache = cache;
         }
 
@@ -86,7 +86,7 @@ namespace ePiggyWeb.Pages
                 //If we the code gets here, it means that we don't have the the correct user currency cached
                 try
                 {
-                    var userCurrency = await CurrencyConverter.GetCurrency(UserModel.Currency);
+                    var userCurrency = await CurrencyApiAgent.GetCurrency(UserModel.Currency);
                     var options = CacheKeys.DefaultCurrencyCacheOptions();
                     Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
                 }
@@ -99,7 +99,7 @@ namespace ePiggyWeb.Pages
 
             try
             {
-                var currencyList = await CurrencyConverter.GetList();
+                var currencyList = await CurrencyApiAgent.GetList();
                 var currencyCodeList = currencyList.Select(currency => currency.Code).ToList();
 
                 var options = CacheKeys.DefaultCurrencyCacheOptions();
@@ -150,7 +150,7 @@ namespace ePiggyWeb.Pages
             if (Recalculate)
             {
                 var currentCurrencyCode = (await UserDatabase.GetUserAsync(userId)).Currency;
-                var rate = await CurrencyConverter.GetRate(currentCurrencyCode, Currency);
+                var rate = await CurrencyApiAgent.GetRate(currentCurrencyCode, Currency);
                 await UserDatabase.ChangeCurrency(userId, Currency, rate);
             }
             else

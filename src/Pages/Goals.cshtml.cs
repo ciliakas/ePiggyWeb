@@ -42,12 +42,12 @@ namespace ePiggyWeb.Pages
         private HttpClient HttpClient { get; }
         private IConfiguration Configuration { get; }
         private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        private CurrencyApiAgent CurrencyApiAgent { get; }
         public string CurrencySymbol { get; private set; }
         public decimal CurrencyRate { get; set; }
         private IMemoryCache Cache { get; }
 
-        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
@@ -56,7 +56,7 @@ namespace ePiggyWeb.Pages
             _internetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
             Configuration = configuration;
             UserDatabase = userDatabase;
-            CurrencyConverter = currencyConverter;
+            CurrencyApiAgent = currencyApiAgent;
             Cache = cache;
         }
 
@@ -96,7 +96,7 @@ namespace ePiggyWeb.Pages
                 var userModel = await UserDatabase.GetUserAsync(UserId);
                 try
                 {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
+                    userCurrency = await CurrencyApiAgent.GetCurrency(userModel.Currency);
                 }
                 catch (Exception)
                 {

@@ -31,7 +31,7 @@ namespace ePiggyWeb.Pages
 
         public async Task OnGet()
         {
-            var currencyConverter = new CurrencyConverter(HttpClient, Configuration);
+            var currencyConverter = new CurrencyApiAgent(HttpClient, Configuration);
             var list = await currencyConverter.GetList();
             var sb = new StringBuilder();
 

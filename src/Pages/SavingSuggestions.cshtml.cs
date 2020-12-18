@@ -43,19 +43,19 @@ namespace ePiggyWeb.Pages
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        private CurrencyApiAgent CurrencyApiAgent { get; }
         public string CurrencySymbol { get; private set; }
         public decimal CurrencyRate { get; set; }
         private IMemoryCache Cache { get; }
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
             Configuration = configuration;
             UserDatabase = userDatabase;
-            CurrencyConverter = currencyConverter;
+            CurrencyApiAgent = currencyApiAgent;
             Cache = cache;
         }
         public async Task OnGet(int id)
@@ -76,7 +76,7 @@ namespace ePiggyWeb.Pages
                 var userModel = await UserDatabase.GetUserAsync(UserId);
                 try
                 {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
+                    userCurrency = await CurrencyApiAgent.GetCurrency(userModel.Currency);
                 }
                 catch (Exception)
                 {

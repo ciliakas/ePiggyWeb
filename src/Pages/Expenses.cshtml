@@ -6,9 +6,19 @@
 
 @if (Model.WasException)
 {
-    <div class="alert alert-danger" role="alert">
-        Whoops! Something went wrong!
-    </div>
+    if (string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            Whoops! Something went wrong!
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert">
+            @Model.ErrorMessage
+        </div>
+    }
+
     <h1 class="text-warning">Example Expenses data used:</h1>
 }
 else

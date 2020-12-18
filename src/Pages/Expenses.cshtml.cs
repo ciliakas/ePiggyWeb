@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -55,25 +57,28 @@ namespace ePiggyWeb.Pages
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
         [BindProperty(SupportsGet = true)]
-        public int CurrentPage { get; set; } = 1;  
+        public int CurrentPage { get; set; } = 1;
 
         public int PageSize = 10;
         public int TotalPages { get; set; }
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
         private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        private CurrencyApiAgent CurrencyApiAgent { get; }
+        public Currency Currency { get; set; }
         public decimal CurrencyRate { get; set; }
         public string CurrencySymbol { get; private set; }
         private IMemoryCache Cache { get; }
-        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        private CurrencyConverter CurrencyConverter { get; }
+        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache, CurrencyConverter currencyConverter)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
             Configuration = configuration;
             UserDatabase = userDatabase;
-            CurrencyConverter = currencyConverter;
+            CurrencyApiAgent = currencyApiAgent;
             Cache = cache;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task OnGet()
@@ -87,26 +92,31 @@ namespace ePiggyWeb.Pages
 
         private async Task SetCurrency()
         {
-            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var userModel = await UserDatabase.GetUserAsync(UserId);
-                try
+                WasException = true;
+                switch (exception)
                 {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
-                }
-                catch (Exception)
-                {
-                    CurrencySymbol = userModel.Currency;
-                    CurrencyRate = 1;
-                    return;
+                    case HttpListenerException ex:
+                        _logger.LogInformation(ex.ToString());
+                        ErrorMessage = "Failed to load currency information!";
+                        break;
+                    case HttpRequestException ex:
+                        _logger.LogInformation(ex.ToString());
+                        ErrorMessage = "Failed to load currency information!";
+                        break;
+                    default:
+                        _logger.LogInformation(exception.ToString());
+                        ErrorMessage = "Failed to connect to database!";
+                        break;
                 }
             }
 
-            CurrencySymbol = userCurrency.GetSymbol();
-            CurrencyRate = userCurrency.Rate;
-            var options = CacheKeys.DefaultCurrencyCacheOptions();
-            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
+            CurrencyRate = Currency.Rate;
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
@@ -132,7 +142,7 @@ namespace ePiggyWeb.Pages
                 }
 
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, "EUR");
+                var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, Currency.Code);
                 await EntryDatabase.CreateAsync(entry, UserId, EntryType.Expense);
                 return RedirectToPage("/expenses");
             }
@@ -142,8 +152,8 @@ namespace ePiggyWeb.Pages
                 WasException = true;
                 return Page();
             }
-           
-            
+
+
         }
 
         public async Task<IActionResult> OnPostDelete()
@@ -172,12 +182,15 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
-                var (expenseList, totalPages) = await EntryDatabase.ReadByPage(x => x.Date >= StartDate && x.Date <= EndDate, UserId,
-                    EntryType.Expense, CurrentPage, PageSize);
-                ExpensesToDisplay = expenseList;
-                TotalPages = totalPages;
+                //var (expenseList, totalPages) = await EntryDatabase.ReadByPage(x => x.Date >= StartDate && x.Date <= EndDate, UserId,
+                //    EntryType.Expense, CurrentPage, PageSize);
+                //ExpensesToDisplay = expenseList;
+                //TotalPages = totalPages;
+
+                Expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId, EntryType.Expense);
+                TotalPages = (int)Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
+                ExpensesToDisplay = Expenses.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
                 AllExpenses = Expenses.GetSum();
             }
             catch (Exception ex)

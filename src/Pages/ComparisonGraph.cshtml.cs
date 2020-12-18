@@ -28,16 +28,16 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
         private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        private CurrencyApiAgent CurrencyApiAgent { get; }
         public string CurrencySymbol { get; private set; }
         public decimal CurrencyRate { get; set; }
         private IMemoryCache Cache { get; }
-        public ComparisonGraphModel(EntryDatabase entryDatabase, ILogger<ComparisonGraphModel> logger, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public ComparisonGraphModel(EntryDatabase entryDatabase, ILogger<ComparisonGraphModel> logger, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
             UserDatabase = userDatabase;
-            CurrencyConverter = currencyConverter;
+            CurrencyApiAgent = currencyApiAgent;
             Cache = cache;
         }
 
@@ -58,7 +58,7 @@ namespace ePiggyWeb.Pages
                 var userModel = await UserDatabase.GetUserAsync(UserId);
                 try
                 {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
+                    userCurrency = await CurrencyApiAgent.GetCurrency(userModel.Currency);
                 }
                 catch (Exception)
                 {
