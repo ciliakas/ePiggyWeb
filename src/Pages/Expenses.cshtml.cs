@@ -190,7 +190,8 @@ namespace ePiggyWeb.Pages
                 Expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
                     UserId, EntryType.Expense);
                 TotalPages = (int)Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
-                ExpensesToDisplay = Expenses.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
+                var expensesToDisplay = Expenses.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
+                ExpensesToDisplay = await CurrencyConverter.ConvertEntryList(expensesToDisplay, UserId);
                 AllExpenses = Expenses.GetSum();
             }
             catch (Exception ex)

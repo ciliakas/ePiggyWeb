@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataBase.Models;
+using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -26,15 +27,35 @@ namespace ePiggyWeb.CurrencyAPI
             UserDatabase = userDatabase;
         }
 
-        private async Task<Tuple<Currency, Exception>> Test()
+        public async Task<IEntryList> ConvertEntryList(IEntryList entryList,int userId)
         {
-            throw new NotImplementedException();
+            var (userCurrency, exception) = await GetUserCurrency(userId);
+            //Error check
+
+            //Temporary while no currency is saved
+            foreach (var entry in entryList)
+            {
+                if(entry.Currency is null || entry.Currency == "currency") entry.Currency = "EUR";
+            }
+
+            var containsForeignCurrency = entryList.Any(x => x.Currency != userCurrency.Code);
+            if(!containsForeignCurrency) return entryList;
+
+            var currencyList = await CurrencyApiAgent.GetList();
+            //Error check
+            foreach (var entry in entryList.Where(x => x.Currency != userCurrency.Code))
+            {
+                var userRate = userCurrency.Rate;
+                var foreignRate = currencyList.First(x => x.Code == entry.Currency).Rate;
+                var rate = userRate / foreignRate;
+                entry.Amount *= rate;
+            }
+
+            return entryList;
         }
 
         public async Task<Tuple<Currency, Exception>> GetUserCurrency(int userId)
         {
-            // We do the whole try thing here, and we throw exceptions down for front to catch and deal with
-
             if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
             {
                 UserModel userModel;
