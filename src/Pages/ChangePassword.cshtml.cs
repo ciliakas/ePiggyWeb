@@ -46,6 +46,7 @@ namespace ePiggyWeb.Pages
         private CurrencyConverter CurrencyConverter { get; }
         public UserModel UserModel { get; private set; }
         private IMemoryCache Cache { get; }
+        public bool FailedToGetCurrencyList { get; set; }
 
         public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
@@ -110,9 +111,11 @@ namespace ePiggyWeb.Pages
                 var userCurrency = currencyList.First(x => x.Code == UserModel.Currency);
                 Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 CurrencyOptions.Add(UserModel.Currency);
+                FailedToGetCurrencyList = true;
+                _logger.LogInformation(e.ToString());
             }
         }
 
