@@ -43,7 +43,7 @@ namespace ePiggyWeb.Pages
         private EmailSender EmailSender { get; }
         private CurrencyConverter CurrencyConverter { get; }
         public UserModel UserModel { get; private set; }
-
+        public bool FailedToGetCurrencyList { get; set; }
         public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
@@ -81,6 +81,7 @@ namespace ePiggyWeb.Pages
             catch (Exception)
             {
                 CurrencyOptions.Add(UserModel.Currency);
+                FailedToGetCurrencyList = true;
             }
         }
 
