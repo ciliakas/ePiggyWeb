@@ -138,10 +138,12 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                Income = entryList.GetFrom(StartDate).GetTo(EndDate);
+                Income = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId,
+                    EntryType.Income);
+
                 IncomeToDisplay = Income.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
-                AllIncome = entryList.GetSum();
+                AllIncome = Income.GetSum();
             }
             catch (Exception ex)
             {

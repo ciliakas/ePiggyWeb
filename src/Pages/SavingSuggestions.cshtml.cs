@@ -41,7 +41,8 @@ namespace ePiggyWeb.Pages
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration)
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase,
+            EntryDatabase entryDatabase, IConfiguration configuration)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
@@ -59,7 +60,9 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate, out var tempEndDate);
+            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate,
+                out var tempEndDate);
+
             StartDate = tempStartDate;
             EndDate = tempEndDate;
 
@@ -73,16 +76,18 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                Expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId,
+                    EntryType.Expense);
+
                 Goal = await GoalDatabase.ReadAsync(Id, UserId);
-                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                Savings = income.GetSum() - Expenses.GetSum();
+                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);//Removed when balance
+                Savings = income.GetSum() - Expenses.GetSum();//Balance method
                 if (Savings < 0)
                 {
                     Savings = 0;
                 }
 
-                Expenses = Expenses.GetFrom(StartDate).GetTo(EndDate);
 
                 var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
                 MinimalSuggestions = suggestionDictionary[SavingType.Minimal];

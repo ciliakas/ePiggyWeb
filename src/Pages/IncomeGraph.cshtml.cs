@@ -43,7 +43,9 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate, out var tempEndDate);
+            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate,
+                out var tempEndDate);
+
             StartDate = tempStartDate;
             EndDate = tempEndDate;
             await SetData();
@@ -55,8 +57,9 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                Income = entryList.GetFrom(StartDate).GetTo(EndDate);
+                var entryList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId,
+                    EntryType.Income);
             }
             catch (Exception ex)
             {
@@ -64,7 +67,6 @@ namespace ePiggyWeb.Pages
                 WasException = true;
                 Income = EntryList.RandomList(Configuration, EntryType.Income);
             }
-            
         }
     }
 }
