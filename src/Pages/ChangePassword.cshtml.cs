@@ -164,6 +164,9 @@ namespace ePiggyWeb.Pages
         public async Task<IActionResult> OnPostDeleteAccount()
         {
             await HttpContext.SignOutAsync();
+            Response.Cookies.Delete("StartDate");
+            Response.Cookies.Delete("EndDate");
+            Cache.Remove(CacheKeys.UserCurrency);
             await UserDatabase.DeleteUserAsync(User.FindFirst(ClaimTypes.Email).Value);
             return Redirect("/index");
         }
