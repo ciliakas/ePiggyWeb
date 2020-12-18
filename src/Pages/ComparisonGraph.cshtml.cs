@@ -41,7 +41,14 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate, out var tempEndDate);
+            TimeManager.SetDate(startDate,
+                endDate,
+                ref ErrorMessage,
+                Response,
+                Request,
+                out var tempStartDate,
+                out var tempEndDate);
+
             StartDate = tempStartDate;
             EndDate = tempEndDate;
             await SetData();
@@ -53,10 +60,13 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Expenses = (await EntryDatabase.ReadListAsync(UserId, EntryType.Expense)).GetFrom(StartDate)
-                    .GetTo(EndDate).GetSum();
-                Income = (await EntryDatabase.ReadListAsync(UserId, EntryType.Income)).GetFrom(StartDate).GetTo(EndDate)
-                    .GetSum();
+                Expenses = (await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId,
+                    EntryType.Expense)).GetSum();//prob better sum method?
+
+                Income = (await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId,
+                    EntryType.Income)).GetSum();//prob better sum method?
             }
             catch (Exception ex)
             {
