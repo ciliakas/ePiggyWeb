@@ -34,8 +34,8 @@ else
 }
 else
 {
-    <h4 class="text-light total-graphs">This period: Income: @NumberFormatter.FormatCurrency(Model.Income) / Expenses: @NumberFormatter.FormatCurrency(Model.Expenses)</h4>
-    <h4 class="text-light total-graphs">Balance: @NumberFormatter.FormatCurrency(Model.Income - Model.Expenses)</h4>
+    <h4 class="text-light total-graphs">This period: Income: @NumberFormatter.FormatCurrency(Model.Income, Model.CurrencySymbol) / Expenses: @NumberFormatter.FormatCurrency(Model.Expenses, Model.CurrencySymbol)</h4>
+    <h4 class="text-light total-graphs">Balance: @NumberFormatter.FormatCurrency(Model.Income - Model.Expenses, Model.CurrencySymbol)</h4>
 }
 <div class="container p-0 mt-3 mb-5">
     <div class="col-lg-12" id="graph">

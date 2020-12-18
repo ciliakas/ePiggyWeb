@@ -16,7 +16,7 @@
 <h2 class="text-light">@Model.Goal.Title</h2>
 <h3 class="text-light mt-3 mb-4">
     Currently: <br/>
-    @NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(Model.Goal.Amount)
+    @NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)/@NumberFormatter.FormatCurrency(Model.Goal.Amount, Model.CurrencySymbol)
 </h3>
 
 @if (!Model.WasException)
@@ -89,7 +89,7 @@
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @NumberFormatter.FormatCurrency(item.Entry.Amount)
+                                            @NumberFormatter.FormatCurrency(item.Entry.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
                                             <span class="text-info">Date: </span>
@@ -102,7 +102,7 @@
                                     </div>
                                 </td>
                                 <td class="border-primary entry-table-side">
-                                    @NumberFormatter.FormatCurrency(item.Amount)
+                                    @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                 </td>
                             </tr>
                         }
@@ -126,10 +126,10 @@
                             <tr class="table-light border-primary">
                                 <td class="border-primary entry-column">
                                     <strong class="text-info">@Html.DisplayFor(m => item.Importance)</strong><br />
-                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage)
+                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
                                 </td>
                                 <td class="border-primary text-info entry-table-side">
-                                    @NumberFormatter.FormatCurrency(item.NewAverage)
+                                    @NumberFormatter.FormatCurrency(item.NewAverage, Model.CurrencySymbol)
                             </tr>
                         }
                     </table>
@@ -180,7 +180,7 @@
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @NumberFormatter.FormatCurrency(item.Entry.Amount)
+                                            @NumberFormatter.FormatCurrency(item.Entry.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
                                             <span class="text-info">Date: </span>
@@ -193,7 +193,7 @@
                                     </div>
                                 </td>
                                 <td class="border-primary entry-table-side">
-                                    @NumberFormatter.FormatCurrency(item.Amount)
+                                    @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                 </td>
                             </tr>
                         }
@@ -217,10 +217,10 @@
                             <tr class="table-light border-primary">
                                 <td class="border-primary entry-column">
                                     <strong class="text-info">@Html.DisplayFor(m => item.Importance)</strong><br />
-                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage)
+                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
                                 </td>
                                 <td class="border-primary text-info entry-table-side">
-                                    @NumberFormatter.FormatCurrency(item.NewAverage)
+                                    @NumberFormatter.FormatCurrency(item.NewAverage, Model.CurrencySymbol)
                             </tr>
                         }
                     </table>
@@ -271,7 +271,7 @@
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @NumberFormatter.FormatCurrency(item.Entry.Amount)
+                                            @NumberFormatter.FormatCurrency(item.Entry.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
                                             <span class="text-info">Date: </span>
@@ -284,7 +284,7 @@
                                     </div>
                                 </td>
                                 <td class="border-primary entry-table-side">
-                                    @NumberFormatter.FormatCurrency(item.Amount)
+                                    @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                 </td>
                             </tr>
                         }
@@ -308,10 +308,10 @@
                             <tr class="table-light border-primary">
                                 <td class="border-primary entry-column">
                                     <strong class="text-info">@Html.DisplayFor(m => item.Importance)</strong><br />
-                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage)
+                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
                                 </td>
                                 <td class="border-primary text-info entry-table-side">
-                                    @NumberFormatter.FormatCurrency(item.NewAverage)
+                                    @NumberFormatter.FormatCurrency(item.NewAverage, Model.CurrencySymbol)
                             </tr>
                         }
                     </table>

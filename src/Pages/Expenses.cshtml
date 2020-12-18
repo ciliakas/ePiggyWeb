@@ -1,5 +1,6 @@
 ﻿@page
 @using System.Linq
+@using ePiggyWeb.CurrencyAPI
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.ExpensesModel
 
@@ -89,8 +90,8 @@ else
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr class="mt-4 mb-4" />
-    <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</h5>
-    <h5 class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses)</h5>
+    <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum(), Model.CurrencySymbol)</h5>
+    <h5 class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses, Model.CurrencySymbol)</h5>
     <hr class="mt-4 mb-4" />
 
 }
@@ -128,7 +129,7 @@ else
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @NumberFormatter.FormatCurrency(item.Amount)
+                                            @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
                                             <span class="text-info">Date: </span>
