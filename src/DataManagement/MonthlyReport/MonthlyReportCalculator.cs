@@ -119,23 +119,6 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
                 Result.HasGoals = false;
                 return;
             }
-            // var max = 0;
-            // var min = decimal.MaxValue;
-            // var minGoal = new Goal();
-            // var maxGoal = new Goal();
-
-            /* foreach (var item in Goals)
-             {
-                 if (item.Amount >= max)
-                 {
-                     max = item.Amount;
-                     maxGoal = (Goal)item;
-                 }
-
-                 if (item.Amount > min || item.Amount <= AllSavings) continue;
-                 min = item.Amount;
-                 minGoal = (Goal)item;
-             }*/
 
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;
