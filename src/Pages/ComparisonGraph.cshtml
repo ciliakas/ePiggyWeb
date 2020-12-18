@@ -24,8 +24,14 @@ else
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
 }
-
-
+@if (Model.CurrencyException)
+{
+    <div class="container">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
+}
 @if (Model.Expenses == 0 && Model.Income == 0)
 {
     <div class="alert alert-warning" role="alert">

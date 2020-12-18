@@ -96,6 +96,15 @@ else
     <hr class="mt-4 mb-4" />
 }
 
+@if (Model.CurrencyException)
+{
+    <div class="container">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
+}
+
 <form method="post">
     <div class="row ml-2 mr-2">
         <button asp-page-handler="Delete" type="submit" class="btn btn-danger">Delete Selected <i class="fas fa-trash-alt"></i></button>

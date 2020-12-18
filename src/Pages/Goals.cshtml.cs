@@ -45,6 +45,7 @@ namespace ePiggyWeb.Pages
         private CurrencyConverter CurrencyConverter { get; }
         public string CurrencySymbol { get; private set; }
         public decimal CurrencyRate { get; set; }
+        public bool CurrencyException { get; set; }
         private IMemoryCache Cache { get; }
 
         public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
@@ -102,6 +103,8 @@ namespace ePiggyWeb.Pages
                 {
                     CurrencySymbol = userModel.Currency;
                     CurrencyRate = 1;
+                    CurrencyException = true;
+
                     return;
                 }
             }
@@ -190,8 +193,6 @@ namespace ePiggyWeb.Pages
                 WasException = true;
                 return RedirectToPage("/goals");
             }
-            
         }
-
     }
 }

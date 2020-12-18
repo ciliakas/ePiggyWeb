@@ -31,6 +31,7 @@ namespace ePiggyWeb.Pages
         private CurrencyConverter CurrencyConverter { get; }
         public string CurrencySymbol { get; private set; }
         public decimal CurrencyRate { get; set; }
+        public bool CurrencyException { get; set; }
         private IMemoryCache Cache { get; }
         public ComparisonGraphModel(EntryDatabase entryDatabase, ILogger<ComparisonGraphModel> logger, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
@@ -64,6 +65,7 @@ namespace ePiggyWeb.Pages
                 {
                     CurrencySymbol = userModel.Currency;
                     CurrencyRate = 1;
+                    CurrencyException = true;
                     return;
                 }
             }
