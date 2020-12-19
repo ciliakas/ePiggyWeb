@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -15,11 +14,9 @@ namespace ePiggyWeb.DataBase
     public class EntryDatabase
     {
         private PiggyDbContext Database { get; }
-        public string CnStr { get; set; }
         public EntryDatabase(PiggyDbContext database)
         {
             Database = database;
-            CnStr = "Server=51.75.187.147;Database=SmartSaver;User Id=usern;Password=123456789;";
         }
 
         public async Task<int> CreateAsync(IEntry localEntry, int userId, EntryType entryType)
@@ -73,7 +70,6 @@ namespace ePiggyWeb.DataBase
                 key.Id = value.Id;
                 entryList.Add(key);
             }
-
 
             return true;
         }
@@ -175,35 +171,27 @@ namespace ePiggyWeb.DataBase
 
         public async Task<IEntryList> ReadListAsync(int userId, EntryType entryType)
         {
-            //return await ReadListAsync(x => true, userId, entryType);
+            return await ReadListAsync(x => true, userId, entryType);
+        }
+
+        public async Task<Tuple<IEntryList, int>> ReadByPage(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType,
+            int pageNumber, int pageSize)
+        {
+            await UpdateRecurringAsync(userId, entryType);
+            var updatedFilter = filter.And(x => x.UserId == userId);
+
+            var allEntries = entryType switch
+            {
+                EntryType.Income => await Database.Incomes.Where(updatedFilter).OrderByDescending(x => x.Date)
+                    .Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
+                _ => await Database.Expenses.Where(updatedFilter).OrderByDescending(x => x.Date)
+                    .Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
+            };
+
             var list = new EntryList(entryType);
-
-            var type = entryType == 0 ? "Incomes" : "Expenses";
-
-            var query = "SELECT * FROM " + type + " WHERE UserId =" + userId;
-
-            var MyDataSet = new DataSet();
-
-            var MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, CnStr);
-
-            MyDataAdapter.Fill(MyDataSet);
-
-            var table = MyDataSet.Tables[0];
-
-            var items = (from DataRow row in table.Rows
-                select new Entry 
-                {
-                    Id = row.Field<int>("Id"),
-                    Amount = row.Field<decimal>("Amount"),
-                    Date = row.Field<DateTime>("Date"),
-                    Importance = row.Field<int>("Importance"),
-                    Recurring = row.Field<bool>("IsMonthly"),
-                    Title = row.Field<string>("Title"),
-                    UserId = row.Field<int>("UserId")
-                } as IEntry).ToList();
-
-            list.AddRange(items);
-            return list;
+            list.AddRange(allEntries.Skip((pageNumber - 1) * pageSize).Take(pageSize));
+            var numberOfPages = (int) Math.Ceiling(decimal.Divide(allEntries.Count, pageSize));
+            return new Tuple<IEntryList, int>(list, numberOfPages);
         }
 
         public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType)

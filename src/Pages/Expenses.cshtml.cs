@@ -55,8 +55,9 @@ namespace ePiggyWeb.Pages
 
         [BindProperty(SupportsGet = true)]
         public int CurrentPage { get; set; } = 1;  
+
         public int PageSize = 10;
-        public int TotalPages => (int) Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
+        public int TotalPages { get; set; }
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
 
@@ -138,15 +139,13 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId,
-                    EntryType.Expense);
-
-                ExpensesToDisplay = Expenses.OrderByDescending(x => x.Date)
-                    .ToIEntryList()
-                    .GetPage(CurrentPage, PageSize);
-
-                AllExpenses = Expenses.GetSum();//Replaced with sum from database.
+                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+                var (expenseList, totalPages) = await EntryDatabase.ReadByPage(x => x.Date >= StartDate && x.Date <= EndDate, UserId,
+                    EntryType.Expense, CurrentPage, PageSize);
+                ExpensesToDisplay = expenseList;
+                TotalPages = totalPages;
+                AllExpenses = Expenses.GetSum();
             }
             catch (Exception ex)
             {
