@@ -153,8 +153,6 @@ namespace ePiggyWeb.Pages
                 WasException = true;
                 return Page();
             }
-
-
         }
 
         public async Task<IActionResult> OnPostDelete()
@@ -180,9 +178,9 @@ namespace ePiggyWeb.Pages
 
         private async Task SetData()
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 //var (expenseList, totalPages) = await EntryDatabase.ReadByPage(x => x.Date >= StartDate && x.Date <= EndDate, UserId,
                 //    EntryType.Expense, CurrentPage, PageSize);
                 //ExpensesToDisplay = expenseList;
@@ -191,8 +189,18 @@ namespace ePiggyWeb.Pages
                 Expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
                     UserId, EntryType.Expense);
                 TotalPages = (int)Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
-                var expensesToDisplay = Expenses.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
-                ExpensesToDisplay = await CurrencyConverter.ConvertEntryList(expensesToDisplay, UserId);
+
+                var expensesToDisplay = Expenses.OrderByDescending(x => x.Date)
+                    .ToIEntryList().GetPage(CurrentPage, PageSize);
+                try
+                {
+                    ExpensesToDisplay = await CurrencyConverter.ConvertEntryList(expensesToDisplay, UserId);
+                }
+                catch (Exception ex)
+                {
+                    // Failed to convert currency
+                    _logger.LogInformation(ex.ToString());
+                }
                 AllExpenses = Expenses.GetSum();
             }
             catch (Exception ex)

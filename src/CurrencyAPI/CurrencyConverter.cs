@@ -55,8 +55,8 @@ namespace ePiggyWeb.CurrencyAPI
 
         public async Task<IEntryList> ConvertEntryList(IEntryList entryList, int userId)
         {
-            var (userCurrency, exception) = await GetUserCurrency(userId);
-            //Error check
+            var (userCurrency, exception1) = await GetUserCurrency(userId);
+            if (exception1 != null) throw exception1;
 
             //Temporary while no currency is saved
             foreach (var entry in entryList)
@@ -67,7 +67,8 @@ namespace ePiggyWeb.CurrencyAPI
             var containsForeignCurrency = entryList.Any(x => x.Currency != userCurrency.Code);
             if (!containsForeignCurrency) return entryList;
 
-            var currencyList = await CurrencyApiAgent.GetList();
+            var (currencyList, exception2) = await GetCurrencyList(userId);
+            if (exception2 != null) throw exception2;
             //Error check
             foreach (var entry in entryList.Where(x => x.Currency != userCurrency.Code))
             {
