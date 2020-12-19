@@ -197,10 +197,9 @@ namespace ePiggyWeb.DataBase
         public async Task<decimal> GetBalance(Expression<Func<IEntryModel, bool>> filter, int userId)
         {
             var updatedFilter = filter.And(x => x.UserId == userId);
-            var expenses = await Database.Expenses.Where(updatedFilter).ToListAsync();
-            var incomes = await Database.Incomes.Where(updatedFilter).ToListAsync();
-
-            var balance = incomes.Sum(x => x.Amount) -  expenses.Sum(x => x.Amount);
+            var expenses = await Database.Expenses.Where(updatedFilter).SumAsync(x => x.Amount);
+            var incomes = await Database.Incomes.Where(updatedFilter).SumAsync(x => x.Amount);
+            var balance = incomes - expenses;
             return balance;
         }
 
