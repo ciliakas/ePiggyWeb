@@ -42,22 +42,19 @@ namespace ePiggyWeb.Pages
 
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
-        private UserDatabase UserDatabase { get; }
-        private CurrencyApiAgent CurrencyApiAgent { get; }
-        public string CurrencySymbol { get; private set; }
-        public decimal CurrencyRate { get; set; }
         public bool CurrencyException { get; set; }
-        private IMemoryCache Cache { get; }
+        public Currency Currency { get; set; }
+        public string CurrencySymbol { get; private set; }
+        private CurrencyConverter CurrencyConverter { get; }
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase,
+            EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
             Configuration = configuration;
-            UserDatabase = userDatabase;
-            CurrencyApiAgent = currencyApiAgent;
-            Cache = cache;
+            CurrencyConverter = currencyConverter;
         }
         public async Task OnGet(int id)
         {
@@ -71,27 +68,14 @@ namespace ePiggyWeb.Pages
 
         private async Task SetCurrency()
         {
-            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var userModel = await UserDatabase.GetUserAsync(UserId);
-                try
-                {
-                    userCurrency = await CurrencyApiAgent.GetCurrency(userModel.Currency);
-                }
-                catch (Exception)
-                {
-                    CurrencySymbol = userModel.Currency;
-                    CurrencyRate = 1;
-                    CurrencyException = true;
-                    return;
-                }
+                CurrencyException = true;
             }
-
-            CurrencySymbol = userCurrency.GetSymbol();
-            CurrencyRate = userCurrency.Rate;
-            var options = CacheKeys.DefaultCurrencyCacheOptions();
-            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
@@ -103,6 +87,7 @@ namespace ePiggyWeb.Pages
             EndDate = tempEndDate;
 
             Id = id;
+            await SetCurrency();
             await SetData();
             return Page();
         }
@@ -112,13 +97,26 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                var expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
                     UserId,
                     EntryType.Expense);
 
                 Goal = await GoalDatabase.ReadAsync(Id, UserId);
-                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);//Removed when balance
-                Savings = income.GetSum() - Expenses.GetSum();//Balance method
+                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+                try
+                {
+                    income = await CurrencyConverter.ConvertEntryList(income, UserId);
+                    Expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
+                    Savings = income.GetSum() - expenses.GetSum();
+                    Savings = Savings < 0 ? 0 : Savings;
+                }
+                catch (Exception ex)
+                {
+                    CurrencyException = true;
+                    _logger.LogInformation(ex.ToString());
+                    throw;
+                }
+                Savings = income.GetSum() - Expenses.GetSum();
                 if (Savings < 0)
                 {
                     Savings = 0;
