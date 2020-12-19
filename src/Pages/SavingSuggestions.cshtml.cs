@@ -97,9 +97,7 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId,
-                    EntryType.Expense);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
 
                 Goal = await GoalDatabase.ReadAsync(Id, UserId);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
@@ -122,6 +120,7 @@ namespace ePiggyWeb.Pages
                     Savings = 0;
                 }
 
+                Expenses.GetFrom(StartDate).GetTo(EndDate);
 
                 var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
                 MinimalSuggestions = suggestionDictionary[SavingType.Minimal];

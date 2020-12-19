@@ -36,11 +36,11 @@
         <input type="hidden" name="handler" value="Filter" />
         <label class="text-light col-md-4">Period:</label>
         <div class="row justify-content-center">
-            <input class="col-md-3 col-sm-5 col-5" for="startDate" min="@DateTime.Now.AddMonths(-2)" max="@DateTime.Now.ToShortDateString()"
-                   asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+            <input class="col-md-3 col-sm-5 col-5" for="startDate" min="@DateTime.Now.AddMonths(-2).ToShortDateString()" 
+                   max="@DateTime.Now.ToShortDateString()" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
             <label class="text-light ml-2 mr-2"> - </label>
-            <input class="col-md-3 col-sm-5 col-5" for="endDate"  min="@DateTime.Now.AddMonths(-2)" max="@DateTime.Now.ToShortDateString()"
-                   asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+            <input class="col-md-3 col-sm-5 col-5" for="endDate"  min="@DateTime.Now.AddMonths(-2).ToShortDateString()"
+                   max="@DateTime.Now.ToShortDateString()" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
         <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
         <p class="text-warning">@Model.ErrorMessage</p>
