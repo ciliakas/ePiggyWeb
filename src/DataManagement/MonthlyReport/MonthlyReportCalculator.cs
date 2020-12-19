@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
@@ -25,12 +26,15 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private DateTime StartTime { get; set; }
         private DateTime EndTime { get; set; }
+        public CurrencyConverter CurrencyConverter { get; set; }
 
-        public MonthlyReportCalculator(GoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId)
+        public MonthlyReportCalculator(GoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId,
+            CurrencyConverter currencyConverter)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
             UserId = userId;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task<MonthlyReportResult> Calculate()
@@ -52,6 +56,13 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
             Income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
             Goals = await GoalDatabase.ReadListAsync(UserId);
+
+            /*Allowing exception to bubble here*/
+            Income = await CurrencyConverter.ConvertEntryList(Income, UserId);
+            Expenses = await CurrencyConverter.ConvertEntryList(Expenses, UserId);
+            Goals = await CurrencyConverter.ConvertGoalList(Goals, UserId);
+
+
 
             var expensesTotal = Expenses.GetSum();
             var incomeTotal = Income.GetSum();
