@@ -1,27 +1,15 @@
 ﻿@page
 @using System.Linq
-@using ePiggyWeb.CurrencyAPI
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.ExpensesModel
 
 @if (Model.WasException)
 {
-    if (string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-        <div class="alert alert-danger" role="alert">
-            Whoops! Something went wrong!
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger" role="alert">
-            @Model.ErrorMessage
-        </div>
-    }
-
-    <h1 class="text-warning">Example Expenses data used:</h1>
+    <div class="alert alert-danger" role="alert">
+        Whoops! Something went wrong!
+    </div>
 }
-else
+@if (!Model.LoadingException)
 {
     <br />
     <div class="container p-0 mt-3">
@@ -97,13 +85,15 @@ else
             <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
         <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
-        <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr class="mt-4 mb-4" />
     <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum(), Model.CurrencySymbol)</h5>
-    <h5 class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses, Model.CurrencySymbol)</h5>
     <hr class="mt-4 mb-4" />
 
+}
+else
+{
+    <h1 class="text-warning">Example Expenses data used:</h1>
 }
 @if (Model.CurrencyException)
 {
@@ -132,7 +122,7 @@ else
                                 <h5 class="text-light">Expenses</h5>
                             </th>
                         </tr>
-                        @foreach (var item in Model.ExpensesToDisplay)
+                        @foreach (var item in Model.Expenses)
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary border entry-table-side">
