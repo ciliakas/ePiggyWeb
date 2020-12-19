@@ -165,6 +165,7 @@ namespace ePiggyWeb.Pages
                 {
                     CurrencyException = true;
                     _logger.LogInformation(ex.ToString());
+                    Income = incomeList;
                 }
             }
             catch (Exception ex)
