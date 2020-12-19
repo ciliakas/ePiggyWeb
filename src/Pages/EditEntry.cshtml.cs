@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
@@ -48,7 +47,6 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost()
         {
-            Debug.WriteLine("\n\n\n\n\n Post called");
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -67,7 +65,6 @@ namespace ePiggyWeb.Pages
 
         public IActionResult OnPostCancel()
         {
-            Debug.WriteLine("\n\n\n\n\n Cancel called");
             return RedirectToPage(EntryTypeInt == 1 ? "/Income" : "/Expenses");
         }
     }
