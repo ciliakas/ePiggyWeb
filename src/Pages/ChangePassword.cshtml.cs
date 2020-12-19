@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
@@ -45,19 +44,17 @@ namespace ePiggyWeb.Pages
         public List<string> CurrencyOptions { get; private set; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        private CurrencyApiAgent CurrencyApiAgent { get; }
         public string UserCurrencyCode { get; set; }
         private IMemoryCache Cache { get; }
         public bool FailedToGetCurrencyList { get; set; }
         private CurrencyConverter CurrencyConverter { get; }
 
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyApiAgent currencyApiAgent, IMemoryCache cache, CurrencyConverter currencyConverter)
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, IMemoryCache cache, CurrencyConverter currencyConverter)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
             EmailSender = emailSenderSettings.Value;
             _logger = logger;
-            CurrencyApiAgent = currencyApiAgent;
             Cache = cache;
             CurrencyConverter = currencyConverter;
         }
@@ -103,7 +100,6 @@ namespace ePiggyWeb.Pages
 
         private async Task SetCurrencyList()
         {
-            // The user model thing needs to get fixed
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             CurrencyOptions = new List<string>();
             var (currencyList1, exception) = await CurrencyConverter.GetCurrencyList(userId);
@@ -130,43 +126,41 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPost()
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return Page();
-                }
-                if (string.Equals(Password, PasswordConfirm))
+                return Page();
+            }
+
+            if (string.Equals(Password, PasswordConfirm))
+            {
+                try
                 {
                     await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
-                    return RedirectToPage("/index");
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex.ToString());
+                }
+                return RedirectToPage("/index");
+            }
 
-                ErrorMessage = "Passwords did not match!";
-                return Page();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.ToString());
-                return Page();
-            }
+            ErrorMessage = "Passwords did not match!";
+            return Page();
         }
 
         // We need to set up error handling here
         public async Task<IActionResult> OnPostCurrency()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            if (Recalculate)
-            {
-                var currentCurrencyCode = (await UserDatabase.GetUserAsync(userId)).Currency;
-                var rate = await CurrencyApiAgent.GetRate(currentCurrencyCode, Currency);
-                await UserDatabase.ChangeCurrency(userId, Currency, rate);
-            }
-            else
+            try
             {
                 await UserDatabase.ChangeCurrency(userId, Currency);
+                Cache.Remove(CacheKeys.UserCurrency);
             }
-            Cache.Remove(CacheKeys.UserCurrency);
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+            }
             return Redirect("/ChangePassword");
         }
 
