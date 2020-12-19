@@ -11,7 +11,7 @@ namespace ePiggyWeb.Utilities
             return new CurrencyWithColor(FormatCurrency(value), color);
         }
         
-        public static string FormatCurrency(decimal value)
+        public static string FormatCurrency(decimal value, string currencySymbol = "")
         {
             var cultureInfo = CultureInfo.CurrentCulture;
             var numberFormat = cultureInfo.NumberFormat;
@@ -51,7 +51,7 @@ namespace ePiggyWeb.Utilities
                     _ => pattern
                 };
             }
-            var formattedValue = string.Format(cultureInfo, pattern, numberFormat.CurrencySymbol, value);
+            var formattedValue = string.Format(cultureInfo, pattern, currencySymbol == "" ? numberFormat.CurrencySymbol : currencySymbol, value);
             return formattedValue;
         }
     }

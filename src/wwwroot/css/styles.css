@@ -229,12 +229,6 @@ body {
     width: 20px;
     height: 20px;
 }
-
-/*tablets (portrait)*/
-@media (max-width: 1024px) {
-  
-}
-
 /*smartphones*/
 @media (min-width: 320px) and (max-width: 480px) {
     

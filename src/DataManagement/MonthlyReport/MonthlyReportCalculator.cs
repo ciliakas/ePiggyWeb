@@ -102,32 +102,44 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private void CalculateGoalReport()
         {
-            if (Goals.Count < 2 || Balance <= 0)
+            var goals = Goals.Where(x => x.Amount > AllSavings).ToList();
+            if (goals.Count < 2 || Balance <= 0)
             {
                 Result.HasGoals = false;
                 return;
             }
 
-            Result.HasGoals = true;
-            var min = decimal.MaxValue;
-            var minGoal = new Goal();
-            var maxGoal = new Goal();
-            var max = 0M;
-            foreach (var item in Goals)
-            {
-                if (item.Amount >= max)
-                {
-                    max = item.Amount;
-                    maxGoal = (Goal)item;
-                }
+            
+            var maxGoal = goals.Aggregate((expensive, next) => next.Amount >= expensive.Amount ? next : expensive);
+            var minGoal = goals.Aggregate((cheapest, next) =>
+                next.Amount <= cheapest.Amount && next.Amount >= AllSavings ? next : cheapest);
 
-                if (item.Amount > min || item.Amount <= AllSavings) continue;
-                min = item.Amount;
-                minGoal = (Goal)item;
+            if (maxGoal.Amount <= AllSavings && minGoal.Amount <= AllSavings)
+            {
+                Result.HasGoals = false;
+                return;
             }
+            // var max = 0;
+            // var min = decimal.MaxValue;
+            // var minGoal = new Goal();
+            // var maxGoal = new Goal();
+
+            /* foreach (var item in Goals)
+             {
+                 if (item.Amount >= max)
+                 {
+                     max = item.Amount;
+                     maxGoal = (Goal)item;
+                 }
+
+                 if (item.Amount > min || item.Amount <= AllSavings) continue;
+                 min = item.Amount;
+                 minGoal = (Goal)item;
+             }*/
 
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;
+            Result.HasGoals = true;
 
             Result.MonthsForCheapestGoal = (int)decimal.Ceiling((minGoal.Amount - AllSavings) / Balance);
             Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling((maxGoal.Amount - AllSavings) / Balance);

@@ -14,8 +14,25 @@ else
 {
     <br />
     <h2 class="text-info">Goals</h2>
+
     <button type="button" class="btn btn-primary text-light mt-3" data-toggle="modal" data-target="#AddGoalModal">Add Goal<i class="ml-1 fas fa-pencil-alt"></i></button>
     <button type="button" class="btn btn-outline-light mt-3" data-toggle="modal" data-target="#ParseGoalModal">Parse Goal<i class="ml-1 fas fa-cloud-download-alt"></i></button>
+    @if (Model.WasExceptionParse)
+    {
+        <div class="row justify-content-center">
+            <div class="alert alert-warning col-md-4 mt-3" align="center" role="alert">
+                ePiggy was unable to parse the goal. But you can add it yourself <a href="#" data-toggle="modal" data-target="#AddGoalModal" class="alert-link">here</a>!
+            </div>
+        </div>
+    }
+}
+@if (Model.CurrencyException)
+{
+    <div class=" mt-3 container">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
 }
 
 @if (!ModelState.IsValid)
@@ -29,6 +46,7 @@ else
         </div>
     </div>
 }
+
 @if (!Model.Goals.Any())
 {
     <div class=" border container bg-primary mt-5 mb-5">
@@ -76,7 +94,7 @@ else
                                 }
                                 <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                             </div>
-                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(item.Amount)</p>
+                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)/@NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)</p>
                         </div>
                         <div class="card-footer">
                             @if (percent == 100)
@@ -94,7 +112,7 @@ else
                         </div>
                     </div>
 
-                    
+
 
                 }
             </div>
@@ -153,11 +171,11 @@ else
                 </div>
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
+                    <div class="form-group mb-1">
                         <input asp-for="Title" type="text" placeholder="Title*" value="" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
-                    <p class="text-primary">Enter exact name of item for more precise pricing! :)</p>
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                    <p class="text-primary mt-3">Enter exact name of item for more precise pricing! :)</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -91,9 +91,18 @@ else
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr class="mt-4 mb-4" />
-    <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum())</h5>
-    <h5 class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome)</h5>
+    <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum(), Model.CurrencySymbol)</h5>
+    <h5 class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome, Model.CurrencySymbol)</h5>
     <hr class="mt-4 mb-4" />
+}
+
+@if (Model.CurrencyException)
+{
+    <div class="container">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
 }
 
 <form method="post">
@@ -114,7 +123,7 @@ else
                                 <h5 class="text-light">Expenses</h5>
                             </th>
                         </tr>
-                        @foreach (var item in Model.Income.OrderByDescending(x => x.Date))
+                        @foreach (var item in Model.IncomeToDisplay)
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary border entry-table-side">
@@ -129,7 +138,7 @@ else
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @NumberFormatter.FormatCurrency(item.Amount)
+                                            @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
                                             <span class="text-info">Date: </span>
@@ -162,4 +171,25 @@ else
         </div>
     </div>
 </form>
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item  @(!Model.ShowPrevious ? "disabled" : "")">
+            <a class="page-link" asp-page="/income" asp-route-CurrentPage="@(Model.CurrentPage - 1)">Previous</a>
+        </li>
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(Model.CurrentPage == i? "active": "")"><a class="page-link" asp-page="/income" asp-route-CurrentPage="@i">@i</a></li>
+        }
+        <li class="page-item @(!Model.ShowNext? "disabled":"")"><a class="page-link" asp-page="/income" asp-route-CurrentPage="@(Model.CurrentPage + 1)">Next</a></li>
+    </ul>
+</nav>
+
+<script language="JavaScript">
+    function toggle(source) {
+        checkboxes = document.getElementsByName('chkEntry');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>
 
