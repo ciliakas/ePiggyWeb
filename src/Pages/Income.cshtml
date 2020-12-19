@@ -8,9 +8,8 @@
     <div class="alert alert-danger" role="alert">
         Whoops! Something went wrong!
     </div>
-    <h1 class="text-warning">Example Income data used:</h1>
 }
-else
+@if (!Model.LoadingException)
 {
     <br />
     <div class="container p-0 mt-3">
@@ -88,12 +87,17 @@ else
             <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
         <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
-        <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr class="mt-4 mb-4" />
-    <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum(), Model.CurrencySymbol)</h5>
-    <h5 class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome, Model.CurrencySymbol)</h5>
-    <hr class="mt-4 mb-4" />
+    @if (!Model.CurrencyException)
+    {
+        <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum(), Model.CurrencySymbol)</h5>
+        <hr class="mt-4 mb-4" />
+    }
+}
+else
+{
+    <h1 class="text-warning">Example Income data used:</h1>
 }
 
 @if (Model.CurrencyException)

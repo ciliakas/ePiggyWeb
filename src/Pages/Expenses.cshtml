@@ -87,9 +87,11 @@
         <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
     </form>
     <hr class="mt-4 mb-4" />
-    <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum(), Model.CurrencySymbol)</h5>
-    <hr class="mt-4 mb-4" />
-
+    @if (!Model.CurrencyException)
+    {
+        <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum(), Model.CurrencySymbol)</h5>
+        <hr class="mt-4 mb-4" />
+    }
 }
 else
 {
