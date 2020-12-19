@@ -1,5 +1,6 @@
 ﻿@page
 @using System.Linq
+@using ePiggyWeb.CurrencyAPI
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.ExpensesModel
 
@@ -89,10 +90,18 @@ else
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr class="mt-4 mb-4" />
-    <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum())</h5>
-    <h5 class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses)</h5>
+    <h5 class="text-light">Spent this period: @NumberFormatter.FormatCurrency(Model.Expenses.GetSum(), Model.CurrencySymbol)</h5>
+    <h5 class="text-light">All expenses: @NumberFormatter.FormatCurrency(Model.AllExpenses, Model.CurrencySymbol)</h5>
     <hr class="mt-4 mb-4" />
 
+}
+@if (Model.CurrencyException)
+{
+    <div class="container">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
 }
 
 <form method="post">
@@ -128,7 +137,7 @@ else
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @NumberFormatter.FormatCurrency(item.Amount)
+                                            @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
                                             <span class="text-info">Date: </span>
@@ -150,7 +159,6 @@ else
                                 </td>
                                 <td class="border-primary border-left-0 entry-table-side">
                                     <a asp-page="/EditEntry" asp-route-id="@item.Id" asp-route-entryType="2" class="btn btn-sm btn-outline-success"><i class="far fa-edit"></i> </a>
-                                    <!--<input asp-page-handler="Delete" asp-route-id="@item.Id" type="submit" class="btn btn-sm btn-outline-danger" value="x" />-->
                                 </td>
                             </tr>
                         }
@@ -161,7 +169,7 @@ else
         </div>
     </div>
 </form>
-<nav aria-label="Page navigation example">
+<nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
         <li class="page-item  @(!Model.ShowPrevious ? "disabled" : "")">
             <a class="page-link" asp-page="/expenses" asp-route-CurrentPage="@(Model.CurrentPage - 1)">Previous</a>

@@ -8,6 +8,20 @@ namespace ePiggyWeb.Utilities
     {
         public static DateTime OneMonthAhead { get; }= GetEndOfTheMonth(DateTime.UtcNow.AddMonths(1));
 
+        public static DateTime RefreshTime()
+        {
+            var time = DateTime.UtcNow;
+
+            if (time.Hour >= 16)
+            {
+                time = time.AddDays(1);
+            }
+
+            time = ChangeHour(time, 16);
+
+            return time;
+        }
+
         public static bool IsDateThisMonthAndLater(DateTime date)
         {
             return (date.Year == DateTime.UtcNow.Year && date.Month >= DateTime.UtcNow.Month) || date.Year > DateTime.UtcNow.Year;
@@ -75,6 +89,11 @@ namespace ePiggyWeb.Utilities
         {
             var day = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
             return ChangeDay(dateTime, day);
+        }
+
+        public static DateTime ChangeHour(DateTime dateTime, int newHour)
+        {
+            return dateTime.AddHours(newHour - dateTime.Hour);
         }
 
         public static DateTime ChangeYear(DateTime dateTime, int newYear)

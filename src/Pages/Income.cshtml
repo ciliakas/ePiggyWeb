@@ -91,9 +91,18 @@ else
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr class="mt-4 mb-4" />
-    <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum())</h5>
-    <h5 class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome)</h5>
+    <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum(), Model.CurrencySymbol)</h5>
+    <h5 class="text-light">All income: @NumberFormatter.FormatCurrency(Model.AllIncome, Model.CurrencySymbol)</h5>
     <hr class="mt-4 mb-4" />
+}
+
+@if (Model.CurrencyException)
+{
+    <div class="container">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
 }
 
 <form method="post">
@@ -129,7 +138,7 @@ else
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @NumberFormatter.FormatCurrency(item.Amount)
+                                            @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
                                             <span class="text-info">Date: </span>

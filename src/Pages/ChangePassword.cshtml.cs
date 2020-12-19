@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
@@ -31,25 +33,29 @@ namespace ePiggyWeb.Pages
         public string PasswordConfirm { get; set; }
 
         public string ErrorMessage = "";
-        
+
         [BindProperty]
-        public int Currency { get; set; }
-        [BindProperty] 
+        public string Currency { get; set; }
+        [BindProperty]
         public bool Recalculate { get; set; }
 
         [BindProperty]
-        public List<string> CurrencyOptions { get; set; }
-
+        public List<string> CurrencyOptions { get; private set; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        private CurrencyConverter CurrencyConverter { get; set; }
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter)
+        private CurrencyConverter CurrencyConverter { get; }
+        public UserModel UserModel { get; private set; }
+        private IMemoryCache Cache { get; }
+        public bool FailedToGetCurrencyList { get; set; }
+
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
             EmailSender = emailSenderSettings.Value;
-             _logger = logger;
-             CurrencyConverter = currencyConverter;
+            _logger = logger;
+            CurrencyConverter = currencyConverter;
+            Cache = cache;
         }
 
         public async Task<IActionResult> OnGet()
@@ -58,15 +64,59 @@ namespace ePiggyWeb.Pages
             {
                 return RedirectToPage("/index");
             }
-            //currency options nuskaitymo simuliacija
-            // Should probably do some backup thing, if the api doesn't work, it currently throws an exception if it doesn't
-            var currencyList = await CurrencyConverter.GetList();
-            CurrencyOptions = new List<string>();
-            foreach (var currency in currencyList)
-            {
-                CurrencyOptions.Add(currency.Code);
-            }
+
+            await SetCurrency();
             return Page();
+        }
+
+        private async Task SetCurrency()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            UserModel = await UserDatabase.GetUserAsync(userId);
+            CurrencyOptions = new List<string>();
+            if (Cache.TryGetValue(CacheKeys.CurrencyList, out List<string> cachedCurrencyList))
+            {
+                CurrencyOptions.AddRange(cachedCurrencyList);
+                //Check if user's currency is cached
+                if (Cache.TryGetValue(CacheKeys.UserCurrency, out Currency cachedCurrency))
+                {
+                    if (UserModel.Currency.Equals(cachedCurrency.Code)) return;
+                }
+
+                //If we the code gets here, it means that we don't have the the correct user currency cached
+                try
+                {
+                    var userCurrency = await CurrencyConverter.GetCurrency(UserModel.Currency);
+                    var options = CacheKeys.DefaultCurrencyCacheOptions();
+                    Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogInformation(e.ToString());
+                }
+                return;
+            }
+
+            try
+            {
+                var currencyList = await CurrencyConverter.GetList();
+                var currencyCodeList = currencyList.Select(currency => currency.Code).ToList();
+
+                var options = CacheKeys.DefaultCurrencyCacheOptions();
+
+                Cache.Set(CacheKeys.CurrencyList, currencyCodeList, options);
+                CurrencyOptions.AddRange(currencyCodeList);
+
+                //Also set user currency 
+                var userCurrency = currencyList.First(x => x.Code == UserModel.Currency);
+                Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+            }
+            catch (Exception e)
+            {
+                CurrencyOptions.Add(UserModel.Currency);
+                FailedToGetCurrencyList = true;
+                _logger.LogInformation(e.ToString());
+            }
         }
 
         public async Task<IActionResult> OnPost()
@@ -82,11 +132,9 @@ namespace ePiggyWeb.Pages
                     await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
                     return RedirectToPage("/index");
                 }
-                else
-                {
-                    ErrorMessage = "Passwords did not match!";
-                    return Page();
-                }
+
+                ErrorMessage = "Passwords did not match!";
+                return Page();
             }
             catch (Exception ex)
             {
@@ -95,22 +143,30 @@ namespace ePiggyWeb.Pages
             }
         }
 
-        //public async Task<IActionResult> OnPostCurrency()
-        public IActionResult OnPostCurrency()
+        // We need to set up error handling here
+        public async Task<IActionResult> OnPostCurrency()
         {
-            //bool ar perskaiciuoti - Recalculate
-            //int su valiutos pasirinkimu - Currency
-            /*
-             <option value="1">EUR</option>
-             <option value="2">USD</option>
-            pvz.: pasirinkus eur grazina 1, pasirinkus usd grazina 1 ir tt.
-             */
-            return Redirect("/index");
+            var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            if (Recalculate)
+            {
+                var currentCurrencyCode = (await UserDatabase.GetUserAsync(userId)).Currency;
+                var rate = await CurrencyConverter.GetRate(currentCurrencyCode, Currency);
+                await UserDatabase.ChangeCurrency(userId, Currency, rate);
+            }
+            else
+            {
+                await UserDatabase.ChangeCurrency(userId, Currency);
+            }
+            Cache.Remove(CacheKeys.UserCurrency);
+            return Redirect("/ChangePassword");
         }
 
         public async Task<IActionResult> OnPostDeleteAccount()
         {
             await HttpContext.SignOutAsync();
+            Response.Cookies.Delete("StartDate");
+            Response.Cookies.Delete("EndDate");
+            Cache.Remove(CacheKeys.UserCurrency);
             await UserDatabase.DeleteUserAsync(User.FindFirst(ClaimTypes.Email).Value);
             return Redirect("/index");
         }

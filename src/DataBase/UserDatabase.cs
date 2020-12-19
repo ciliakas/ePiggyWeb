@@ -11,10 +11,8 @@ namespace ePiggyWeb.DataBase
 {
     public class UserDatabase
     {
+        private const string DefaultCurrency = "EUR";
         public event EventHandler<UserModel>? LoggedIn, Registered, Deleted;
-
-        public delegate void RegisterEvent(object? sender, UserModel user);
-        //public event EventHandler<UserModel> Registered;
 
         private PiggyDbContext Database { get; }
         public UserDatabase(PiggyDbContext database)
@@ -33,7 +31,7 @@ namespace ePiggyWeb.DataBase
             var salt = HashingProcessor.CreateSalt();
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
 
-            var user = new UserModel { Email = email, Password = passwordHash, Salt = salt };
+            var user = new UserModel { Email = email, Password = passwordHash, Salt = salt , Currency = DefaultCurrency};
             Database.Add(user);
             await Database.SaveChangesAsync();
 
@@ -134,7 +132,7 @@ namespace ePiggyWeb.DataBase
         {
             var user = await Database.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
-            //user.Currency = currencyCode;
+            user.Currency = currencyCode;
 
             await Database.SaveChangesAsync();
         }
@@ -151,25 +149,25 @@ namespace ePiggyWeb.DataBase
             {
                 foreach (var goal in goals)
                 {
-                    goal.Price = decimal.Round(goal.Price * rate, 2);
+                    goal.Price *= rate;
                 }
             }
             if (incomes != null)
             {
                 foreach (var income in incomes)
                 {
-                    income.Amount = decimal.Round(income.Amount * rate, 2);
+                    income.Amount *= rate;
                 }
             }
             if (expenses != null)
             {
                 foreach (var expense in expenses)
                 {
-                    expense.Amount = decimal.Round(expense.Amount * rate, 2);
+                    expense.Amount *= rate;
                 }
             }
 
-            //user.Currency = currencyCode;
+            user.Currency = currencyCode;
 
             await Database.SaveChangesAsync();
         }

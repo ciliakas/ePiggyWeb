@@ -26,6 +26,14 @@ else
         </div>
     }
 }
+@if (Model.CurrencyException)
+{
+    <div class=" mt-3 container">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
+}
 
 @if (!ModelState.IsValid)
 {
@@ -38,6 +46,7 @@ else
         </div>
     </div>
 }
+
 @if (!Model.Goals.Any())
 {
     <div class=" border container bg-primary mt-5 mb-5">
@@ -85,7 +94,7 @@ else
                                 }
                                 <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                             </div>
-                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings)/@NumberFormatter.FormatCurrency(item.Amount)</p>
+                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)/@NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)</p>
                         </div>
                         <div class="card-footer">
                             @if (percent == 100)
