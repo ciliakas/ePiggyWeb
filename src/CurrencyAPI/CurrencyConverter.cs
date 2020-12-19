@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Entries;
+using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,35 @@ namespace ePiggyWeb.CurrencyAPI
             return new Tuple<IList<Currency>, Exception>(currencyList, null);
         }
 
+
+        public async Task<IGoalList> ConvertGoalList(IGoalList goalList, int userId)
+        {
+            var (userCurrency, exception1) = await GetUserCurrency(userId);
+            if (exception1 != null) throw exception1;
+
+            //Temporary while no currency is saved
+            foreach (var goal in goalList)
+            {
+                if (goal.Currency is null || goal.Currency == "currency") goal.Currency = "EUR";
+            }
+
+            var containsForeignCurrency = goalList.Any(x => x.Currency != userCurrency.Code);
+            if (!containsForeignCurrency) return goalList;
+
+            var (currencyList, exception2) = await GetCurrencyList(userId);
+            if (exception2 != null) throw exception2;
+            //Error check
+            foreach (var goal in goalList.Where(x => x.Currency != userCurrency.Code))
+            {
+                var userRate = userCurrency.Rate;
+                var foreignRate = currencyList.First(x => x.Code == goal.Currency).Rate;
+                var rate = userRate / foreignRate;
+                goal.Amount *= rate;
+            }
+
+            return goalList;
+        }
+
         public async Task<IEntryList> ConvertEntryList(IEntryList entryList, int userId)
         {
             var (userCurrency, exception1) = await GetUserCurrency(userId);
@@ -80,6 +110,8 @@ namespace ePiggyWeb.CurrencyAPI
 
             return entryList;
         }
+
+
 
         public async Task<Tuple<Currency, Exception>> GetUserCurrency(int userId)
         {
