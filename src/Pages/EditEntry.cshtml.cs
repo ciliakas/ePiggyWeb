@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.Utilities;

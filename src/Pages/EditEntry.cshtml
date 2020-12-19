@@ -1,4 +1,5 @@
 ﻿@page
+@using ePiggyWeb.DataManagement.Entries
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.EditEntryModel
 
@@ -7,11 +8,11 @@
     <!--Displays text accordingly to the EntryType-->
     @if (Model.EntryTypeInt == 1)
     {
-        <h2 class="text-info">Income</h2>
+        <h2 class="text-info">Income (@Model.Entry.Currency)</h2>
     }
     else
     {
-        <h2 class="text-info">Expenses</h2>
+<h2 class="text-info">Expenses (@Model.Entry.Currency)</h2>
     }
 </div>
 
