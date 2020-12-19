@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataBase.Models
@@ -9,6 +10,7 @@ namespace ePiggyWeb.DataBase.Models
         [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
+        [Column(TypeName = "decimal(18,5)")]
         public decimal Amount { get; set; }
         [StringLength(255)]
         public string Title { get; set; }
