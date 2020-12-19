@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
@@ -33,9 +34,15 @@ namespace ePiggyWeb.DataManagement.Saving
                 generateRandomData = true;              
             }
 
-            for (var i = enumCount; i > (int)Importance.Necessary; i--)
+            var listToUse = generateRandomData ? expensesRandomList : entryList;
+            var groupedByImportance = (from entry in listToUse
+                                       where entry.Importance != 1
+                                       group entry by entry.Importance).ToArray();
+
+            foreach (var group in groupedByImportance)
             {
-                var expenses = !generateRandomData ? entryList.GetBy((Importance)i) : expensesRandomList.GetBy((Importance)i);
+                var i = group.Key;
+                var expenses = group.ToIEntryList();
 
                 var ratio = enumCount - i;
                 foreach (var entry in expenses)

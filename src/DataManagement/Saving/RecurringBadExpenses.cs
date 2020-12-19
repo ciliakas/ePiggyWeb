@@ -44,7 +44,7 @@ namespace ePiggyWeb.DataManagement.Saving
             */
             //var result = recurringBadExpensesList.ToList;
 ;
-            return recurringBadExpensesList;
+            return null;
         } 
     }
 }
