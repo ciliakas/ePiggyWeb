@@ -51,8 +51,8 @@ namespace ePiggyWeb.Pages
         [BindProperty(SupportsGet = true)]
         public int CurrentPage { get; set; } = 1;
 
-        public const int PageSize = 10;
-        public int TotalPages { get; set; }
+        private static int PageSize => 10;
+        public int TotalPages => (int)Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
 
@@ -69,6 +69,8 @@ namespace ePiggyWeb.Pages
 
         /*Display*/
         public IEntryList Expenses { get; set; }
+        public IEntryList ExpensesToDisplay => Expenses.GetPage(CurrentPage, PageSize);
+        public decimal TotalExpenses => Expenses.GetSum();
         private int UserId { get; set; }
 
      
@@ -151,11 +153,9 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
-                var (expenseList, totalPages) = await EntryDatabase.ReadByPage(
-                    x => x.Date >= StartDate && x.Date <= EndDate, UserId,
-                    EntryType.Expense, CurrentPage, PageSize);
+                var expenseList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId, EntryType.Expense, orderByDate: true);
 
-                TotalPages = totalPages;
                 try
                 {
                     Expenses = await CurrencyConverter.ConvertEntryList(expenseList, UserId);

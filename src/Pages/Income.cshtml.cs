@@ -53,7 +53,7 @@ namespace ePiggyWeb.Pages
         public int CurrentPage { get; set; } = 1;
 
         public const int PageSize = 10;
-        public int TotalPages { get; set; }
+        public int TotalPages => (int)Math.Ceiling(decimal.Divide(Income.Count, PageSize));
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
 
@@ -70,8 +70,10 @@ namespace ePiggyWeb.Pages
         public bool LoadingException { get; set; }
 
         /*Display*/
-        private int UserId { get; set; }
         public IEntryList Income { get; set; }
+        public IEntryList IncomeToDisplay => Income.GetPage(CurrentPage, PageSize);
+        public decimal TotalIncome => Income.GetSum();
+        private int UserId { get; set; }
 
 
         public IncomesModel(EntryDatabase entryDatabase, ILogger<IncomeModel> logger, IConfiguration configuration,
@@ -152,11 +154,8 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
-                var (incomeList, totalPages) = await EntryDatabase.ReadByPage(
-                    x => x.Date >= StartDate && x.Date <= EndDate, UserId,
-                    EntryType.Income, CurrentPage, PageSize);
-
-                TotalPages = totalPages;
+                var incomeList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId, EntryType.Expense, orderByDate: true);
                 try
                 {
                     Income = await CurrencyConverter.ConvertEntryList(incomeList, UserId);

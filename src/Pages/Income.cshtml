@@ -91,7 +91,7 @@
     <hr class="mt-4 mb-4" />
     @if (!Model.CurrencyException)
     {
-        <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.Income.GetSum(), Model.CurrencySymbol)</h5>
+        <h5 class="text-light">Earned this period: @NumberFormatter.FormatCurrency(Model.TotalIncome, Model.CurrencySymbol)</h5>
         <hr class="mt-4 mb-4" />
     }
 }
@@ -127,7 +127,7 @@ else
                                 <h5 class="text-light">Expenses</h5>
                             </th>
                         </tr>
-                        @foreach (var item in Model.Income)
+                        @foreach (var item in Model.IncomeToDisplay)
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary border entry-table-side">

@@ -203,7 +203,7 @@ namespace ePiggyWeb.DataBase
             return balance;
         }
 
-        public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType)
+        public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType, bool orderByDate = false)
         {
             await UpdateRecurringAsync(userId, entryType);
             var updatedFilter = filter.And(x => x.UserId == userId);
@@ -213,7 +213,8 @@ namespace ePiggyWeb.DataBase
                 EntryType.Income => await Database.Incomes.Where(updatedFilter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
                 _ => await Database.Expenses.Where(updatedFilter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
             };
-            list.AddRange(temp);
+
+            list.AddRange(orderByDate? temp.OrderByDescending(x => x.Date) : temp);
             return list;
         }
 
