@@ -15,6 +15,7 @@ namespace ePiggyWeb.DataBase.Models
         public string Title { get; set; }
         [StringLength(3)]
         public string Currency { get; set; }
+        public GoalModel() { }
 
         public GoalModel(IGoal goal, int userId)
         {

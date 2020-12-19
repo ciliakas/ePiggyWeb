@@ -20,6 +20,8 @@ namespace ePiggyWeb.DataBase.Models
         [StringLength(3)]
         public string Currency { get; set; }
 
+        public ExpenseModel() { }
+
         public ExpenseModel(IEntry entry, int userId)
         {
             UserId = userId;

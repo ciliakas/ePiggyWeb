@@ -19,6 +19,7 @@ namespace ePiggyWeb.DataBase.Models
         public int Importance { get; set; }
         [StringLength(3)]
         public string Currency { get; set; }
+        public IncomeModel() { }
 
         public IncomeModel(IEntry entry, int userId)
         {
