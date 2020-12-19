@@ -21,9 +21,7 @@ namespace ePiggyWeb.Pages
     public class GoalsModel : PageModel
     {
         private readonly ILogger<GoalsModel> _logger;
-        public bool WasException { get; private set; }
-        [BindProperty(SupportsGet = true)]
-        public bool WasExceptionParse { get; set; }
+      
 
         private readonly Lazy<InternetParser> _internetParser;
         public IGoalList Goals { get; private set; }
@@ -44,14 +42,22 @@ namespace ePiggyWeb.Pages
         private EntryDatabase EntryDatabase { get; }
         private HttpClient HttpClient { get; }
         private IConfiguration Configuration { get; }
-        private UserDatabase UserDatabase { get; }
-        private CurrencyApiAgent CurrencyApiAgent { get; }
-        public string CurrencySymbol { get; private set; }
-        public decimal CurrencyRate { get; set; }
-        public bool CurrencyException { get; set; }
-        private IMemoryCache Cache { get; }
 
-        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
+        /*Currency vars*/
+        public Currency Currency { get; set; }
+        public string CurrencySymbol { get; private set; }
+
+        /*Exception handling vars*/
+        [BindProperty(SupportsGet = true)]
+        public bool WasException { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public bool CurrencyException { get; set; }
+        public bool LoadingException { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public bool WasExceptionParse { get; set; }
+
+        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger,
+            HttpClient httpClient, IConfiguration configuration, CurrencyConverter currencyConverter)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
@@ -59,9 +65,6 @@ namespace ePiggyWeb.Pages
             HttpClient = httpClient;
             _internetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
             Configuration = configuration;
-            UserDatabase = userDatabase;
-            CurrencyApiAgent = currencyApiAgent;
-            Cache = cache;
         }
 
         public async Task OnGet()
@@ -94,28 +97,14 @@ namespace ePiggyWeb.Pages
 
         private async Task SetCurrency()
         {
-            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var userModel = await UserDatabase.GetUserAsync(UserId);
-                try
-                {
-                    userCurrency = await CurrencyApiAgent.GetCurrency(userModel.Currency);
-                }
-                catch (Exception)
-                {
-                    CurrencySymbol = userModel.Currency;
-                    CurrencyRate = 1;
-                    CurrencyException = true;
-
-                    return;
-                }
+                CurrencyException = true;
             }
-
-            CurrencySymbol = userCurrency.GetSymbol();
-            CurrencyRate = userCurrency.Rate;
-            var options = CacheKeys.DefaultCurrencyCacheOptions();
-            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
         }
 
         public async Task<IActionResult> OnPostNewGoal()
