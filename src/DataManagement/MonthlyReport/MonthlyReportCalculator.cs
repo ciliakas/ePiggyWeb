@@ -102,20 +102,19 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private void CalculateGoalReport()
         {
-            if (Goals.Count < 2 || Balance <= 0)
+            var goals = Goals.Where(x => x.Amount > AllSavings).ToList();
+            if (goals.Count < 2 || Balance <= 0)
             {
                 Result.HasGoals = false;
                 return;
             }
 
-            Result.HasGoals = true;
-           
-          
+            
+            var maxGoal = goals.Aggregate((expensive, next) => next.Amount >= expensive.Amount ? next : expensive);
+            var minGoal = goals.Aggregate((cheapest, next) =>
+                next.Amount <= cheapest.Amount && next.Amount >= AllSavings ? next : cheapest);
 
-            var maxGoal = Goals.Aggregate((expensive, next) => next.Amount >= expensive.Amount ? next : expensive);
-            var minGoal = Goals.Aggregate((cheapest, next) => (next.Amount <= cheapest.Amount && next.Amount >= AllSavings)  ? next : cheapest);
-
-            if (maxGoal.Amount < AllSavings && minGoal.Amount < AllSavings)
+            if (maxGoal.Amount <= AllSavings && minGoal.Amount <= AllSavings)
             {
                 Result.HasGoals = false;
                 return;
@@ -140,6 +139,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;
+            Result.HasGoals = true;
 
             Result.MonthsForCheapestGoal = (int)decimal.Ceiling((minGoal.Amount - AllSavings) / Balance);
             Result.MonthsForMostExpensiveGoal = (int)decimal.Ceiling((maxGoal.Amount - AllSavings) / Balance);

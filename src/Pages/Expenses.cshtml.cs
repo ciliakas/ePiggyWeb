@@ -141,20 +141,8 @@ namespace ePiggyWeb.Pages
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
             }
-           
 
-                /* try
-                 {
-                     UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                     await EntryDatabase.DeleteAsync(id, UserId, EntryType.Expense);
-                 }
-                 catch (Exception ex)
-                 {
-                     _logger.LogInformation(ex.ToString());
-                     WasException = true;
-                 }*/
-
-                return RedirectToPage("/expenses");
+            return RedirectToPage("/expenses");
         }
 
         private async Task SetData()
@@ -163,7 +151,7 @@ namespace ePiggyWeb.Pages
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);//If we want to remove this I need to get total amount of these as well as their sum
+                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
                 ExpensesToDisplay = Expenses.OrderByDescending(x => x.Date).ToIEntryList().GetPage(CurrentPage, PageSize);
                 AllExpenses = Expenses.GetSum();
             }

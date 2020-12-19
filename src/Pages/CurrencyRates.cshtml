@@ -1,10 +1,12 @@
 ﻿@page
 @model ePiggyWeb.Pages.CurrencyRatesModel
 
-<h3 class="text-light mt-5 mb-5">Currency rates compared to EUR</h3>
+<hr class="mt-5 mb-5" />
+<h4 class="text-light mt-5">Currency rates compared to <span class="text-warning">EUR</span></h4>
+<hr class="mt-5 mb-5"/>
 <div class="justify-content-center mt-3 mb-3">
     <input placeholder="Search; e.g. Canada" type="text" id="search">
-    <input type="button" class="btn btn-primary mb-1" value="Go" onclick="search(document.getElementById('search').value)">
+    <input type="button" class="btn btn-primary mb-1" value="Find" onclick="search(document.getElementById('search').value)">
 </div>
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-light">
