@@ -63,7 +63,6 @@ namespace ePiggyWeb.Pages
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
         public Currency Currency { get; set; }
-        public decimal CurrencyRate { get; set; }
         public string CurrencySymbol { get; private set; }
         public bool CurrencyException { get; set; }
         private CurrencyConverter CurrencyConverter { get; }
@@ -105,7 +104,6 @@ namespace ePiggyWeb.Pages
             }
 
             await SetCurrency();
-            Amount *= 1 / CurrencyRate;
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var entry1 = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, Currency.Code);
             try
@@ -202,7 +200,6 @@ namespace ePiggyWeb.Pages
 
             Currency = currency;
             CurrencySymbol = Currency.SymbolString;
-            CurrencyRate = Currency.Rate;
         }
     }
 }
