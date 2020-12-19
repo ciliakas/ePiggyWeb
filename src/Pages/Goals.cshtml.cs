@@ -22,6 +22,9 @@ namespace ePiggyWeb.Pages
     {
         private readonly ILogger<GoalsModel> _logger;
         public bool WasException { get; private set; }
+        [BindProperty(SupportsGet = true)]
+        public bool WasExceptionParse { get; set; }
+
         private readonly Lazy<InternetParser> _internetParser;
         public IGoalList Goals { get; private set; }
         public decimal Savings { get; private set; }
@@ -29,7 +32,7 @@ namespace ePiggyWeb.Pages
 
         [Required(ErrorMessage = "Required")]
         [BindProperty]
-        [StringLength(30)]
+        [StringLength(25)]
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Required")]
@@ -134,7 +137,7 @@ namespace ePiggyWeb.Pages
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
             }
-           
+
             return RedirectToPage("/goals");
         }
 
@@ -156,9 +159,10 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
+                return RedirectToPage("/goals", new { wasExceptionParse = true });
+
             }
             return RedirectToPage("/goals");
-
         }
 
         public async Task<IActionResult> OnPostDelete(int id)

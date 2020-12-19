@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -34,11 +35,10 @@ namespace ePiggyWeb.Utilities
             htmlDocument.LoadHtml(html);
             var productHtml = htmlDocument.DocumentNode.Descendants("div").Where(node => node.GetAttributeValue("class", "")/*Everything on the page*/
                 .Equals("row column search_results")).ToList();
-
+           
             var productListItems = productHtml[0].Descendants("div").Where(node => node.GetAttributeValue("class", "")
             .Equals("row")).ToList();
-
-         
+           
             var name = productListItems[0].Descendants("strong").FirstOrDefault()?.InnerText;
             name = name?.Remove(name.Length - 13);
 
@@ -48,27 +48,21 @@ namespace ePiggyWeb.Utilities
             stringPrice = stringPrice?.Substring(1).Trim();
             if (stringPrice == null)
             {
-                return Goal.CreateLocalGoal(itemName, 0);
+                throw new Exception();
             }
 
-            try
+            var decimalPrice = Convert.ToDecimal(stringPrice, System.Globalization.CultureInfo.InvariantCulture);
+            decimalPrice = _cnv(decimalPrice);
+            if (_isTooLong(25, name))
             {
-                var decimalPrice = Convert.ToDecimal(stringPrice, System.Globalization.CultureInfo.InvariantCulture);
-                decimalPrice = _cnv(decimalPrice);
-                if (_isTooLong(30, name))
-                {
-                    itemName = WebUtility.UrlDecode(itemName);
-                    name = itemName;
-                }
+                itemName = WebUtility.UrlDecode(itemName);
+                name = itemName;
+            }
 
-                var temp = Goal.CreateLocalGoal(name, decimalPrice);
-                return temp;
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            var temp = Goal.CreateLocalGoal(name, decimalPrice);
+            return temp;
             
+
         }
     }
 }
