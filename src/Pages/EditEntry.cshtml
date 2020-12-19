@@ -1,6 +1,5 @@
 ﻿@page
 @using System.Globalization
-@using ePiggyWeb.DataManagement.Entries
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.EditEntryModel
 
@@ -13,7 +12,7 @@
     }
     else
     {
-<h2 class="text-info">Expenses (@Model.Entry.Currency)</h2>
+        <h2 class="text-info">Expenses (@Model.Entry.Currency)</h2>
     }
 </div>
 
@@ -66,32 +65,32 @@
     <input type="submit" value="Save" class="btn btn-primary mt-2" />
     <input asp-page-handler="Cancel" class="btn btn-danger ml-2 mt-2" type="submit" value="Cancel">
     <br />
-    <div class="container p-0 mt-5 mb-4">
-        <h4 class="text-info">Quotes by famous people</h4>
-    </div>
-
-    <!--Bootstrap cards just to fill space-->
-    <div class="card-deck mt-2 mb-5">
-        <div class="card">
-            <img src="https://news.tradimo.com/wp-content/uploads/2019/08/Save-Money-1.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">George Lorimer</h5>
-                <p class="card-text">It’s good to have money and the things that money can buy, but it’s good, too, to check up once in a while and make sure that you haven’t lost the things that money can’t buy.</p>
-            </div>
-        </div>
-        <div class="card">
-            <img src="https://theworkingfamily.org/wp-content/uploads/2018/06/Money-Saving-1.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Thomas T. Munger</h5>
-                <p class="card-text">The habit of saving is itself an education; it fosters every virtue, teaches self-denial, cultivates the sense of order, trains to forethought, and so broadens the mind.</p>
-            </div>
-        </div>
-        <div class="card">
-            <img src="https://ei.marketwatch.com/Multimedia/2017/06/15/Photos/ZQ/MW-FO584_greek__20170615154354_ZQ.jpg?uuid=f6ec1d08-5202-11e7-8d98-9c8e992d421e" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Aristotle</h5>
-                <p class="card-text">Money is a guarantee that we may have what we want in the future. Though we need nothing at the moment it insures the possibility of satisfying a new desire when it arises.</p>
-            </div>
-        </div>
-    </div>
 </form>
+
+<div class="container p-0 mt-5 mb-4">
+    <h4 class="text-info">Quotes by famous people</h4>
+</div>
+<!--Bootstrap cards just to fill space-->
+<div class="card-deck mt-2 mb-5">
+    <div class="card">
+        <img src="https://news.tradimo.com/wp-content/uploads/2019/08/Save-Money-1.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">George Lorimer</h5>
+            <p class="card-text">It’s good to have money and the things that money can buy, but it’s good, too, to check up once in a while and make sure that you haven’t lost the things that money can’t buy.</p>
+        </div>
+    </div>
+    <div class="card">
+        <img src="https://theworkingfamily.org/wp-content/uploads/2018/06/Money-Saving-1.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">Thomas T. Munger</h5>
+            <p class="card-text">The habit of saving is itself an education; it fosters every virtue, teaches self-denial, cultivates the sense of order, trains to forethought, and so broadens the mind.</p>
+        </div>
+    </div>
+    <div class="card">
+        <img src="https://ei.marketwatch.com/Multimedia/2017/06/15/Photos/ZQ/MW-FO584_greek__20170615154354_ZQ.jpg?uuid=f6ec1d08-5202-11e7-8d98-9c8e992d421e" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">Aristotle</h5>
+            <p class="card-text">Money is a guarantee that we may have what we want in the future. Though we need nothing at the moment it insures the possibility of satisfying a new desire when it arises.</p>
+        </div>
+    </div>
+</div>

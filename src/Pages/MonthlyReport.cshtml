@@ -31,32 +31,39 @@ else
         <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Income, Model.CurrencySymbol)</h3>
         <h4 class="text-light">Expenses of period: </h4>
         <h3 class="text-light mt-2 mb-2">@NumberFormatter.FormatCurrency(Model.Data.Expenses, Model.CurrencySymbol)</h3>
-
-        <div class="container p-0 mt-3 mb-5">
-            <div class="col-lg-12" id="graph">
-                <div class="spinner-border text-warning loader" role="status">
-                    <span class="sr-only">Loading...</span>
+        
+        @if (Model.Data.Income != 0 || Model.Data.Expenses != 0)
+        {
+            <div class="container p-0 mt-3 mb-5">
+                <div class="col-lg-12" id="graph">
+                    <div class="spinner-border text-warning loader" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </div>
             </div>
+        }
+    </div>
+    @if (Model.Data.Income != 0 || Model.Data.Expenses != 0)
+    {
+        <hr class="mt-5 mb-5" />
+        <div data-aos="fade-right">
+            @if (Model.Data.Balance > 0)
+            {
+                <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-piggy-bank"></i></span>You've saved this month:</h4>
+                <h3 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.Balance, Model.CurrencySymbol)</h3>
+            }
+            else if (Model.Data.Balance < 0)
+            {
+                <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-minus-circle"></i></span>Your balance was negative this month:</h4>
+                <h3 class="text-warning">@NumberFormatter.FormatCurrency(Model.Data.Balance, Model.CurrencySymbol)</h3>
+            }
+            else
+            {
+                <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-minus-circle"></i></span>You've spent all you've earned this month</h4>
+            }
         </div>
-    </div>
-    <hr class="mt-5 mb-5" />
-    <div data-aos="fade-right">
-        @if (Model.Data.Balance > 0)
-        {
-            <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-piggy-bank"></i></span>You've saved this month:</h4>
-            <h3 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.Balance, Model.CurrencySymbol)</h3>
-        }
-        else if (Model.Data.Balance < 0)
-        {
-            <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-minus-circle"></i></span>Your balance was negative this month:</h4>
-            <h3 class="text-warning">@NumberFormatter.FormatCurrency(Model.Data.Balance, Model.CurrencySymbol)</h3>
-        }
-        else
-        {
-            <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-minus-circle"></i></span>You've spent all you've earned this month</h4>
-        }
-    </div>
+    }
+  
     <hr class="mt-5 mb-5" />
 
     <div data-aos="fade-up">
@@ -97,7 +104,11 @@ else
     <hr class="mt-5 mb-5" />
     <div data-aos="fade-up">
         <h3 class="text-light mt-3 mb-3"><span class="text-warning"><i class="mr-1 fas fa-coins"></i></span>Your Income:</h3>
-        @if (Model.Data.DifferenceInIncome == 0)
+        @if (Model.Data.Income == 0)
+        {
+            <h4 class="text-light"><span class="text-danger"><i class="mr-1 fas fa-heart-broken"></i></span>You did not have any Income...</h4>
+        }
+        else if (Model.Data.DifferenceInIncome == 0)
         {
             <h4 class="text-light"><i class="mr-1 fas fa-balance-scale"></i>Your income stayed the same as previous month.</h4>
         }
