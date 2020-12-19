@@ -102,7 +102,7 @@ else
                         <div class="card-footer">
                             @if (percent == 100)
                             {
-                                <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-sm btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-check fa-2x text-success"></i></button>
+                                <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" asp-route-currency="@item.Currency" class="btn btn-sm btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-check fa-2x text-success"></i></button>
                             }
                             else
                             {

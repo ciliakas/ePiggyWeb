@@ -71,7 +71,7 @@ namespace ePiggyWeb.CurrencyAPI
 
             var (currencyList, exception2) = await GetCurrencyList(userId);
             if (exception2 != null) throw exception2;
-            //Error check
+
             foreach (var goal in goalList.Where(x => x.Currency != userCurrency.Code))
             {
                 var userRate = userCurrency.Rate;

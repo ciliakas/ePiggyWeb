@@ -58,8 +58,7 @@ namespace ePiggyWeb.Utilities
                 name = itemName;
             }
 
-            //TODO Currency
-            var temp = Goal.CreateLocalGoal(name, decimalPrice, "");
+            var temp = Goal.CreateLocalGoal(name, decimalPrice, "GBP");
             return temp;
         }
     }

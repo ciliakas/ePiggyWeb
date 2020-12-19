@@ -71,29 +71,28 @@ namespace ePiggyWeb.Pages
 
         public async Task OnGet()
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            await SetCurrency();
             try
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var goalsList = await GoalDatabase.ReadListAsync(UserId);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
                 try
                 {
                     Goals = await CurrencyConverter.ConvertGoalList(goalsList, UserId);
+                    income = await CurrencyConverter.ConvertEntryList(income, UserId);
+                    expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
                 }
                 catch (Exception ex)
                 {
-                    CurrencyException = true;
                     _logger.LogInformation(ex.ToString());
+                    CurrencyException = true;
                     Goals = goalsList;
                 }
 
-                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-
                 Savings = income.GetSum() - expenses.GetSum();
-                if (Savings < 0)
-                {
-                    Savings = 0;
-                }
+                Savings = Savings < 0 ? 0 : Savings;
             }
             catch (Exception ex)
             {
@@ -102,10 +101,6 @@ namespace ePiggyWeb.Pages
                 LoadingException = true;
                 Goals = GoalList.RandomList(Configuration);
                 Savings = 0;
-            }
-            finally
-            {
-                await SetCurrency();
             }
         }
 
@@ -117,23 +112,24 @@ namespace ePiggyWeb.Pages
             {
                 CurrencyException = true;
             }
+
             Currency = currency;
             CurrencySymbol = Currency.SymbolString;
         }
 
         public async Task<IActionResult> OnPostNewGoal()
         {
+            if (!ModelState.IsValid)
+            {
+                await OnGet();
+                return Page();
+            }
+
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            await SetCurrency();
+            var temp = Goal.CreateLocalGoal(Title, Amount, Currency.Code);
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    await OnGet();
-                    return Page();
-                }
-                await SetCurrency();
-
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var temp = Goal.CreateLocalGoal(Title, Amount, "EUR");
                 await GoalDatabase.CreateAsync(temp, UserId);
             }
             catch (Exception ex)
@@ -147,16 +143,15 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPostParseGoal()
         {
+            if (string.IsNullOrEmpty(Title))
+            {
+                await OnGet();
+                return Page();
+            }
+
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
-                if (string.IsNullOrEmpty(Title))
-                {
-                    await OnGet();
-                    return Page();
-                }
-                await SetCurrency();
-
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var temp = await _internetParser.Value.ReadPriceFromCamel(Title);
                 await GoalDatabase.CreateAsync(temp, UserId);
             }
@@ -167,14 +162,15 @@ namespace ePiggyWeb.Pages
                 return RedirectToPage("/goals", new { wasExceptionParse = true });
 
             }
+
             return RedirectToPage("/goals", new { WasException, CurrencyException });
         }
 
         public async Task<IActionResult> OnPostDelete(int id)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 await GoalDatabase.DeleteAsync(id, UserId);
             }
             catch (Exception ex)
@@ -182,17 +178,19 @@ namespace ePiggyWeb.Pages
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
             }
+
             return RedirectToPage("/goals", new { WasException, CurrencyException });
         }
 
-        public async Task<IActionResult> OnPostPurchased(int id, string title, string amount)
+        public async Task<IActionResult> OnPostPurchased(int id, string title, string amount, string currency)
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            await SetCurrency();
             try
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 decimal.TryParse(amount, out var parsedAmount);
                 var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring: false,
-                    importance: 1, "EUR");
+                    importance: 1, currency);
                 await GoalDatabase.MoveGoalToExpensesAsync(id, UserId, entry);
                 return RedirectToPage("/expenses");
             }
