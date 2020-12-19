@@ -194,6 +194,16 @@ namespace ePiggyWeb.DataBase
             return new Tuple<IEntryList, int>(list, numberOfPages);
         }
 
+        public async Task<decimal> GetBalance(Expression<Func<IEntryModel, bool>> filter, int userId)
+        {
+            var updatedFilter = filter.And(x => x.UserId == userId);
+            var expenses = await Database.Expenses.Where(updatedFilter).ToListAsync();
+            var incomes = await Database.Incomes.Where(updatedFilter).ToListAsync();
+
+            var balance = incomes.Sum(x => x.Amount) -  expenses.Sum(x => x.Amount);
+            return balance;
+        }
+
         public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType)
         {
             await UpdateRecurringAsync(userId, entryType);
