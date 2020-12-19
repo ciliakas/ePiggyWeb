@@ -8,9 +8,8 @@
     <div class="alert alert-danger" role="alert">
         Whoops! Something went wrong!
     </div>
-    <h1 class="text-warning">Example Goals data used:</h1>
 }
-else
+@if (!Model.LoadingException)
 {
     <br />
     <h2 class="text-info">Goals</h2>
@@ -25,6 +24,10 @@ else
             </div>
         </div>
     }
+}
+else
+{
+    <h1 class="text-warning">Example Goals data used:</h1>
 }
 @if (Model.CurrencyException)
 {

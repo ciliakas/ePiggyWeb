@@ -73,9 +73,22 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var goals = await GoalDatabase.ReadListAsync(UserId);
+                var goalsList = await GoalDatabase.ReadListAsync(UserId);
+                try
+                {
+                    Goals = await CurrencyConverter.ConvertGoalList(goalsList, UserId);
+                }
+                catch (Exception ex)
+                {
+                    CurrencyException = true;
+                    _logger.LogInformation(ex.ToString());
+                    Goals = goalsList;
+                }
 
-                Savings = await EntryDatabase.GetBalance(x => true, UserId);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
+
+                Savings = income.GetSum() - expenses.GetSum();
                 if (Savings < 0)
                 {
                     Savings = 0;
