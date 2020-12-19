@@ -24,6 +24,8 @@ namespace ePiggyWeb.DataManagement.Goals
             Currency = currency;
         }
 
+        public Goal() { }
+
         public Goal(int id, int userId, string title, decimal amount, string currency) : this(title, amount, currency)
         {
             Id = id;
