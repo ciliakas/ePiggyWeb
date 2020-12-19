@@ -10,6 +10,14 @@
     </div>
     <h1 class="text-warning">Example Goals data used:</h1>
 }
+@if (Model.CurrencyException)
+{
+    <div class="container mt-2">
+        <div class="alert alert-warning" role="alert">
+            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+        </div>
+    </div>
+}
 <div data-aos="slide-down">
 
     <h2 class="text-light mt-5 mb-3">Report</h2>
@@ -55,7 +63,8 @@
     {
         <h4 class="text-light"><span class="text-success"><i class="fas fa-dollar-sign"></i></span>You did not have any expenses...</h4>
         <a class="btn btn-primary mt-2" asp-page="/expenses" role="button"><i class="fas fa-hand-holding-usd"></i>To Expenses</a>
-    }else if (Model.Data.NecessarySum >= Model.Data.BiggestCategorySum)
+    }
+    else if (Model.Data.NecessarySum >= Model.Data.BiggestCategorySum)
     {
         <h4 class="text-light"><span class="text-warning"><i class="mr-1 fas fa-award"></i></span>Well done, you've spent most money for the necessary expenses!</h4>
         <h5 class="text-light">@NumberFormatter.FormatCurrency(Model.Data.NecessarySum, Model.CurrencySymbol)</h5>
