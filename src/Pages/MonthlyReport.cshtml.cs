@@ -31,6 +31,7 @@ namespace ePiggyWeb.Pages
         private CurrencyApiAgent CurrencyApiAgent { get; }
         public string CurrencySymbol { get; private set; }
         public decimal CurrencyRate { get; set; }
+        public bool CurrencyException { get; set; }
         private IMemoryCache Cache { get; }
 
         public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache)
@@ -65,6 +66,7 @@ namespace ePiggyWeb.Pages
                 {
                     CurrencySymbol = userModel.Currency;
                     CurrencyRate = 1;
+                    CurrencyException = true;
                     return;
                 }
             }
