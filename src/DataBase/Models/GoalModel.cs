@@ -11,20 +11,22 @@ namespace ePiggyWeb.DataBase.Models
         public decimal Price { get; set; }
         [StringLength(255)]
         public string Title { get; set; }
-
-        public GoalModel() { }
+        [StringLength(3)]
+        public string Currency { get; set; }
 
         public GoalModel(IGoal goal, int userId)
         {
             UserId = userId;
             Price = goal.Amount;
             Title = goal.Title;
+            Currency = goal.Currency;
         }
 
         public void Edit(IGoal newGoal)
         {
             Price = newGoal.Amount;
             Title = newGoal.Title;
+            Currency = newGoal.Currency;
         }
     }
 }

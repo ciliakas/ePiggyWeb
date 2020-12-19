@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataBase.Models;
@@ -12,7 +8,6 @@ using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.CurrencyAPI
 {
@@ -59,12 +54,6 @@ namespace ePiggyWeb.CurrencyAPI
         {
             var (userCurrency, exception1) = await GetUserCurrency(userId);
             if (exception1 != null) throw exception1;
-
-            //Temporary while no currency is saved
-            foreach (var goal in goalList)
-            {
-                if (goal.Currency is null || goal.Currency == "currency") goal.Currency = "EUR";
-            }
 
             var containsForeignCurrency = goalList.Any(x => x.Currency != userCurrency.Code);
             if (!containsForeignCurrency) return goalList;

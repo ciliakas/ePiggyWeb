@@ -26,11 +26,6 @@ namespace ePiggyWeb.DataManagement.Entries
             return new Entry(title, amount, date, recurring, importance, currency);
         }
 
-        public static Entry CreateLocalEntry(IGoal goal, DateTime date, bool recurring, int importance, string currency)
-        {
-            return new Entry(goal.Title, goal.Amount, date, recurring, importance, currency);
-        }
-
         private Entry(string title, decimal amount, DateTime date, bool recurring, int importance, string currency)
         {
             Title = title;
@@ -51,19 +46,16 @@ namespace ePiggyWeb.DataManagement.Entries
         public Entry(int id, int userId, IEntry entry)
             : this(id, userId, entry.Title, entry.Amount, entry.Date, entry.Recurring, entry.Importance, entry.Currency) { }
 
-        //TODO
-        public Entry(IEntryModel dbEntry)
-            : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance, "currency") { }
+        public Entry(IEntryModel dbEntry) : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, 
+            dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance, dbEntry.Currency) { }
 
         public Entry(int id, IGoal goal, DateTime date, bool recurring, int importance)
             : this(id, goal.UserId, goal.Title, goal.Amount, date, recurring, importance, goal.Currency) { }
 
-        //TODO
         public Entry(int id, IGoalModel dbGoal, DateTime date, bool recurring, int importance)
-            : this(id, dbGoal.UserId, dbGoal.Title, dbGoal.Price, date, recurring, importance, "currency") { }
+            : this(id, dbGoal.UserId, dbGoal.Title, dbGoal.Price, date, recurring, importance, dbGoal.Currency) { }
 
 
-        //For simpler editing in other methods
         public void Edit(IEntry newEntry)
         {
             Title = newEntry.Title;

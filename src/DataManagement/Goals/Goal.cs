@@ -30,10 +30,7 @@ namespace ePiggyWeb.DataManagement.Goals
             UserId = userId;
         }
 
-        //TODO
-        public Goal(IGoalModel dbGoalModel) : this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Price, "currency") { }
-
-        public Goal(int id, int userId, IGoal goal) : this(id, userId, goal.Title, goal.Amount, goal.Currency) { }
+        public Goal(IGoalModel dbGoal) : this(dbGoal.Id, dbGoal.UserId, dbGoal.Title, dbGoal.Price, dbGoal.Currency) { }
 
         public void Edit(IGoal goal)
         {
