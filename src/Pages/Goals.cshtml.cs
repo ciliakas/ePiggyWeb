@@ -19,8 +19,8 @@ namespace ePiggyWeb.Pages
     [Authorize]
     public class GoalsModel : PageModel
     {
+        /*DI objects*/
         private readonly ILogger<GoalsModel> _logger;
-
         private CurrencyConverter CurrencyConverter { get; }
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
@@ -28,11 +28,7 @@ namespace ePiggyWeb.Pages
         private IConfiguration Configuration { get; }
         private readonly Lazy<InternetParser> _internetParser;
 
-
-        public IGoalList Goals { get; private set; }
-        public decimal Savings { get; private set; }
-        private int UserId { get; set; }
-
+        /*New Entry vars*/
         [Required(ErrorMessage = "Required")]
         [BindProperty]
         [StringLength(25)]
@@ -55,6 +51,11 @@ namespace ePiggyWeb.Pages
         public bool LoadingException { get; set; }
         [BindProperty(SupportsGet = true)]
         public bool WasExceptionParse { get; set; }
+
+        /*Display*/
+        public IGoalList Goals { get; private set; }
+        public decimal Savings { get; private set; }
+        private int UserId { get; set; }
 
         public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger,
             HttpClient httpClient, IConfiguration configuration, CurrencyConverter currencyConverter)
