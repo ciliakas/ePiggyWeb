@@ -20,6 +20,10 @@ namespace ePiggyWeb.DataManagement.Entries
         public int Importance { get; set; }
         public string Currency { get; set; }
 
+        public Entry()
+        {
+
+        }
 
         public static Entry CreateLocalEntry(string title, decimal amount, DateTime date, bool recurring, int importance, string currency)
         {
