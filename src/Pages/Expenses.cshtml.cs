@@ -131,21 +131,19 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPostNewEntry()
         {
+            if (!ModelState.IsValid)
+            {
+                await OnGet();
+                return Page();
+            }
+
+            await SetCurrency();
+            Amount *= 1 / CurrencyRate;
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var entry1 = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, Currency.Code);
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    var today = DateTime.Now;
-                    StartDate = new DateTime(today.Year, today.Month, 1);
-                    EndDate = DateTime.Today;
-                    await SetData();
-                    return Page();
-                }
-
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, Currency.Code);
-                await EntryDatabase.CreateAsync(entry, UserId, EntryType.Expense);
-                return RedirectToPage("/expenses");
+                await EntryDatabase.CreateAsync(entry1, UserId, EntryType.Expense);
             }
             catch (Exception ex)
             {
@@ -153,6 +151,8 @@ namespace ePiggyWeb.Pages
                 WasException = true;
                 return Page();
             }
+
+            return RedirectToPage("/expenses");
         }
 
         public async Task<IActionResult> OnPostDelete()
