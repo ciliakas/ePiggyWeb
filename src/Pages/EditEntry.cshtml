@@ -1,4 +1,6 @@
 ﻿@page
+@using System.Globalization
+@using ePiggyWeb.DataManagement.Entries
 @using ePiggyWeb.Utilities
 @model ePiggyWeb.Pages.EditEntryModel
 
@@ -7,11 +9,11 @@
     <!--Displays text accordingly to the EntryType-->
     @if (Model.EntryTypeInt == 1)
     {
-        <h2 class="text-info">Income</h2>
+        <h2 class="text-info">Income (@Model.Entry.Currency)</h2>
     }
     else
     {
-        <h2 class="text-info">Expenses</h2>
+<h2 class="text-info">Expenses (@Model.Entry.Currency)</h2>
     }
 </div>
 
@@ -22,7 +24,7 @@
     <input asp-for="Entry.Id" type="hidden" />
     <input asp-for="Entry.UserId" type="hidden" />
     <input class="mt-2" asp-for="Title" type="text" />
-    <input class="mt-2" asp-for="Entry.Amount" type="text" />
+    <input class="mt-2" asp-for="Entry.Amount" type="text" value ="@Math.Round(Model.Entry.Amount, 2).ToString(CultureInfo.CurrentCulture)"/>
     <input class="mt-2" asp-for="Entry.Date" type="date" value="@Model.Entry.Date.ToShortDateString()" />
     @if (Model.EntryTypeInt == 1)
     {
