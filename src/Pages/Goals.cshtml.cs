@@ -11,7 +11,6 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -21,9 +20,15 @@ namespace ePiggyWeb.Pages
     public class GoalsModel : PageModel
     {
         private readonly ILogger<GoalsModel> _logger;
-      
 
+        private CurrencyConverter CurrencyConverter { get; }
+        private GoalDatabase GoalDatabase { get; }
+        private EntryDatabase EntryDatabase { get; }
+        private HttpClient HttpClient { get; }
+        private IConfiguration Configuration { get; }
         private readonly Lazy<InternetParser> _internetParser;
+
+
         public IGoalList Goals { get; private set; }
         public decimal Savings { get; private set; }
         private int UserId { get; set; }
@@ -37,11 +42,6 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
-
-        private GoalDatabase GoalDatabase { get; }
-        private EntryDatabase EntryDatabase { get; }
-        private HttpClient HttpClient { get; }
-        private IConfiguration Configuration { get; }
 
         /*Currency vars*/
         public Currency Currency { get; set; }
@@ -65,6 +65,7 @@ namespace ePiggyWeb.Pages
             HttpClient = httpClient;
             _internetParser = new Lazy<InternetParser>(() => new InternetParser(HttpClient));
             Configuration = configuration;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task OnGet()
@@ -72,11 +73,9 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Goals = await GoalDatabase.ReadListAsync(UserId);
+                var goals = await GoalDatabase.ReadListAsync(UserId);
 
-                var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Savings = income.GetSum() - expenses.GetSum();
+                Savings = await EntryDatabase.GetBalance(x => true, UserId);
                 if (Savings < 0)
                 {
                     Savings = 0;
@@ -86,6 +85,7 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
+                LoadingException = true;
                 Goals = GoalList.RandomList(Configuration);
                 Savings = 0;
             }
@@ -116,6 +116,7 @@ namespace ePiggyWeb.Pages
                     await OnGet();
                     return Page();
                 }
+                await SetCurrency();
 
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var temp = Goal.CreateLocalGoal(Title, Amount, "EUR");
@@ -127,7 +128,7 @@ namespace ePiggyWeb.Pages
                 WasException = true;
             }
 
-            return RedirectToPage("/goals");
+            return RedirectToPage("/goals", new { WasException, CurrencyException });
         }
 
         public async Task<IActionResult> OnPostParseGoal()
@@ -139,6 +140,7 @@ namespace ePiggyWeb.Pages
                     await OnGet();
                     return Page();
                 }
+                await SetCurrency();
 
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var temp = await _internetParser.Value.ReadPriceFromCamel(Title);
@@ -151,7 +153,7 @@ namespace ePiggyWeb.Pages
                 return RedirectToPage("/goals", new { wasExceptionParse = true });
 
             }
-            return RedirectToPage("/goals");
+            return RedirectToPage("/goals", new { WasException, CurrencyException });
         }
 
         public async Task<IActionResult> OnPostDelete(int id)
@@ -166,7 +168,7 @@ namespace ePiggyWeb.Pages
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
             }
-            return RedirectToPage("/goals");
+            return RedirectToPage("/goals", new { WasException, CurrencyException });
         }
 
         public async Task<IActionResult> OnPostPurchased(int id, string title, string amount)
