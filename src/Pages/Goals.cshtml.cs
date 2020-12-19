@@ -83,16 +83,18 @@ namespace ePiggyWeb.Pages
                     Goals = await CurrencyConverter.ConvertGoalList(goalsList, UserId);
                     income = await CurrencyConverter.ConvertEntryList(income, UserId);
                     expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
+                    Savings = income.GetSum() - expenses.GetSum();
+                    Savings = Savings < 0 ? 0 : Savings;
                 }
                 catch (Exception ex)
                 {
                     _logger.LogInformation(ex.ToString());
                     CurrencyException = true;
                     Goals = goalsList;
+                    Savings = 0;
                 }
 
-                Savings = income.GetSum() - expenses.GetSum();
-                Savings = Savings < 0 ? 0 : Savings;
+                
             }
             catch (Exception ex)
             {
