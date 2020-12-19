@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -63,69 +62,37 @@ namespace ePiggyWeb.Pages
         public int TotalPages { get; set; }
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
-        private UserDatabase UserDatabase { get; }
-        private CurrencyApiAgent CurrencyApiAgent { get; }
         public Currency Currency { get; set; }
         public decimal CurrencyRate { get; set; }
         public string CurrencySymbol { get; private set; }
         public bool CurrencyException { get; set; }
-        private IMemoryCache Cache { get; }
         private CurrencyConverter CurrencyConverter { get; }
-        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyApiAgent currencyApiAgent, IMemoryCache cache, CurrencyConverter currencyConverter)
+        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration, CurrencyConverter currencyConverter)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
             Configuration = configuration;
-            UserDatabase = userDatabase;
-            CurrencyApiAgent = currencyApiAgent;
-            Cache = cache;
             CurrencyConverter = currencyConverter;
         }
 
         public async Task OnGet()
         {
-            TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
+            TimeManager.GetDate(Request, out var startDate, out var EndDate);
+            await LoadData(startDate, EndDate);
+        }
+
+        private async Task LoadData(DateTime startDate, DateTime endDate)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
             await SetCurrency();
             await SetData();
         }
 
-        private async Task SetCurrency()
-        {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
-            if (exception != null)
-            {
-                WasException = true;
-                switch (exception)
-                {
-                    case HttpListenerException ex:
-                        _logger.LogInformation(ex.ToString());
-                        ErrorMessage = "Failed to load currency information!";
-                        break;
-                    case HttpRequestException ex:
-                        _logger.LogInformation(ex.ToString());
-                        ErrorMessage = "Failed to load currency information!";
-                        break;
-                    default:
-                        _logger.LogInformation(exception.ToString());
-                        ErrorMessage = "Failed to connect to database!";
-                        break;
-                }
-            }
-
-            Currency = currency;
-            CurrencySymbol = Currency.SymbolString;
-            CurrencyRate = Currency.Rate;
-        }
-
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate, out var tempEndDate);
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
-            await SetData();
+            TimeManager.SetDateUpdated(startDate, endDate, Response);
+            await LoadData(startDate, EndDate);
             return Page();
         }
 
@@ -149,7 +116,6 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                return Page();
             }
 
             return RedirectToPage("/expenses");
@@ -157,14 +123,12 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnPostDelete()
         {
+            var selected = Request.Form["chkEntry"].ToString();
+            var selectedList = selected.Split(',');
+            var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
-                var selected = Request.Form["chkEntry"].ToString();
-                var selectedList = selected.Split(',');
-                var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();
-
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-
                 await EntryDatabase.DeleteListAsync(entryIdList, UserId, EntryType.Expense);
             }
             catch (Exception ex)
@@ -211,6 +175,34 @@ namespace ePiggyWeb.Pages
                 ExpensesToDisplay = Expenses;
                 AllExpenses = Expenses.GetSum();
             }
+        }
+        private async Task SetCurrency()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
+            {
+                WasException = true;
+                switch (exception)
+                {
+                    case HttpListenerException ex:
+                        _logger.LogInformation(ex.ToString());
+                        ErrorMessage = "Failed to load currency information!";
+                        break;
+                    case HttpRequestException ex:
+                        _logger.LogInformation(ex.ToString());
+                        ErrorMessage = "Failed to load currency information!";
+                        break;
+                    default:
+                        _logger.LogInformation(exception.ToString());
+                        ErrorMessage = "Failed to connect to database!";
+                        break;
+                }
+            }
+
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
+            CurrencyRate = Currency.Rate;
         }
     }
 }
