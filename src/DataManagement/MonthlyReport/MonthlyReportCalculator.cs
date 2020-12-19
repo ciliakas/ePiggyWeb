@@ -85,9 +85,11 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
             var biggestCategory = (Importance)enumCount;
             var sum = 0m;
+            var monthExpenses = Expenses.GetFrom(StartTime).GetTo(EndTime);
+
             foreach (var importance in Enum.GetValues(typeof(Importance)).Cast<Importance>())
             {
-                var expenses = Expenses.GetBy(importance);
+                var expenses = monthExpenses.GetBy(importance);
                 var temp = expenses.Sum(entry => entry.Amount);
                 if (temp < sum) continue;
                 sum = temp;
