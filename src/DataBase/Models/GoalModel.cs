@@ -11,6 +11,8 @@ namespace ePiggyWeb.DataBase.Models
         public decimal Price { get; set; }
         [StringLength(255)]
         public string Title { get; set; }
+        [StringLength(3)]
+        public string Currency { get; set; }
 
         public GoalModel() { }
 

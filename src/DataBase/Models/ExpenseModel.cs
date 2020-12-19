@@ -15,6 +15,8 @@ namespace ePiggyWeb.DataBase.Models
         public DateTime Date { get; set; }
         public bool IsMonthly { get; set; }
         public int Importance { get; set; }
+        [StringLength(3)]
+        public string Currency { get; set; }
 
         public ExpenseModel() {}
 
