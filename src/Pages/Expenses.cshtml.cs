@@ -132,6 +132,10 @@ namespace ePiggyWeb.Pages
         public async Task<IActionResult> OnPostDelete()
         {
             var selected = Request.Form["chkEntry"].ToString();
+            if (string.IsNullOrEmpty(selected))
+            {
+                return RedirectToPage("/income");
+            }
             var selectedList = selected.Split(',');
             var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
