@@ -9,7 +9,6 @@ using ePiggyWeb.DataManagement.Saving;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -29,8 +28,6 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public DateTime StartDate { get; set; }
-        [BindProperty]
-        public DateTime EndDate { get; set; }
         public CalculationResults MinimalSuggestions { get; set; }
         public CalculationResults RegularSuggestions { get; set; }
         public CalculationResults MaximalSuggestions { get; set; }
@@ -59,9 +56,8 @@ namespace ePiggyWeb.Pages
         public async Task OnGet(int id)
         {
             Id = id;
-            TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
+            var today = DateTime.Today;
+            StartDate = new DateTime(today.Year, today.Month, 1);
             await SetCurrency();
             await SetData();
         }
@@ -78,13 +74,10 @@ namespace ePiggyWeb.Pages
             CurrencySymbol = Currency.SymbolString;
         }
 
-        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
+        public async Task<IActionResult> OnGetFilter(DateTime startDate, int id)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate,
-                out var tempEndDate);
 
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
+            StartDate = startDate;
 
             Id = id;
             await SetCurrency();
@@ -120,7 +113,8 @@ namespace ePiggyWeb.Pages
                     Savings = 0;
                 }
 
-                Expenses.GetFrom(StartDate).GetTo(EndDate);
+                var endDate = StartDate.AddMonths(1).AddDays(-1);
+                Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
                 var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
                 MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
