@@ -204,7 +204,7 @@ else
         }
         else if (Model.CurrentPage >= (Model.TotalPages - 2))
         {
-            @for (var i = (Model.TotalPages - 5); i <= Model.TotalPages; i++)
+            @for (var i = (Model.TotalPages - 4); i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(Model.CurrentPage == i ? "active" : "")"><a class="page-link" asp-page="/income" asp-route-CurrentPage="@i">@i</a></li>
             }
