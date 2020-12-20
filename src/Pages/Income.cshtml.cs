@@ -155,7 +155,7 @@ namespace ePiggyWeb.Pages
             try
             {
                 var incomeList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId, EntryType.Expense, orderByDate: true);
+                    UserId, EntryType.Income, orderByDate: true);
                 try
                 {
                     Income = await CurrencyConverter.ConvertEntryList(incomeList, UserId);
