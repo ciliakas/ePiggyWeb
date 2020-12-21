@@ -180,7 +180,7 @@ namespace ePiggyWeb.DataBase
                     "INSERT INTO Expenses(UserId, Amount, Title, Date, IsMonthly, Importance, Currency) VALUES (@UserId, @Amount, @Title, @Date, @IsMonthly, @Importance, @Currency);SELECT CAST(scope_identity() AS int);",
                     sqlConnection)
                 { CommandType = CommandType.Text };
-            sqlCommand.Parameters.AddWithValue("@UserId", expense.UserId);
+            sqlCommand.Parameters.AddWithValue("@UserId", userId);
             sqlCommand.Parameters.AddWithValue("@Amount", expense.Amount);
             sqlCommand.Parameters.AddWithValue("@Title", expense.Title);
             sqlCommand.Parameters.AddWithValue("@Date", expense.Date);
