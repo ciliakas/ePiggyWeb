@@ -43,12 +43,12 @@ namespace ePiggyWeb.DataManagement
             for (var i = 0; i < months - 1; i++)
             {
                 month = TimeManager.MoveToNextMonth(dateTime: month);
-                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, month, false, entry.Importance);
+                var newEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, month, false, entry.Importance, entry.Currency);
                 tempList.Add(newEntry);
             }
 
             month = TimeManager.MoveToNextMonth(month);
-            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, month, true, entry.Importance);
+            var newestEntry = Entry.CreateLocalEntry(entry.Title, entry.Amount, month, true, entry.Importance, entry.Currency);
             tempList.Add(newestEntry);
             return tempList;
         }

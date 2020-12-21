@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -71,7 +70,6 @@ namespace ePiggyWeb.DataBase
                 key.Id = value.Id;
                 entryList.Add(key);
             }
-
 
             return true;
         }
@@ -176,7 +174,36 @@ namespace ePiggyWeb.DataBase
             return await ReadListAsync(x => true, userId, entryType);
         }
 
-        public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType)
+        public async Task<Tuple<IEntryList, int>> ReadByPage(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType,
+            int pageNumber, int pageSize)
+        {
+            await UpdateRecurringAsync(userId, entryType);
+            var updatedFilter = filter.And(x => x.UserId == userId);
+
+            var allEntries = entryType switch
+            {
+                EntryType.Income => await Database.Incomes.Where(updatedFilter).OrderByDescending(x => x.Date)
+                    .Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
+                _ => await Database.Expenses.Where(updatedFilter).OrderByDescending(x => x.Date)
+                    .Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
+            };
+
+            var list = new EntryList(entryType);
+            list.AddRange(allEntries.Skip((pageNumber - 1) * pageSize).Take(pageSize));
+            var numberOfPages = (int) Math.Ceiling(decimal.Divide(allEntries.Count, pageSize));
+            return new Tuple<IEntryList, int>(list, numberOfPages);
+        }
+
+        public async Task<decimal> GetBalance(Expression<Func<IEntryModel, bool>> filter, int userId)
+        {
+            var updatedFilter = filter.And(x => x.UserId == userId);
+            var expenses = await Database.Expenses.Where(updatedFilter).SumAsync(x => x.Amount);
+            var incomes = await Database.Incomes.Where(updatedFilter).SumAsync(x => x.Amount);
+            var balance = incomes - expenses;
+            return balance;
+        }
+
+        public async Task<IEntryList> ReadListAsync(Expression<Func<IEntryModel, bool>> filter, int userId, EntryType entryType, bool orderByDate = false)
         {
             await UpdateRecurringAsync(userId, entryType);
             var updatedFilter = filter.And(x => x.UserId == userId);
@@ -186,7 +213,8 @@ namespace ePiggyWeb.DataBase
                 EntryType.Income => await Database.Incomes.Where(updatedFilter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync(),
                 _ => await Database.Expenses.Where(updatedFilter).Select(dbEntry => new Entry(dbEntry) as IEntry).ToListAsync()
             };
-            list.AddRange(temp);
+
+            list.AddRange(orderByDate? temp.OrderByDescending(x => x.Date) : temp);
             return list;
         }
 

@@ -20,61 +20,52 @@ namespace ePiggyWeb.Pages
         public bool WasException { get; set; }
         private int UserId { get; set; }
 
-        public string ErrorMessage = "";
-
         [BindProperty]
         public MonthlyReportResult Data { get; set; }
 
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
-        private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        public Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
-        public decimal CurrencyRate { get; set; }
         public bool CurrencyException { get; set; }
-        private IMemoryCache Cache { get; }
+        private CurrencyConverter CurrencyConverter { get; }
 
-        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase,
+            EntryDatabase entryDatabase, CurrencyConverter currencyConverter)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
-            UserDatabase = userDatabase;
             CurrencyConverter = currencyConverter;
-            Cache = cache;
         }
         public async Task<IActionResult> OnGet()
         {
-            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var monthlyReportCalculator = new MonthlyReportCalculator(GoalDatabase, EntryDatabase, UserId);
-            Data = await monthlyReportCalculator.Calculate();
-            await SetCurrency();
+            try
+            {
+                await SetCurrency();
+                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+                var monthlyReportCalculator = new MonthlyReportCalculator(GoalDatabase, EntryDatabase, UserId, CurrencyConverter);
+                Data = await monthlyReportCalculator.Calculate();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+            }
+           
             return Page();
         }
 
         private async Task SetCurrency()
         {
-            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var userModel = await UserDatabase.GetUserAsync(UserId);
-                try
-                {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
-                }
-                catch (Exception)
-                {
-                    CurrencySymbol = userModel.Currency;
-                    CurrencyRate = 1;
-                    CurrencyException = true;
-                    return;
-                }
+                CurrencyException = true;
             }
-
-            CurrencySymbol = userCurrency.GetSymbol();
-            CurrencyRate = userCurrency.Rate;
-            var options = CacheKeys.DefaultCurrencyCacheOptions();
-            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
         }
 
     }

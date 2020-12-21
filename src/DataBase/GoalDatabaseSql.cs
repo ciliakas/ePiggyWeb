@@ -185,7 +185,8 @@ namespace ePiggyWeb.DataBase
                     Id = row.Field<int>("Id"),
                     Amount = row.Field<decimal>("Price"),
                     Title = row.Field<string>("Title"),
-                    UserId = row.Field<int>("UserId")
+                    UserId = row.Field<int>("UserId"),
+                    Currency = row.Field<string>("Currency")
                 } as IGoal).ToList();
 
             list.AddRange(items);

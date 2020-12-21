@@ -45,6 +45,7 @@ namespace ePiggyWeb
             services.AddScoped<GoalDatabase>();
             services.Configure<EmailSender>(options => Configuration.GetSection("Email").Bind(options));
             services.AddScoped<HttpClient>();
+            services.AddScoped<CurrencyApiAgent>();
             services.AddScoped<CurrencyConverter>();
         }
 

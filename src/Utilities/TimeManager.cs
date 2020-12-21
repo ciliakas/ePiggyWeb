@@ -6,7 +6,7 @@ namespace ePiggyWeb.Utilities
 {
     public static class TimeManager
     {
-        public static DateTime OneMonthAhead { get; }= GetEndOfTheMonth(DateTime.UtcNow.AddMonths(1));
+        public static DateTime OneMonthAhead { get; } = GetEndOfTheMonth(DateTime.UtcNow.AddMonths(1));
 
         public static DateTime RefreshTime()
         {
@@ -73,6 +73,15 @@ namespace ePiggyWeb.Utilities
                 response.Cookies.Append("StartDate", startDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
                 response.Cookies.Append("EndDate", endDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
             }
+        }
+
+        public static void SetDateUpdated(DateTime startDate, DateTime endDate, HttpResponse response)
+        {
+            if (startDate > endDate) throw new ArgumentException();
+
+            var cookieOptions = new CookieOptions { Expires = DateTimeOffset.UtcNow.AddHours(4) };
+            response.Cookies.Append("StartDate", startDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
+            response.Cookies.Append("EndDate", endDate.ToString(CultureInfo.InvariantCulture), cookieOptions);
         }
 
         public static int DifferenceInMonths(DateTime laterTime, DateTime earlierTime)

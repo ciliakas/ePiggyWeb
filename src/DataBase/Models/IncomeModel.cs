@@ -19,8 +19,7 @@ namespace ePiggyWeb.DataBase.Models
         public int Importance { get; set; }
         [StringLength(3)]
         public string Currency { get; set; }
-
-        public IncomeModel() {}
+        public IncomeModel() { }
 
         public IncomeModel(IEntry entry, int userId)
         {
@@ -30,6 +29,7 @@ namespace ePiggyWeb.DataBase.Models
             Date = entry.Date;
             IsMonthly = entry.Recurring;
             Importance = entry.Importance;
+            Currency = entry.Currency;
         }
 
         public void Edit(IEntry newEntry)
@@ -39,6 +39,7 @@ namespace ePiggyWeb.DataBase.Models
             Date = newEntry.Date;
             IsMonthly = newEntry.Recurring;
             Importance = newEntry.Importance;
+            Currency = newEntry.Currency;
         }
     }
 

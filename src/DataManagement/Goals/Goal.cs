@@ -10,72 +10,35 @@ namespace ePiggyWeb.DataManagement.Goals
         public int UserId { get; set; }
         public string Title { get; set; }
         public decimal Amount { get; set; }
+        public string Currency { get; set; }
 
-        public static Goal CreateLocalGoal(string title, decimal amount)
+        public static Goal CreateLocalGoal(string title, decimal amount, string currency)
         {
-            return new Goal(title, amount);
+            return new Goal(title, amount, currency);
         }
 
-        private Goal(string title, decimal amount)
+        private Goal(string title, decimal amount, string currency)
         {
             Title = title;
             Amount = amount;
+            Currency = currency;
         }
 
-        public Goal(int id, int userId, string title, decimal amount) : this(title, amount)
+        public Goal() { }
+
+        public Goal(int id, int userId, string title, decimal amount, string currency) : this(title, amount, currency)
         {
             Id = id;
             UserId = userId;
         }
 
-        public Goal(IGoalModel dbGoalModel) : this(dbGoalModel.Id, dbGoalModel.UserId, dbGoalModel.Title, dbGoalModel.Price) { }
-
-        public Goal(int id, int userId, IGoal goal) : this(id, userId, goal.Title, goal.Amount) { }
-
-        public Goal()
-        {
-            Id = 0;
-            UserId = 0;
-            Title = "unnamed";
-            Amount = 0;
-        }
+        public Goal(IGoalModel dbGoal) : this(dbGoal.Id, dbGoal.UserId, dbGoal.Title, dbGoal.Price, dbGoal.Currency) { }
 
         public void Edit(IGoal goal)
         {
             Title = goal.Title;
             Amount = goal.Amount;
         }
-
-        // Since I don't know how this should work with the threads and so on, I will keep this commented for the time being
-
-        //public Goal(string title)
-        //{
-        //    SetGoalFromWeb(title);
-        //}
-
-        //private static readonly string ResourceDirectoryParsedGoal = Directory.GetParent(Environment.CurrentDirectory)
-        //                                                                 .Parent?.Parent?.FullName +
-        //                                                             @"\resources\textData\parsedGoal.txt";
-        //public void SetGoalFromWeb(string itemName)
-        //{
-        //    try
-        //    {
-        //Below line should be amended, as the teacher said this is not the correct way to use threads
-        //        Task.Run(() => InternetParser.ReadPriceFromCamel(itemName)).Wait();
-
-        //        var file = new StreamReader(ResourceDirectoryParsedGoal);
-        //        file.ReadLine();
-        //        Title = file.ReadLine();
-        //        var priceString = file.ReadLine();
-        //        Amount = Convert.ToDecimal(priceString, System.Globalization.CultureInfo.CurrentCulture);
-        //        file.Close();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        ExceptionHandler.Log(e.ToString());
-        //    }
-        //}
-
 
         public int CompareTo(IGoal other)
         {

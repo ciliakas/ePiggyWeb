@@ -30,7 +30,6 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
 
         public bool CodeSent;
-        public bool Expired;
 
         private Lazy<EmailSender> EmailSender { get; }
         private UserDatabase UserDatabase { get; }
@@ -81,16 +80,12 @@ namespace ePiggyWeb.Pages
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");
                 }
-                else
-                {
-                    ErrorMessage = "Password did not match!";
-                }
+                ErrorMessage = "Password did not match!";
             }
             else
             {
                 ErrorMessage = "Wrong code!";
             }
-
             return Page();
         }
 

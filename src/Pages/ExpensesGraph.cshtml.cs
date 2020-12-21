@@ -8,7 +8,6 @@ using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -25,25 +24,20 @@ namespace ePiggyWeb.Pages
         public DateTime StartDate { get; set; }
         [BindProperty]
         public DateTime EndDate { get; set; }
-
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
         private IConfiguration Configuration { get; }
-        private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
         public string CurrencySymbol { get; private set; }
-        public decimal CurrencyRate { get; set; }
+        private CurrencyConverter CurrencyConverter { get; }
+        public Currency Currency { get; set; }
         public bool CurrencyException { get; set; }
-        private IMemoryCache Cache { get; }
-
-        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger,
+            IConfiguration configuration, CurrencyConverter currencyConverter)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
             Configuration = configuration;
-            UserDatabase = userDatabase;
             CurrencyConverter = currencyConverter;
-            Cache = cache;
         }
         public async Task OnGet()
         {
@@ -53,49 +47,49 @@ namespace ePiggyWeb.Pages
             await SetCurrency();
             await SetData();
         }
-        private async Task SetCurrency()
-        {
-            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
-            {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var userModel = await UserDatabase.GetUserAsync(UserId);
-                try
-                {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
-                }
-                catch (Exception)
-                {
-                    CurrencySymbol = userModel.Currency;
-                    CurrencyRate = 1;
-                    CurrencyException = true;
-                    return;
-                }
-            }
-
-            CurrencySymbol = userCurrency.GetSymbol();
-            CurrencyRate = userCurrency.Rate;
-            var options = CacheKeys.DefaultCurrencyCacheOptions();
-            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
-        }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate, out var tempEndDate);
+            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate,
+                out var tempEndDate);
+
             StartDate = tempStartDate;
             EndDate = tempEndDate;
+            await SetCurrency();
             await SetData();
             return Page();
         }
 
+        private async Task SetCurrency()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
+            {
+                CurrencyException = true;
+            }
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
+        }
         private async Task SetData()
         {
-            //throw new Exception();
             try
             {
-                //throw new Exception();
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
+                var entryList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId,
+                    EntryType.Expense);
+
+                try
+                {
+                    Expenses = await CurrencyConverter.ConvertEntryList(entryList, UserId);
+                }
+                catch (Exception ex)
+                {
+                    CurrencyException = true;
+                    _logger.LogInformation(ex.ToString());
+                    Expenses = entryList;
+                }
             }
             catch (Exception ex)
             {
@@ -103,7 +97,6 @@ namespace ePiggyWeb.Pages
                 WasException = true;
                 Expenses = EntryList.RandomList(Configuration, EntryType.Expense);
             }
-
         }
     }
 }

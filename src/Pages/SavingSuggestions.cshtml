@@ -22,7 +22,8 @@
 {
     <div class="container">
         <div class="alert alert-warning" role="alert">
-            We were unable to load <strong>Currencies...</strong><i class="ml-1 fas fa-robot"></i>
+            We were unable to load <strong>Currencies...</strong>And calculator can't calculate using different currencies...
+            <i class="ml-1 fas fa-robot"></i>
         </div>
     </div>
 }
@@ -33,27 +34,47 @@
     <form method="get" class="mt-5 mb-5">
         <input asp-for="Id" type="hidden" value="@Model.Id" />
         <input type="hidden" name="handler" value="Filter" />
-        <label class="text-light col-md-4">Period:</label>
-        <div class="row justify-content-center">
-            <input class="col-md-3 col-sm-5 col-5" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
-            <label class="text-light ml-2 mr-2"> - </label>
-            <input class="col-md-3 col-sm-5 col-5" for="endDate" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+        <div>
+            <div>
+                <span>
+                    <label class="text-light" for="year">Year:</label>
+                    <select asp-for="Year" id="year" name="year">
+                        <option hidden selected value="@Model.Today.Year">@Model.Today.Year</option>
+                        @for (var i = 2016; i <= @DateTime.Today.Year; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </span>
+                <span>
+                    <label class="text-light" for="month">Month:</label>
+                    <select asp-for="Month" id="month" name="month">
+                        <option hidden selected value="@Model.Today.Month">@Model.Today.Month</option>
+                        @for (var i = 1; i <= 12; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </span>
+            </div>
         </div>
         <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
-        <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr />
 
     <div class="container mb-5 " id="SavingType">
         <p>
             <label class="text-light">Saving type</label><br />
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#minimalSuggestions" aria-expanded="false" aria-controls="minimalSuggestions">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#minimalSuggestions"
+                    aria-expanded="false" aria-controls="minimalSuggestions">
                 Minimal<i class="ml-1 fas fa-search-minus"></i>
             </button>
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#regularSuggestions" aria-expanded="false" aria-controls="regularSuggestions">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#regularSuggestions"
+                    aria-expanded="false" aria-controls="regularSuggestions">
                 Regular<i class="ml-1 fas fa-search-dollar"></i>
             </button>
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#maximalSuggestions" aria-expanded="false" aria-controls="maximalSuggestions">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#maximalSuggestions"
+                    aria-expanded="false" aria-controls="maximalSuggestions">
                 Maximal<i class="ml-1 fas fa-search-plus"></i>
             </button>
         </p><hr />
@@ -70,7 +91,13 @@
                     <h4 class="text-warning">Example Data used, since You don't have enough entries!</h4>
                     Model.MinimalSuggestions.TimesToRepeatSaving *= -1;
                 }
-                <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MinimalSuggestions.TimesToRepeatSaving months</span></h4>
+                <h4 class="text-light">Using suggestions you would need to save for
+                    <span class="text-warning">@Model.MinimalSuggestions.TimesToRepeatSaving months</span>
+                </h4>
+                @if (@Model.MinimalSuggestions.TimesToRepeatSaving > 24)
+                {
+                    <h4 class="text-light">Saving not recommended!</h4>
+                }
                 <hr />
                 <!----------------------------PastedCode----------------------------------------->
                 <div class="row justify-content-center ml-1 mr-1">
@@ -84,7 +111,7 @@
                                 Suggested <br />amount
                             </th>
                         </tr>
-                        @foreach (var item in Model.MinimalSuggestions.EntrySuggestions)
+                        @foreach (var item in Model.MinimalSuggestions.EntrySuggestions.OrderBy(x => x.Entry.Date))
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary text-nowrap entry-column">
@@ -133,7 +160,8 @@
                             <tr class="table-light border-primary">
                                 <td class="border-primary entry-column">
                                     <strong class="text-info">@Html.DisplayFor(m => item.Importance)</strong><br />
-                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
+                                    <span class="text-info"> Amount: </span>
+                                    @NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
                                 </td>
                                 <td class="border-primary text-info entry-table-side">
                                     @NumberFormatter.FormatCurrency(item.NewAverage, Model.CurrencySymbol)
@@ -161,7 +189,13 @@
                     <h4 class="text-warning">Example Data used, since You don't have enough entries!</h4>
                     Model.RegularSuggestions.TimesToRepeatSaving *= -1;
                 }
-                <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.RegularSuggestions.TimesToRepeatSaving months</span></h4>
+                <h4 class="text-light">Using suggestions you would need to save for 
+                    <span class="text-warning">@Model.RegularSuggestions.TimesToRepeatSaving months</span>
+                </h4>
+                @if (@Model.RegularSuggestions.TimesToRepeatSaving > 24)
+                {
+                    <h4 class="text-light">Saving not recommended!</h4>
+                }
                 <hr />
                 <!----------------------------PastedCode----------------------------------------->
                 <div class="row justify-content-center ml-1 mr-1">
@@ -175,7 +209,7 @@
                                 Suggested <br />amount
                             </th>
                         </tr>
-                        @foreach (var item in Model.RegularSuggestions.EntrySuggestions)
+                        @foreach (var item in Model.RegularSuggestions.EntrySuggestions.OrderBy(x => x.Entry.Date))
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary text-nowrap entry-column">
@@ -252,7 +286,13 @@
                     <h4 class="text-warning">Example Data used, since You don't have enough entries!</h4>
                     Model.MaximalSuggestions.TimesToRepeatSaving *= -1;
                 }
-                <h4 class="text-light">Using suggestions you would need to save for <span class="text-warning">@Model.MaximalSuggestions.TimesToRepeatSaving months</span></h4>
+                <h4 class="text-light">
+                    Using suggestions you would need to save for <span class="text-warning">@Model.MaximalSuggestions.TimesToRepeatSaving months</span>
+                </h4>
+                @if (@Model.MaximalSuggestions.TimesToRepeatSaving > 24)
+                {
+                    <h4 class="text-light">Saving not recommended!</h4>
+                }
                 <hr />
                 <!----------------------------PastedCode----------------------------------------->
                 <div class="row justify-content-center ml-1 mr-1">
@@ -266,7 +306,7 @@
                                 Suggested <br />amount
                             </th>
                         </tr>
-                        @foreach (var item in Model.MaximalSuggestions.EntrySuggestions)
+                        @foreach (var item in Model.MaximalSuggestions.EntrySuggestions.OrderBy(x => x.Entry.Date))
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary text-nowrap entry-column">
@@ -315,7 +355,8 @@
                             <tr class="table-light border-primary">
                                 <td class="border-primary entry-column">
                                     <strong class="text-info">@Html.DisplayFor(m => item.Importance)</strong><br />
-                                    <span class="text-info"> Amount: </span>@NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
+                                    <span class="text-info"> Amount: </span>
+                                    @NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
                                 </td>
                                 <td class="border-primary text-info entry-table-side">
                                     @NumberFormatter.FormatCurrency(item.NewAverage, Model.CurrencySymbol)

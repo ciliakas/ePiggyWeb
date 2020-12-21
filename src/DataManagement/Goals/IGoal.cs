@@ -9,6 +9,7 @@ namespace ePiggyWeb.DataManagement.Goals
         public int UserId { get; set; }
         public string Title { get; set; }
         public decimal Amount { get; set; }
+        public string Currency { get; set; }
         public void Edit(IGoal goal);
     }
 }

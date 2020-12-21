@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -43,19 +44,19 @@ namespace ePiggyWeb.Pages
         public List<string> CurrencyOptions { get; private set; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        private CurrencyConverter CurrencyConverter { get; }
-        public UserModel UserModel { get; private set; }
+        public string UserCurrencyCode { get; set; }
         private IMemoryCache Cache { get; }
         public bool FailedToGetCurrencyList { get; set; }
+        private CurrencyConverter CurrencyConverter { get; }
 
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, IMemoryCache cache, CurrencyConverter currencyConverter)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
             EmailSender = emailSenderSettings.Value;
             _logger = logger;
-            CurrencyConverter = currencyConverter;
             Cache = cache;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task<IActionResult> OnGet()
@@ -65,99 +66,101 @@ namespace ePiggyWeb.Pages
                 return RedirectToPage("/index");
             }
 
-            await SetCurrency();
+            await SetCurrencyList();
+            await SetUserCurrency();
             return Page();
         }
 
-        private async Task SetCurrency()
+        private async Task SetUserCurrency()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            UserModel = await UserDatabase.GetUserAsync(userId);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(userId);
+            if (exception != null)
+            {
+                switch (exception)
+                {
+                    case HttpListenerException ex:
+                        _logger.LogInformation(ex.ToString());
+                        ErrorMessage = "Failed to load currency information!";
+                        break;
+                    case HttpRequestException ex:
+                        _logger.LogInformation(ex.ToString());
+                        ErrorMessage = "Failed to load currency information!";
+                        break;
+                    default:
+                        // Failed to even get the user currency from the database, the big one
+                        _logger.LogInformation(exception.ToString());
+                        ErrorMessage = "Failed to connect to database!";
+                        break;
+                }
+            }
+
+            UserCurrencyCode = currency.Code;
+        }
+
+        private async Task SetCurrencyList()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             CurrencyOptions = new List<string>();
-            if (Cache.TryGetValue(CacheKeys.CurrencyList, out List<string> cachedCurrencyList))
+            var (currencyList1, exception) = await CurrencyConverter.GetCurrencyList(userId);
+
+            if (exception != null)
             {
-                CurrencyOptions.AddRange(cachedCurrencyList);
-                //Check if user's currency is cached
-                if (Cache.TryGetValue(CacheKeys.UserCurrency, out Currency cachedCurrency))
-                {
-                    if (UserModel.Currency.Equals(cachedCurrency.Code)) return;
-                }
-
-                //If we the code gets here, it means that we don't have the the correct user currency cached
-                try
-                {
-                    var userCurrency = await CurrencyConverter.GetCurrency(UserModel.Currency);
-                    var options = CacheKeys.DefaultCurrencyCacheOptions();
-                    Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogInformation(e.ToString());
-                }
-                return;
-            }
-
-            try
-            {
-                var currencyList = await CurrencyConverter.GetList();
-                var currencyCodeList = currencyList.Select(currency => currency.Code).ToList();
-
-                var options = CacheKeys.DefaultCurrencyCacheOptions();
-
-                Cache.Set(CacheKeys.CurrencyList, currencyCodeList, options);
-                CurrencyOptions.AddRange(currencyCodeList);
-
-                //Also set user currency 
-                var userCurrency = currencyList.First(x => x.Code == UserModel.Currency);
-                Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
-            }
-            catch (Exception e)
-            {
-                CurrencyOptions.Add(UserModel.Currency);
                 FailedToGetCurrencyList = true;
-                _logger.LogInformation(e.ToString());
+                _logger.LogInformation(exception.ToString());
+                if (exception is HttpRequestException || exception is HttpListenerException)
+                {
+                    // Something wrong with API6
+                }
+                else
+                {
+                    // Something wrong with database
+                }
+            }
+
+            foreach (var currency in currencyList1)
+            {
+                CurrencyOptions.Add(currency.Code);
             }
         }
 
         public async Task<IActionResult> OnPost()
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return Page();
-                }
-                if (string.Equals(Password, PasswordConfirm))
+                return Page();
+            }
+
+            if (string.Equals(Password, PasswordConfirm))
+            {
+                try
                 {
                     await UserDatabase.ChangePasswordAsync(User.FindFirst(ClaimTypes.Email).Value, Password);
-                    return RedirectToPage("/index");
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex.ToString());
+                }
+                return RedirectToPage("/index");
+            }
 
-                ErrorMessage = "Passwords did not match!";
-                return Page();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.ToString());
-                return Page();
-            }
+            ErrorMessage = "Passwords did not match!";
+            return Page();
         }
 
         // We need to set up error handling here
         public async Task<IActionResult> OnPostCurrency()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            if (Recalculate)
-            {
-                var currentCurrencyCode = (await UserDatabase.GetUserAsync(userId)).Currency;
-                var rate = await CurrencyConverter.GetRate(currentCurrencyCode, Currency);
-                await UserDatabase.ChangeCurrency(userId, Currency, rate);
-            }
-            else
+            try
             {
                 await UserDatabase.ChangeCurrency(userId, Currency);
+                Cache.Remove(CacheKeys.UserCurrency);
             }
-            Cache.Remove(CacheKeys.UserCurrency);
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+            }
             return Redirect("/ChangePassword");
         }
 
