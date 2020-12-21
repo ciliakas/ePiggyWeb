@@ -170,16 +170,17 @@ namespace ePiggyWeb.DataBase
             {
                 CommandType = CommandType.Text
             };
+
             sqlCommand.Parameters.AddWithValue("@Id", goalId);
             sqlCommand.Parameters.AddWithValue("@UserId", userId);
             await sqlCommand.ExecuteNonQueryAsync();
 
             var dbExpense = new ExpenseModel(expense, userId);
-            sqlCommand =
-                new SqlCommand(
-                    "INSERT INTO Expenses(UserId, Amount, Title, Date, IsMonthly, Importance, Currency) VALUES (@UserId, @Amount, @Title, @Date, @IsMonthly, @Importance, @Currency);SELECT CAST(scope_identity() AS int);",
-                    sqlConnection)
-                { CommandType = CommandType.Text };
+            sqlCommand = new SqlCommand(
+                "INSERT INTO Expenses(UserId, Amount, Title, Date, IsMonthly, Importance, Currency) " +
+                "VALUES (@UserId, @Amount, @Title, @Date, @IsMonthly, @Importance, @Currency);SELECT CAST(scope_identity() AS int);",
+                sqlConnection)
+            { CommandType = CommandType.Text };
             sqlCommand.Parameters.AddWithValue("@UserId", userId);
             sqlCommand.Parameters.AddWithValue("@Amount", expense.Amount);
             sqlCommand.Parameters.AddWithValue("@Title", expense.Title);
@@ -187,9 +188,7 @@ namespace ePiggyWeb.DataBase
             sqlCommand.Parameters.AddWithValue("@IsMonthly", expense.Recurring);
             sqlCommand.Parameters.AddWithValue("@Importance", expense.Importance);
             sqlCommand.Parameters.AddWithValue("@Currency", "EUR");
-            //public DateTime Date { get; set; }
-            //public bool IsMonthly { get; set; }
-            //public int Importance { get; set; }
+
             dbExpense.Id = (int)await sqlCommand.ExecuteScalarAsync();
 
             await sqlConnection.CloseAsync();
