@@ -64,20 +64,6 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
-                <!--
-                @if (!Context.Request.Cookies.ContainsKey("snow"))
-                {
-                    <form method="post" asp-controller="Snow" asp-action="StartSnow" asp-route-returnUrl="@Context.Request.Path">
-                        <button class="btn btn-outline-light">I'm feeling Christmas!</button>
-                    </form>
-                }
-                else
-                {
-                    <form method="post" asp-controller="Snow" asp-action="StopSnow" asp-route-returnUrl="@Context.Request.Path">
-                        <button class="btn btn-outline-light">I don't feel Christmas!</button>
-                    </form>
-                }-->
-
 
                 <li class="nav-item">
                     @if (User.Identity.IsAuthenticated)
@@ -121,7 +107,6 @@
             });
     };
         </script>
-
 
         <script src="~/js/site.js"></script>
 
