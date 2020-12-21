@@ -12,7 +12,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
     public class MonthlyReportCalculator
     {
         private int UserId { get; }
-        private GoalDatabase GoalDatabase { get; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
 
         private IEntryList Expenses { get; set; }
@@ -26,7 +26,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
         private DateTime StartTime { get; set; }
         private DateTime EndTime { get; set; }
 
-        public MonthlyReportCalculator(GoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId)
+        public MonthlyReportCalculator(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;

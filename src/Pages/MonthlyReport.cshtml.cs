@@ -25,7 +25,7 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public MonthlyReportResult Data { get; set; }
 
-        private GoalDatabase GoalDatabase { get; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         private UserDatabase UserDatabase { get; }
         private CurrencyConverter CurrencyConverter { get; }
@@ -34,7 +34,7 @@ namespace ePiggyWeb.Pages
         public bool CurrencyException { get; set; }
         private IMemoryCache Cache { get; }
 
-        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase, EntryDatabase entryDatabase, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;

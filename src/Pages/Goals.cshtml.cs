@@ -40,7 +40,7 @@ namespace ePiggyWeb.Pages
         [Range(0, 99999999.99)]
         public decimal Amount { get; set; }
 
-        private GoalDatabase GoalDatabase { get; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         private HttpClient HttpClient { get; }
         private IConfiguration Configuration { get; }
@@ -51,7 +51,7 @@ namespace ePiggyWeb.Pages
         public bool CurrencyException { get; set; }
         private IMemoryCache Cache { get; }
 
-        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public GoalsModel(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger, HttpClient httpClient, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;

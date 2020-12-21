@@ -40,7 +40,7 @@ namespace ePiggyWeb.Pages
 
         public string ErrorMessage = "";
 
-        private GoalDatabase GoalDatabase { get; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         private UserDatabase UserDatabase { get; }
         private CurrencyConverter CurrencyConverter { get; }
@@ -49,7 +49,7 @@ namespace ePiggyWeb.Pages
         public bool CurrencyException { get; set; }
         private IMemoryCache Cache { get; }
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
