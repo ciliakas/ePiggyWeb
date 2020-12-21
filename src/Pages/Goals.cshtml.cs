@@ -22,7 +22,7 @@ namespace ePiggyWeb.Pages
         /*DI objects*/
         private readonly ILogger<GoalsModel> _logger;
         private CurrencyConverter CurrencyConverter { get; }
-        private GoalDatabase GoalDatabase { get; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         private HttpClient HttpClient { get; }
         private IConfiguration Configuration { get; }
@@ -57,7 +57,7 @@ namespace ePiggyWeb.Pages
         public decimal Savings { get; private set; }
         private int UserId { get; set; }
 
-        public GoalsModel(GoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger,
+        public GoalsModel(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, ILogger<GoalsModel> logger,
             HttpClient httpClient, IConfiguration configuration, CurrencyConverter currencyConverter)
         {
             GoalDatabase = goalDatabase;
@@ -94,7 +94,7 @@ namespace ePiggyWeb.Pages
                     Savings = 0;
                 }
 
-                
+
             }
             catch (Exception ex)
             {

@@ -37,7 +37,9 @@ namespace ePiggyWeb.Pages
 
         private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
-        private GoalDatabase GoalDatabase { get; }
+        public string ErrorMessage = "";
+
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         public bool CurrencyException { get; set; }
         public Currency Currency { get; set; }
@@ -50,7 +52,7 @@ namespace ePiggyWeb.Pages
         public int Year { get; set; }
 
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase,
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
             EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
         {
             _logger = logger;
@@ -95,9 +97,9 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-
                 Goal = await GoalDatabase.ReadAsync(Id, UserId);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
                 try
                 {

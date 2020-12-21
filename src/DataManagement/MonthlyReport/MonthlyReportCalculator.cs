@@ -13,7 +13,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
     public class MonthlyReportCalculator
     {
         private int UserId { get; }
-        private GoalDatabase GoalDatabase { get; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
 
         private IEntryList Expenses { get; set; }
@@ -28,7 +28,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
         private DateTime EndTime { get; set; }
         public CurrencyConverter CurrencyConverter { get; set; }
 
-        public MonthlyReportCalculator(GoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId,
+        public MonthlyReportCalculator(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId,
             CurrencyConverter currencyConverter)
         {
             GoalDatabase = goalDatabase;
@@ -122,7 +122,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
                 return;
             }
 
-            
+
             var maxGoal = goals.Aggregate((expensive, next) => next.Amount >= expensive.Amount ? next : expensive);
             var minGoal = goals.Aggregate((cheapest, next) =>
                 next.Amount <= cheapest.Amount && next.Amount >= AllSavings ? next : cheapest);

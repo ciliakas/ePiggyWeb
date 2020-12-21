@@ -23,14 +23,14 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public MonthlyReportResult Data { get; set; }
 
-        private GoalDatabase GoalDatabase { get; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         public Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
         public bool CurrencyException { get; set; }
         private CurrencyConverter CurrencyConverter { get; }
 
-        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase,
+        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
             EntryDatabase entryDatabase, CurrencyConverter currencyConverter)
         {
             _logger = logger;

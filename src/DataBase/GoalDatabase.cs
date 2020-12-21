@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ePiggyWeb.DataBase
 {
-    public class GoalDatabase
+    public class GoalDatabase : IGoalDatabase
     {
         private PiggyDbContext Database { get; }
         public GoalDatabase(PiggyDbContext database)
