@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -18,39 +17,36 @@ namespace ePiggyWeb.Pages
     public class SavingSuggestionsModel : PageModel
     {
         private readonly ILogger<SavingSuggestionsModel> _logger;
-        public bool WasException { get; set; }
-        public IGoal Goal { get; set; }
-        public decimal Savings { get; set; }
+        public bool WasException { get; private set; }
+        public IGoal Goal { get; private set; }
+        public decimal Savings { get; private set; }
         private int UserId { get; set; }
-        public IEntryList Expenses { get; set; }
+        private IEntryList Expenses { get; set; }
 
         [BindProperty]
         public int Id { get; set; }
 
         [BindProperty]
-        public DateTime StartDate { get; set; }
-        public DateTime Today { get; set; }
-        public CalculationResults MinimalSuggestions { get; set; }
-        public CalculationResults RegularSuggestions { get; set; }
-        public CalculationResults MaximalSuggestions { get; set; }
-        public IConfiguration Configuration { get; }
+        private DateTime StartDate { get; set; }
+        public DateTime Today { get; private set; }
+        public CalculationResults MinimalSuggestions { get; private set; }
+        public CalculationResults RegularSuggestions { get; private set; }
+        public CalculationResults MaximalSuggestions { get; private set; }
+        private IConfiguration Configuration { get; }
 
         private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
-        public string ErrorMessage = "";
-
         private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
-        public bool CurrencyException { get; set; }
-        public Currency Currency { get; set; }
+        public bool CurrencyException { get; private set; }
+        private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
         private CurrencyConverter CurrencyConverter { get; }
 
-        [BindProperty(SupportsGet = true)] 
+        [BindProperty(SupportsGet = true)]
         public int Month { get; set; }
         [BindProperty(SupportsGet = true)]
         public int Year { get; set; }
-
 
         public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
             EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
@@ -61,6 +57,7 @@ namespace ePiggyWeb.Pages
             Configuration = configuration;
             CurrencyConverter = currencyConverter;
         }
+
         public async Task OnGet(int id)
         {
             Id = id;
@@ -92,7 +89,7 @@ namespace ePiggyWeb.Pages
             return Page();
         }
 
-        public async Task SetData()
+        private async Task SetData()
         {
             try
             {

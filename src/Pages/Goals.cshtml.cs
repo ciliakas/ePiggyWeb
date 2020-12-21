@@ -40,17 +40,18 @@ namespace ePiggyWeb.Pages
         public decimal Amount { get; set; }
 
         /*Currency vars*/
-        public Currency Currency { get; set; }
+        private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
 
         /*Exception handling vars*/
         [BindProperty(SupportsGet = true)]
-        public bool WasException { get; set; }
+        public bool WasException { get; private set; }
         [BindProperty(SupportsGet = true)]
-        public bool CurrencyException { get; set; }
-        public bool LoadingException { get; set; }
+        public bool CurrencyException { get; private set; }
+        public bool LoadingException { get; private set; }
         [BindProperty(SupportsGet = true)]
-        public bool WasExceptionParse { get; set; }
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
+        public bool WasExceptionParse { get; }
 
         /*Display*/
         public IGoalList Goals { get; private set; }
@@ -93,8 +94,6 @@ namespace ePiggyWeb.Pages
                     Goals = goalsList;
                     Savings = 0;
                 }
-
-
             }
             catch (Exception ex)
             {

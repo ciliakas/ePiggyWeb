@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.MonthlyReport;
-using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
@@ -17,17 +15,17 @@ namespace ePiggyWeb.Pages
     public class MonthlyReportModel : PageModel
     {
         private readonly ILogger<SavingSuggestionsModel> _logger;
-        public bool WasException { get; set; }
+        public bool WasException { get; private set; }
         private int UserId { get; set; }
 
         [BindProperty]
-        public MonthlyReportResult Data { get; set; }
+        public MonthlyReportResult Data { get; private set; }
 
         private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
-        public Currency Currency { get; set; }
+        private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
-        public bool CurrencyException { get; set; }
+        public bool CurrencyException { get; private set; }
         private CurrencyConverter CurrencyConverter { get; }
 
         public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
@@ -67,6 +65,5 @@ namespace ePiggyWeb.Pages
             Currency = currency;
             CurrencySymbol = Currency.SymbolString;
         }
-
     }
 }
