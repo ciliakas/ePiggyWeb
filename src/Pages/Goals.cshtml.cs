@@ -126,9 +126,9 @@ namespace ePiggyWeb.Pages
                 return Page();
             }
 
+            await SetCurrency();
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             var temp = Goal.CreateLocalGoal(Title, Amount, Currency.Code);
-            await SetCurrency();
             try
             {
                 await GoalDatabase.CreateAsync(temp, UserId);
