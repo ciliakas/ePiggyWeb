@@ -179,11 +179,14 @@ namespace ePiggyWeb.DataBase
             await sqlCommand.ExecuteNonQueryAsync();
 
             var dbExpense = new ExpenseModel(expense, userId);
-            sqlCommand = new SqlCommand(
-                "INSERT INTO Expenses(UserId, Amount, Title, Date, IsMonthly, Importance, Currency) " +
-                "VALUES (@UserId, @Amount, @Title, @Date, @IsMonthly, @Importance, @Currency);SELECT CAST(scope_identity() AS int);",
-                sqlConnection)
-            { CommandType = CommandType.Text };
+            var query = @"INSERT INTO Expenses(UserId, Amount, Title, Date, IsMonthly, Importance, Currency) 
+            VALUES (@UserId, @Amount, @Title, @Date, @IsMonthly, @Importance, @Currency); SELECT CAST(scope_identity() AS int);";
+
+            sqlCommand = new SqlCommand(query, sqlConnection)
+            {
+                CommandType = CommandType.Text
+            };
+
             sqlCommand.Parameters.AddWithValue("@UserId", userId);
             sqlCommand.Parameters.AddWithValue("@Amount", expense.Amount);
             sqlCommand.Parameters.AddWithValue("@Title", expense.Title);
