@@ -82,9 +82,9 @@
         <div class="row justify-content-center">
             <input class="col-md-3 col-sm-5 col-5" onchange="handleFilter(this)" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
             <label class="text-light ml-2 mr-2"> - </label>
-            <input class="col-md-3 col-sm-5 col-5" for="endDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+            <input class="col-md-3 col-sm-5 col-5" onchange="handleFilter(this)" for="endDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
-        <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
+        <button type="submit" id="FilterButton" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
     </form>
     <hr class="mt-4 mb-4" />
     @if (!Model.CurrencyException)
@@ -128,7 +128,7 @@ else
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary border entry-table-side">
-                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id" onClick ="toggleDelete()" />
+                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id" onClick="toggleDelete()" />
                                 </td>
                                 <td class=" border-right-0 border-primary text-nowrap entry-column">
                                     <div class="row">
@@ -227,8 +227,12 @@ else
 
 <script language="JavaScript">
     function handleFilter(source) {
-        if (source.value < source.min) {
-            source.value = source.min;
+        var filterButton = document.getElementById("FilterButton");
+        if (source.value < source.min || source.value > source.max) {
+            filterButton.disabled = true;
+        }
+        else {
+            filterButton.disabled = false;
         }
     }
     function toggleDelete() {
