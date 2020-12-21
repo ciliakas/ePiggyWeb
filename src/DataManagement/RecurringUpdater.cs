@@ -6,30 +6,6 @@ namespace ePiggyWeb.DataManagement
 {
     public static class RecurringUpdater
     {
-        public static bool UpdateRecurring(IEntryManager entryManager)
-        {
-            foreach (var entry in entryManager.EntryList.GetBy(recurring: true))
-            {
-                var differenceInMonths = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: entry.Date);
-                if (differenceInMonths <= 0) continue;
-                entry.Date = entry.Date.AddMonths(differenceInMonths);
-                entryManager.Edit(entry.Id, entry);
-            }
-            return true;
-        }
-
-        public static bool Recurring(IEntryList entryList)
-        {
-            foreach (var entry in entryList.GetBy(recurring: true))
-            {
-                var differenceInMonths = TimeManager.DifferenceInMonths(laterTime: DateTime.Today, earlierTime: entry.Date);
-                if (differenceInMonths <= 0) continue;
-                entry.Date = entry.Date.AddMonths(differenceInMonths);
-                //entryManager.Edit(entry.Id, entry);
-            }
-            return true;
-        }
-
         public static IEntryList CreateRecurringListWithoutOriginalEntry(IEntry entry, EntryType entryType)
         {
             var tempList = new EntryList(entryType);

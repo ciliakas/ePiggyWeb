@@ -17,8 +17,8 @@ namespace ePiggyWeb.Pages
     public class ExpensesGraphModel : PageModel
     {
         private readonly ILogger<ExpensesGraphModel> _logger;
-        public bool WasException { get; set; }
-        public IEntryList Expenses { get; set; }
+        public bool WasException { get; private set; }
+        public IEntryList Expenses { get; private set; }
         private int UserId { get; set; }
         [BindProperty]
         public DateTime StartDate { get; set; }
@@ -29,8 +29,9 @@ namespace ePiggyWeb.Pages
         private IConfiguration Configuration { get; }
         public string CurrencySymbol { get; private set; }
         private CurrencyConverter CurrencyConverter { get; }
-        public Currency Currency { get; set; }
-        public bool CurrencyException { get; set; }
+        private Currency Currency { get; set; }
+        public bool CurrencyException { get; private set; }
+
         public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger,
             IConfiguration configuration, CurrencyConverter currencyConverter)
         {
@@ -66,6 +67,7 @@ namespace ePiggyWeb.Pages
             {
                 CurrencyException = true;
             }
+
             Currency = currency;
             CurrencySymbol = Currency.SymbolString;
         }
@@ -75,8 +77,7 @@ namespace ePiggyWeb.Pages
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId,
-                    EntryType.Expense);
+                    UserId, EntryType.Expense);
 
                 try
                 {

@@ -15,9 +15,9 @@ namespace ePiggyWeb.Pages
     public class ComparisonGraphModel : PageModel
     {
         private readonly ILogger<ComparisonGraphModel> _logger;
-        public bool WasException { get; set; }
-        public decimal Income { get; set; }
-        public decimal Expenses { get; set; }
+        public bool WasException { get; private set; }
+        public decimal Income { get; private set; }
+        public decimal Expenses { get; private set; }
         private int UserId { get; set; }
         [BindProperty]
         public DateTime StartDate { get; set; }
@@ -27,9 +27,9 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
         private EntryDatabase EntryDatabase { get; }
         private CurrencyConverter CurrencyConverter { get; }
-        public Currency Currency { get; set; }
+        private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
-        public bool CurrencyException { get; set; }
+        public bool CurrencyException { get; private set; }
 
         public ComparisonGraphModel(EntryDatabase entryDatabase, ILogger<ComparisonGraphModel> logger,
             CurrencyConverter currencyConverter)
@@ -56,6 +56,7 @@ namespace ePiggyWeb.Pages
             {
                 CurrencyException = true;
             }
+
             Currency = currency;
             CurrencySymbol = Currency.SymbolString;
         }
@@ -76,12 +77,10 @@ namespace ePiggyWeb.Pages
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId,
-                    EntryType.Expense);
+                    UserId, EntryType.Expense);
 
                 var income = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId,
-                    EntryType.Income);
+                    UserId, EntryType.Income);
                 try
                 {
                     Income = (await CurrencyConverter.ConvertEntryList(income, UserId)).GetSum();
@@ -101,10 +100,9 @@ namespace ePiggyWeb.Pages
                 const int max = 500001;
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                Expenses = (decimal)rand.Next(min,max)/100;
+                Expenses = (decimal)rand.Next(min, max) / 100;
                 Income = (decimal)rand.Next(min, max) / 100;
             }
-
         }
     }
 }

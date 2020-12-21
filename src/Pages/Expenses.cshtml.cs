@@ -49,7 +49,7 @@ namespace ePiggyWeb.Pages
 
         /*Pagination vars*/
         [BindProperty(SupportsGet = true)]
-        public int CurrentPage { get; set; } = 1;
+        public int CurrentPage { get; } = 1;
 
         private static int PageSize => 10;
         public int TotalPages => (int)Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
@@ -57,24 +57,22 @@ namespace ePiggyWeb.Pages
         public bool ShowNext => CurrentPage < TotalPages;
 
         /*Currency vars*/
-        public Currency Currency { get; set; }
+        private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
 
         /*Exception handling vars*/
         [BindProperty(SupportsGet = true)]
-        public bool WasException { get; set; }
+        public bool WasException { get; private set; }
         [BindProperty(SupportsGet = true)]
-        public bool CurrencyException { get; set; }
-        public bool LoadingException { get; set; }
+        public bool CurrencyException { get; private set; }
+        public bool LoadingException { get; private set; }
 
         /*Display*/
-        public IEntryList Expenses { get; set; }
+        public IEntryList Expenses { get; private set; }
         public IEntryList ExpensesToDisplay => Expenses.GetPage(CurrentPage, PageSize);
         public decimal TotalExpenses => Expenses.GetSum();
         private int UserId { get; set; }
 
-     
-        
         public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration,
             CurrencyConverter currencyConverter)
         {
@@ -126,7 +124,7 @@ namespace ePiggyWeb.Pages
                 WasException = true;
             }
 
-            return RedirectToPage("/expenses", new {WasException, CurrencyException});
+            return RedirectToPage("/expenses", new { WasException, CurrencyException });
         }
 
         public async Task<IActionResult> OnPostDelete()

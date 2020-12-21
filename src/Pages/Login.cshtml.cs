@@ -4,14 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.DataBase;
-using ePiggyWeb.DataBase.Models;
-using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
 
 namespace ePiggyWeb.Pages
 {
@@ -30,17 +27,9 @@ namespace ePiggyWeb.Pages
         public bool FailedToSendEmail;
 
         private UserDatabase UserDatabase { get; }
-        private EmailSender EmailSender { get; }
-        public LoginModel(UserDatabase userDatabase, IOptions<EmailSender> emailSenderSettings)
+        public LoginModel(UserDatabase userDatabase)
         {
             UserDatabase = userDatabase;
-            EmailSender = emailSenderSettings.Value;
-            UserDatabase.LoggedIn += OnLogin;
-        }
-
-        private void OnLogin(object sender, UserModel user)
-        {
-            //Could do something here
         }
 
         public IActionResult OnGet()
