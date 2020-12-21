@@ -6,16 +6,17 @@ namespace ePiggyWeb.Utilities
 {
     public static class TimeManager
     {
+        private static int RateRefreshHour => 16;
         public static DateTime RefreshTime()
         {
             var time = DateTime.UtcNow;
 
-            if (time.Hour >= 16)
+            if (time.Hour >= RateRefreshHour)
             {
                 time = time.AddDays(1);
             }
 
-            time = ChangeHour(time, 16);
+            time = ChangeHour(time, RateRefreshHour);
 
             return time;
         }

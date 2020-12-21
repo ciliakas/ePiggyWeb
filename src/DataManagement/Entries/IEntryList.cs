@@ -4,8 +4,9 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
-    public interface IEntryList : IList<IEntry>, IEntryEnumerable
+    public interface IEntryList : IList<IEntry>
     {
+        public EntryType EntryType { get; set; }
         public IEntryList GetBy(Importance importance);
         public IEntryList GetBy(DateTime dateTime);
         public IEntryList GetFrom(DateTime dateTime);
