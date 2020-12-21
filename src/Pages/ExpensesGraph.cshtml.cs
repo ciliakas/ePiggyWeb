@@ -50,7 +50,7 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            TimeManager.SetDateUpdated(startDate, endDate, Response);
+            TimeManager.SetDate(startDate, endDate, Response);
             StartDate = startDate;
             EndDate = endDate;
             await SetCurrency();
