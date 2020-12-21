@@ -5,6 +5,7 @@ namespace ePiggyWeb.CurrencyAPI
 {
     public class Currency
     {
+        public static string DefaultCurrencyCode => "EUR";
         public string Name { get; set; }
 
         public string Code { get; set; }

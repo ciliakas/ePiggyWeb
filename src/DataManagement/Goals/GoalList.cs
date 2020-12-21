@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ePiggyWeb.CurrencyAPI;
 using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Goals
@@ -14,21 +15,22 @@ namespace ePiggyWeb.DataManagement.Goals
             foreach (var goal in this)
             {
                 sb.Append(goal);
-                //sb.Append("\n");
             }
 
             return sb.ToString();
         }
+
         public static IGoalList RandomList(IConfiguration configuration)
         {
             IGoalList list = new GoalList();
             var section = configuration.GetSection("Goal");
 
-            foreach (var thing in section.GetChildren())
+            foreach (var configurationSection in section.GetChildren())
             {
-                var sec = thing.GetChildren();
+                var sec = configurationSection.GetChildren();
                 var configurationSections = sec as IConfigurationSection[] ?? sec.ToArray();
-                IGoal goal = Goal.CreateLocalGoal(configurationSections.Last().Value, decimal.Parse(configurationSections.First().Value), "EUR");
+                IGoal goal = Goal.CreateLocalGoal(title: configurationSections.Last().Value,
+                   amount: decimal.Parse(configurationSections.First().Value), currency: Currency.DefaultCurrencyCode);
                 list.Add(goal);
             }
 

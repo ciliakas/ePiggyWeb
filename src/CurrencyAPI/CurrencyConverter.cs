@@ -54,10 +54,10 @@ namespace ePiggyWeb.CurrencyAPI
 
         public async Task<IGoalList> ConvertGoalList(IGoalList goalList, int userId)
         {
-            var (userCurrency, exception1) = await GetUserCurrency(userId);
-            if (exception1 != null)
+            var (userCurrency, getUserCurrencyException) = await GetUserCurrency(userId);
+            if (getUserCurrencyException != null)
             {
-                throw exception1;
+                throw getUserCurrencyException;
             }
 
             var containsForeignCurrency = goalList.Any(x => x.Currency != userCurrency.Code);
@@ -66,10 +66,10 @@ namespace ePiggyWeb.CurrencyAPI
                 return goalList;
             }
 
-            var (currencyList, exception2) = await GetCurrencyList(userId);
-            if (exception2 != null)
+            var (currencyList, getCurrencyListException) = await GetCurrencyList(userId);
+            if (getCurrencyListException != null)
             {
-                throw exception2;
+                throw getCurrencyListException;
             }
 
             foreach (var goal in goalList.Where(x => x.Currency != userCurrency.Code))
@@ -85,14 +85,23 @@ namespace ePiggyWeb.CurrencyAPI
 
         public async Task<IEntryList> ConvertEntryList(IEntryList entryList, int userId)
         {
-            var (userCurrency, exception1) = await GetUserCurrency(userId);
-            if (exception1 != null) throw exception1;
+            var (userCurrency, getUserCurrencyException) = await GetUserCurrency(userId);
+            if (getUserCurrencyException != null)
+            {
+                throw getUserCurrencyException;
+            }
 
             var containsForeignCurrency = entryList.Any(x => x.Currency != userCurrency.Code);
-            if (!containsForeignCurrency) return entryList;
+            if (!containsForeignCurrency)
+            {
+                return entryList;
+            }
 
-            var (currencyList, exception2) = await GetCurrencyList(userId);
-            if (exception2 != null) throw exception2;
+            var (currencyList, getCurrencyListException) = await GetCurrencyList(userId);
+            if (getCurrencyListException != null)
+            {
+                throw getCurrencyListException;
+            }
 
             foreach (var entry in entryList.Where(x => x.Currency != userCurrency.Code))
             {
@@ -116,7 +125,12 @@ namespace ePiggyWeb.CurrencyAPI
                 }
                 catch (Exception ex)
                 {
-                    return new Tuple<Currency, Exception>(new Currency { Code = "EUR", Rate = 1, SymbolString = "EUR" }, ex);
+                    return new Tuple<Currency, Exception>(new Currency
+                    {
+                        Code = Currency.DefaultCurrencyCode,
+                        Rate = 1,
+                        SymbolString = Currency.DefaultCurrencyCode
+                    }, ex);
                 }
 
                 try
@@ -125,8 +139,12 @@ namespace ePiggyWeb.CurrencyAPI
                 }
                 catch (Exception ex)
                 {
-                    return new Tuple<Currency, Exception>
-                        (new Currency { Code = userModel.Currency, Rate = 1, SymbolString = userModel.Currency }, ex);
+                    return new Tuple<Currency, Exception>(new Currency
+                    {
+                        Code = userModel.Currency,
+                        Rate = 1,
+                        SymbolString = userModel.Currency
+                    }, ex);
                 }
             }
 

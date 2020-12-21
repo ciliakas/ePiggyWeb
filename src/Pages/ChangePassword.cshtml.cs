@@ -23,7 +23,9 @@ namespace ePiggyWeb.Pages
         private readonly ILogger<ChangePasswordModel> _logger;
 
         [Required(ErrorMessage = "All fields required!")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", ErrorMessage = "Password must contain at least one uppercase letter, at least one number, special character and be longer than six characters.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", 
+            ErrorMessage = "Password must contain at least one uppercase letter, at least one number, " +
+                           "special character and be longer than six characters.")]
         [BindProperty]
         [DataType(DataType.Password)]
         public string Password { get; set; }
@@ -37,19 +39,18 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public string Currency { get; set; }
-        [BindProperty]
-        public bool Recalculate { get; set; }
 
         [BindProperty]
         public List<string> CurrencyOptions { get; private set; }
         private UserDatabase UserDatabase { get; }
         private EmailSender EmailSender { get; }
-        public string UserCurrencyCode { get; set; }
+        public string UserCurrencyCode { get; private set; }
         private IMemoryCache Cache { get; }
         public bool FailedToGetCurrencyList { get; set; }
         private CurrencyConverter CurrencyConverter { get; }
 
-        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, ILogger<ChangePasswordModel> logger, IMemoryCache cache, CurrencyConverter currencyConverter)
+        public ChangePasswordModel(PiggyDbContext piggyDbContext, IOptions<EmailSender> emailSenderSettings, 
+            ILogger<ChangePasswordModel> logger, IMemoryCache cache, CurrencyConverter currencyConverter)
         {
             UserDatabase = new UserDatabase(piggyDbContext);
             UserDatabase.Deleted += OnDeleteUser;
@@ -61,11 +62,6 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnGet()
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToPage("/index");
-            }
-
             await SetCurrencyList();
             await SetUserCurrency();
             return Page();
@@ -77,22 +73,13 @@ namespace ePiggyWeb.Pages
             var (currency, exception) = await CurrencyConverter.GetUserCurrency(userId);
             if (exception != null)
             {
-                switch (exception)
+                _logger.LogInformation(exception.ToString());
+                ErrorMessage = exception switch
                 {
-                    case HttpListenerException ex:
-                        _logger.LogInformation(ex.ToString());
-                        ErrorMessage = "Failed to load currency information!";
-                        break;
-                    case HttpRequestException ex:
-                        _logger.LogInformation(ex.ToString());
-                        ErrorMessage = "Failed to load currency information!";
-                        break;
-                    default:
-                        // Failed to even get the user currency from the database, the big one
-                        _logger.LogInformation(exception.ToString());
-                        ErrorMessage = "Failed to connect to database!";
-                        break;
-                }
+                    HttpListenerException _ => "Failed to load currency information!",
+                    HttpRequestException _ => "Failed to load currency information!",
+                    _ => "Failed to connect to database!"
+                };
             }
 
             UserCurrencyCode = currency.Code;
@@ -108,14 +95,6 @@ namespace ePiggyWeb.Pages
             {
                 FailedToGetCurrencyList = true;
                 _logger.LogInformation(exception.ToString());
-                if (exception is HttpRequestException || exception is HttpListenerException)
-                {
-                    // Something wrong with API6
-                }
-                else
-                {
-                    // Something wrong with database
-                }
             }
 
             foreach (var currency in currencyList1)
@@ -148,7 +127,6 @@ namespace ePiggyWeb.Pages
             return Page();
         }
 
-        // We need to set up error handling here
         public async Task<IActionResult> OnPostCurrency()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
