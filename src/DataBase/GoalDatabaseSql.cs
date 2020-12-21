@@ -177,12 +177,19 @@ namespace ePiggyWeb.DataBase
             var dbExpense = new ExpenseModel(expense, userId);
             sqlCommand =
                 new SqlCommand(
-                    "INSERT INTO Expenses(UserId, Amount, Title) VALUES (@UserId, @Amount, @Title);SELECT CAST(scope_identity() AS int);",
+                    "INSERT INTO Expenses(UserId, Amount, Title, Date, IsMonthly, Importance, Currency) VALUES (@UserId, @Amount, @Title, @Date, @IsMonthly, @Importance, @Currency);SELECT CAST(scope_identity() AS int);",
                     sqlConnection)
                 { CommandType = CommandType.Text };
             sqlCommand.Parameters.AddWithValue("@UserId", expense.UserId);
             sqlCommand.Parameters.AddWithValue("@Amount", expense.Amount);
             sqlCommand.Parameters.AddWithValue("@Title", expense.Title);
+            sqlCommand.Parameters.AddWithValue("@Date", expense.Date);
+            sqlCommand.Parameters.AddWithValue("@IsMonthly", expense.Recurring);
+            sqlCommand.Parameters.AddWithValue("@Importance", expense.Importance);
+            sqlCommand.Parameters.AddWithValue("@Currency", "EUR");
+            //public DateTime Date { get; set; }
+            //public bool IsMonthly { get; set; }
+            //public int Importance { get; set; }
             dbExpense.Id = (int)await sqlCommand.ExecuteScalarAsync();
 
             await sqlConnection.CloseAsync();
