@@ -25,24 +25,26 @@ namespace ePiggyWeb.CurrencyAPI
 
         public async Task<Tuple<IList<Currency>, Exception>> GetCurrencyList(int userId)
         {
-            if (!Cache.TryGetValue(CacheKeys.CurrencyList, out IList<Currency> currencyList))
+            if (Cache.TryGetValue(CacheKeys.CurrencyList, out IList<Currency> currencyList))
+            {
+                return new Tuple<IList<Currency>, Exception>(currencyList, null);
+            }
+
+            try
+            {
+                currencyList = await CurrencyApiAgent.GetList();
+            }
+            catch (Exception apiException)
             {
                 try
                 {
-                    currencyList = await CurrencyApiAgent.GetList();
+                    var userModel = await UserDatabase.GetUserAsync(userId);
+                    var userCurrency = new Currency { Code = userModel.Currency };
+                    return new Tuple<IList<Currency>, Exception>(new List<Currency> { userCurrency }, apiException);
                 }
-                catch (Exception apiException)
+                catch (Exception dbException)
                 {
-                    try
-                    {
-                        var userModel = await UserDatabase.GetUserAsync(userId);
-                        var userCurrency = new Currency { Code = userModel.Currency };
-                        return new Tuple<IList<Currency>, Exception>(new List<Currency> { userCurrency }, apiException);
-                    }
-                    catch (Exception dbException)
-                    {
-                        return new Tuple<IList<Currency>, Exception>(new List<Currency>(), dbException);
-                    }
+                    return new Tuple<IList<Currency>, Exception>(new List<Currency>(), dbException);
                 }
             }
 
@@ -53,13 +55,22 @@ namespace ePiggyWeb.CurrencyAPI
         public async Task<IGoalList> ConvertGoalList(IGoalList goalList, int userId)
         {
             var (userCurrency, exception1) = await GetUserCurrency(userId);
-            if (exception1 != null) throw exception1;
+            if (exception1 != null)
+            {
+                throw exception1;
+            }
 
             var containsForeignCurrency = goalList.Any(x => x.Currency != userCurrency.Code);
-            if (!containsForeignCurrency) return goalList;
+            if (!containsForeignCurrency)
+            {
+                return goalList;
+            }
 
             var (currencyList, exception2) = await GetCurrencyList(userId);
-            if (exception2 != null) throw exception2;
+            if (exception2 != null)
+            {
+                throw exception2;
+            }
 
             foreach (var goal in goalList.Where(x => x.Currency != userCurrency.Code))
             {
@@ -77,18 +88,12 @@ namespace ePiggyWeb.CurrencyAPI
             var (userCurrency, exception1) = await GetUserCurrency(userId);
             if (exception1 != null) throw exception1;
 
-            //Temporary while no currency is saved
-            foreach (var entry in entryList)
-            {
-                if (entry.Currency is null || entry.Currency == "currency") entry.Currency = "EUR";
-            }
-
             var containsForeignCurrency = entryList.Any(x => x.Currency != userCurrency.Code);
             if (!containsForeignCurrency) return entryList;
 
             var (currencyList, exception2) = await GetCurrencyList(userId);
             if (exception2 != null) throw exception2;
-            //Error check
+
             foreach (var entry in entryList.Where(x => x.Currency != userCurrency.Code))
             {
                 var userRate = userCurrency.Rate;
@@ -99,8 +104,6 @@ namespace ePiggyWeb.CurrencyAPI
 
             return entryList;
         }
-
-
 
         public async Task<Tuple<Currency, Exception>> GetUserCurrency(int userId)
         {
@@ -131,6 +134,5 @@ namespace ePiggyWeb.CurrencyAPI
             Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
             return new Tuple<Currency, Exception>(userCurrency, null);
         }
-
     }
 }
