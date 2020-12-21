@@ -34,13 +34,31 @@
     <form method="get" class="mt-5 mb-5">
         <input asp-for="Id" type="hidden" value="@Model.Id" />
         <input type="hidden" name="handler" value="Filter" />
-        <label class="text-light col-md-4">Period:</label>
-        <div class="row justify-content-center">
-            <input class="col-md-3 col-sm-5 col-5" for="startDate" min="2016-01" 
-                   max="@DateTime.Now.ToString("yyyy-MM")" asp-for="StartDate" type="month" value="@DateTime.Now.ToString("yyyy-MM")" />
+        <div>
+            <div>
+                <span>
+                    <label class="text-light" for="year">Year:</label>
+                    <select asp-for="Year" id="year" name="year">
+                        <option hidden selected value="@Model.Today.Year">@Model.Today.Year</option>
+                        @for (var i = 2016; i <= @DateTime.Today.Year; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </span>
+                <span>
+                    <label class="text-light" for="month">Month:</label>
+                    <select asp-for="Month" id="month" name="month">
+                        <option hidden selected value="@Model.Today.Month">@Model.Today.Month</option>
+                        @for (var i = 1; i <= 12; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </span>
+            </div>
         </div>
         <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
-        <p class="text-warning">@Model.ErrorMessage</p>
     </form>
     <hr />
 
@@ -75,7 +93,11 @@
                 }
                 <h4 class="text-light">Using suggestions you would need to save for
                     <span class="text-warning">@Model.MinimalSuggestions.TimesToRepeatSaving months</span>
-                    </h4>
+                </h4>
+                @if (@Model.MinimalSuggestions.TimesToRepeatSaving > 24)
+                {
+                    <h4 class="text-light">Saving not recommended!</h4>
+                }
                 <hr />
                 <!----------------------------PastedCode----------------------------------------->
                 <div class="row justify-content-center ml-1 mr-1">
@@ -169,7 +191,11 @@
                 }
                 <h4 class="text-light">Using suggestions you would need to save for 
                     <span class="text-warning">@Model.RegularSuggestions.TimesToRepeatSaving months</span>
-                    </h4>
+                </h4>
+                @if (@Model.RegularSuggestions.TimesToRepeatSaving > 24)
+                {
+                    <h4 class="text-light">Saving not recommended!</h4>
+                }
                 <hr />
                 <!----------------------------PastedCode----------------------------------------->
                 <div class="row justify-content-center ml-1 mr-1">
@@ -263,6 +289,10 @@
                 <h4 class="text-light">
                     Using suggestions you would need to save for <span class="text-warning">@Model.MaximalSuggestions.TimesToRepeatSaving months</span>
                 </h4>
+                @if (@Model.MaximalSuggestions.TimesToRepeatSaving > 24)
+                {
+                    <h4 class="text-light">Saving not recommended!</h4>
+                }
                 <hr />
                 <!----------------------------PastedCode----------------------------------------->
                 <div class="row justify-content-center ml-1 mr-1">

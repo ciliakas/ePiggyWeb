@@ -134,7 +134,7 @@ namespace ePiggyWeb.Pages
             var selected = Request.Form["chkEntry"].ToString();
             if (string.IsNullOrEmpty(selected))
             {
-                return RedirectToPage("/income");
+                return RedirectToPage("/expenses");
             }
             var selectedList = selected.Split(',');
             var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();

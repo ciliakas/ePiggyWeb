@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -28,6 +29,7 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public DateTime StartDate { get; set; }
+        public DateTime Today { get; set; }
         public CalculationResults MinimalSuggestions { get; set; }
         public CalculationResults RegularSuggestions { get; set; }
         public CalculationResults MaximalSuggestions { get; set; }
@@ -35,14 +37,18 @@ namespace ePiggyWeb.Pages
 
         private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
-        public string ErrorMessage = "";
-
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         public bool CurrencyException { get; set; }
         public Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
         private CurrencyConverter CurrencyConverter { get; }
+
+        [BindProperty(SupportsGet = true)] 
+        public int Month { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public int Year { get; set; }
+
 
         public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase,
             EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
@@ -56,8 +62,8 @@ namespace ePiggyWeb.Pages
         public async Task OnGet(int id)
         {
             Id = id;
-            var today = DateTime.Today;
-            StartDate = new DateTime(today.Year, today.Month, 1);
+            Today = DateTime.Today;
+            StartDate = new DateTime(Today.Year, Today.Month, 1);
             await SetCurrency();
             await SetData();
         }
@@ -74,10 +80,9 @@ namespace ePiggyWeb.Pages
             CurrencySymbol = Currency.SymbolString;
         }
 
-        public async Task<IActionResult> OnGetFilter(DateTime startDate, int id)
+        public async Task<IActionResult> OnGetFilter(int id)
         {
-
-            StartDate = startDate;
+            StartDate = new DateTime(Year, Month, 1);
 
             Id = id;
             await SetCurrency();
