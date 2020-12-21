@@ -115,10 +115,10 @@ namespace ePiggyWeb.Pages
 
             await SetCurrency();
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            var entry1 = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, Currency.Code);
+            var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, Currency.Code);
             try
             {
-                await EntryDatabase.CreateAsync(entry1, UserId, EntryType.Expense);
+                await EntryDatabase.CreateAsync(entry, UserId, EntryType.Expense);
             }
             catch (Exception ex)
             {
