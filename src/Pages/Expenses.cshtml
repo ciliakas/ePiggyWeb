@@ -80,7 +80,7 @@
         <input type="hidden" name="handler" value="Filter" />
         <label class="text-light col-md-4">Period:</label>
         <div class="row justify-content-center">
-            <input class="col-md-3 col-sm-5 col-5" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+            <input class="col-md-3 col-sm-5 col-5" onchange="handleFilter(this)" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" for="startDate" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
             <label class="text-light ml-2 mr-2"> - </label>
             <input class="col-md-3 col-sm-5 col-5" for="endDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
@@ -226,6 +226,11 @@ else
 
 
 <script language="JavaScript">
+    function handleFilter(source) {
+        if (source.value < source.min) {
+            source.value = source.min;
+        }
+    }
     function toggleDelete() {
         var deleteButton = document.getElementById("DeleteButton");
         deleteButton.disabled = true;
