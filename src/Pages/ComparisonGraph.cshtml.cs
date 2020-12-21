@@ -62,16 +62,9 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            TimeManager.SetDate(startDate,
-                endDate,
-                ref ErrorMessage,
-                Response,
-                Request,
-                out var tempStartDate,
-                out var tempEndDate);
-
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
+            TimeManager.SetDateUpdated(startDate, endDate, Response);
+            StartDate = startDate;
+            EndDate = endDate;
             await SetCurrency();
             await SetData();
             return Page();

@@ -101,7 +101,7 @@ namespace ePiggyWeb.Pages
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            TimeManager.SetDateUpdated(startDate, endDate, Response);
+            TimeManager.SetDate(startDate, endDate, Response);
             await LoadData(startDate, endDate);
             return Page();
         }
