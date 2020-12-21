@@ -53,14 +53,14 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             StartTime = month.AddMonths(-1);
             EndTime = month.AddDays(-1);
 
+            Goals = await GoalDatabase.ReadListAsync(UserId);
             Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
             Income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-            Goals = await GoalDatabase.ReadListAsync(UserId);
 
             /*Allowing exception to bubble here*/
+            Goals = await CurrencyConverter.ConvertGoalList(Goals, UserId);
             Income = await CurrencyConverter.ConvertEntryList(Income, UserId);
             Expenses = await CurrencyConverter.ConvertEntryList(Expenses, UserId);
-            Goals = await CurrencyConverter.ConvertGoalList(Goals, UserId);
 
 
 

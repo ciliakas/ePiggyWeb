@@ -66,8 +66,8 @@ namespace ePiggyWeb.Pages
             Id = id;
             Today = DateTime.Today;
             StartDate = new DateTime(Today.Year, Today.Month, 1);
-            await SetCurrency();
             await SetData();
+            await SetCurrency();
         }
 
         private async Task SetCurrency()
@@ -87,8 +87,8 @@ namespace ePiggyWeb.Pages
             StartDate = new DateTime(Year, Month, 1);
 
             Id = id;
-            await SetCurrency();
             await SetData();
+            await SetCurrency();
             return Page();
         }
 
@@ -135,7 +135,6 @@ namespace ePiggyWeb.Pages
                 Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100, "EUR");
                 Savings = 0;
             }
-
         }
     }
 }

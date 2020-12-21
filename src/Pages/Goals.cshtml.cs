@@ -72,7 +72,6 @@ namespace ePiggyWeb.Pages
         public async Task OnGet()
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            await SetCurrency();
             try
             {
                 var goalsList = await GoalDatabase.ReadListAsync(UserId);
@@ -80,6 +79,7 @@ namespace ePiggyWeb.Pages
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
                 try
                 {
+                    await SetCurrency();
                     Goals = await CurrencyConverter.ConvertGoalList(goalsList, UserId);
                     income = await CurrencyConverter.ConvertEntryList(income, UserId);
                     expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
@@ -128,8 +128,8 @@ namespace ePiggyWeb.Pages
             }
 
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-            await SetCurrency();
             var temp = Goal.CreateLocalGoal(Title, Amount, Currency.Code);
+            await SetCurrency();
             try
             {
                 await GoalDatabase.CreateAsync(temp, UserId);
