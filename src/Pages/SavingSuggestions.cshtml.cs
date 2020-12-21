@@ -110,8 +110,8 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 Goal = await GoalDatabase.ReadAsync(Id, UserId);
+                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
                 Savings = income.GetSum() - Expenses.GetSum();
                 if (Savings < 0)
