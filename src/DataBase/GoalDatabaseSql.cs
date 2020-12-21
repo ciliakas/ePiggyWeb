@@ -46,20 +46,24 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> CreateListAsync(IGoalList goalList, int userid)
         {
-            var dictionary = new Dictionary<IGoal, IGoalModel>();
+            var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
+
+            if (sqlConnection.State == ConnectionState.Closed)
+            {
+                sqlConnection.Open();
+            }
+
+            var sqlCommand = new SqlCommand("INSERT INTO Goals(UserId, Price, Title) VALUES (@UserId, @Price, @Title);SELECT CAST(scope_identity() AS int);", sqlConnection);
+            sqlCommand.CommandType = CommandType.Text;
+
             foreach (var goal in goalList)
             {
                 var dbGoal = new GoalModel(goal, userid);
-                dictionary.Add(goal, dbGoal);
-            }
-            // Setting all of the ID's to local Entries, just so this method remains usable both with local and only database usage
-            await Database.AddRangeAsync(dictionary.Values);
-            await Database.SaveChangesAsync();
-            goalList.Clear();
-            foreach (var (key, value) in dictionary)
-            {
-                key.Id = value.Id;
-                goalList.Add(key);
+
+                sqlCommand.Parameters.AddWithValue("@UserId", dbGoal.UserId);
+                sqlCommand.Parameters.AddWithValue("@Price", dbGoal.Price);
+                sqlCommand.Parameters.AddWithValue("@Title", dbGoal.Title);
+                dbGoal.Id = (int)sqlCommand.ExecuteScalar();
             }
             return true;
         }
@@ -169,8 +173,14 @@ namespace ePiggyWeb.DataBase
 
         public async Task<IGoalList> ReadListAsync(int userId)
         {
-            var list = new GoalList();
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
+
+            if (sqlConnection.State == ConnectionState.Closed)
+            {
+                sqlConnection.Open();
+            }
+
+            var list = new GoalList();
             var query = "SELECT * FROM Goals WHERE UserId =" + userId;
             var MyDataSet = new DataSet();
             var MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, sqlConnection);
