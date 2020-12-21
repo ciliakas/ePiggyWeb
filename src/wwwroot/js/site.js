@@ -33,10 +33,10 @@ function toggle(source) {
         if (checkboxes[i].checked === true) {
             anyChecked = true;
         }
-        if (anyChecked) {
-            deleteButton.disabled = false;
-        } else {
-            deleteButton.disabled = true;
-        }
+    }
+    if (anyChecked) {
+        deleteButton.disabled = false;
+    } else {
+        deleteButton.disabled = true;
     }
 }

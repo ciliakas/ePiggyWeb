@@ -16,13 +16,13 @@ else
         <input type="hidden" name="handler" value="Filter" />
         <label class="text-light col-md-4">Period:</label>
         <div class="row justify-content-center">
-            <input class="col-md-3 col-sm-5 col-5" for="startDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()"
+            <input class="col-md-3 col-sm-5 col-5" onchange="handleFilter(this)"  for="startDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()"
                    asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
             <label class="text-light ml-2 mr-2"> - </label>
-            <input class="col-md-3 col-sm-5 col-5" for="endDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()"
+            <input class="col-md-3 col-sm-5 col-5" onchange="handleFilter(this)"  for="endDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()"
                    asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
-        <button type="submit" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
+        <button type="submit" id ="FilterButton" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
         <p class="text-warning">@Model.ErrorMessage</p>
     </form>
 }
@@ -57,8 +57,6 @@ else
         </div>
     </div>
 </div>
-
-<script src="~/js/site.js"></script>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
