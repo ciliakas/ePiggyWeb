@@ -26,7 +26,7 @@ namespace ePiggyWeb.DataManagement.Goals
 
         public Goal() { }
 
-        public Goal(int id, int userId, string title, decimal amount, string currency) : this(title, amount, currency)
+        private Goal(int id, int userId, string title, decimal amount, string currency) : this(title, amount, currency)
         {
             Id = id;
             UserId = userId;

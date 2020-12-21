@@ -40,25 +40,15 @@ namespace ePiggyWeb.DataManagement.Entries
             Currency = currency;
         }
 
-        public Entry(int id, int userId, string title, decimal amount, DateTime date, bool recurring, int importance, string currency)
+        private Entry(int id, int userId, string title, decimal amount, DateTime date, bool recurring, int importance, string currency)
             : this(title, amount, date, recurring, importance, currency)
         {
             Id = id;
             UserId = userId;
         }
 
-        public Entry(int id, int userId, IEntry entry)
-            : this(id, userId, entry.Title, entry.Amount, entry.Date, entry.Recurring, entry.Importance, entry.Currency) { }
-
         public Entry(IEntryModel dbEntry) : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, 
             dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance, dbEntry.Currency) { }
-
-        public Entry(int id, IGoal goal, DateTime date, bool recurring, int importance)
-            : this(id, goal.UserId, goal.Title, goal.Amount, date, recurring, importance, goal.Currency) { }
-
-        public Entry(int id, IGoalModel dbGoal, DateTime date, bool recurring, int importance)
-            : this(id, dbGoal.UserId, dbGoal.Title, dbGoal.Price, date, recurring, importance, dbGoal.Currency) { }
-
 
         public void Edit(IEntry newEntry)
         {
