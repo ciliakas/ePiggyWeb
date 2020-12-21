@@ -42,5 +42,4 @@ namespace ePiggyWeb.DataBase.Models
             Currency = newEntry.Currency;
         }
     }
-
 }

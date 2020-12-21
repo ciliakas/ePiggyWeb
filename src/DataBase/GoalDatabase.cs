@@ -74,7 +74,7 @@ namespace ePiggyWeb.DataBase
             return await DeleteAsync(x => x.Id == id && x.UserId == userId);
         }
 
-        public async Task<bool> DeleteAsync(Expression<Func<IGoalModel, bool>> filter)
+        private async Task<bool> DeleteAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
             Database.Remove(dbGoal ?? throw new InvalidOperationException());
@@ -88,12 +88,12 @@ namespace ePiggyWeb.DataBase
             return await DeleteListAsync(idList, userId);
         }
 
-        public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
+        private async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
         {
             return await DeleteListAsync(PredicateBuilder.BuildGoalFilter(idArray, userId));
         }
 
-        public async Task<bool> DeleteListAsync(Expression<Func<IGoalModel, bool>> filter)
+        private async Task<bool> DeleteListAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             var goalsToRemove = await Database.Goals.Where(filter).ToListAsync();
             Database.RemoveRange(goalsToRemove);
@@ -120,8 +120,7 @@ namespace ePiggyWeb.DataBase
         {
             return await ReadAsync(x => x.Id == id && x.UserId == userId);
         }
-
-        public async Task<IGoal> ReadAsync(Expression<Func<IGoalModel, bool>> filter)
+        private async Task<IGoal> ReadAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
             return new Goal(dbGoal);
@@ -132,7 +131,7 @@ namespace ePiggyWeb.DataBase
             return await ReadListAsync(x => x.UserId == userId);
         }
 
-        public async Task<IGoalList> ReadListAsync(Expression<Func<IGoalModel, bool>> filter)
+        private async Task<IGoalList> ReadListAsync(Expression<Func<IGoalModel, bool>> filter)
         {
             var list = await Database.Goals.Where(filter).Select(dbGoal => new Goal(dbGoal)).Cast<IGoal>().ToListAsync();
             var goalList = new GoalList();

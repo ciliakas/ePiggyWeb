@@ -50,27 +50,27 @@ namespace ePiggyWeb.Pages
 
         /*Pagination vars*/
         [BindProperty(SupportsGet = true)]
-        public int CurrentPage { get; set; } = 1;
+        public int CurrentPage { get; } = 1;
 
-        public const int PageSize = 10;
+        private static int PageSize => 10;
         public int TotalPages => (int)Math.Ceiling(decimal.Divide(Income.Count, PageSize));
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
 
         /*Currency vars*/
-        public Currency Currency { get; set; }
+        private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
 
 
         /*Exception handling vars*/
         [BindProperty(SupportsGet = true)]
-        public bool WasException { get; set; }
+        public bool WasException { get; private set; }
         [BindProperty(SupportsGet = true)]
-        public bool CurrencyException { get; set; }
-        public bool LoadingException { get; set; }
+        public bool CurrencyException { get; private set; }
+        public bool LoadingException { get; private set; }
 
         /*Display*/
-        public IEntryList Income { get; set; }
+        public IEntryList Income { get; private set; }
         public IEntryList IncomeToDisplay => Income.GetPage(CurrentPage, PageSize);
         public decimal TotalIncome => Income.GetSum();
         private int UserId { get; set; }
@@ -137,6 +137,7 @@ namespace ePiggyWeb.Pages
             {
                 return RedirectToPage("/income");
             }
+
             var selectedList = selected.Split(',');
             var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
@@ -188,6 +189,7 @@ namespace ePiggyWeb.Pages
             {
                 CurrencyException = true;
             }
+
             Currency = currency;
             CurrencySymbol = Currency.SymbolString;
         }

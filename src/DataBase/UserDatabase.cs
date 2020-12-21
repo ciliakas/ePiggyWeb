@@ -22,7 +22,7 @@ namespace ePiggyWeb.DataBase
 
         public async Task<int> RegisterAsync(string email, string pass)
         {
-            var userExists = await Database.Users.AnyAsync(a => a.Email == email); //Find if email is in db
+            var userExists = await Database.Users.AnyAsync(a => a.Email == email);
             if (userExists)
             {
                 //This email is already in use
@@ -61,13 +61,13 @@ namespace ePiggyWeb.DataBase
             return user.Id;
         }
 
-        public async Task<bool> ChangePasswordAsync(string email, string pass)
+        public async Task ChangePasswordAsync(string email, string pass)
         {
             var user = await Database.Users.FirstOrDefaultAsync(a => a.Email == email);
 
             if (user is null)
             {
-                return false;
+                throw new ArgumentException();
             }
 
             var salt = HashingProcessor.CreateSalt();
@@ -76,27 +76,20 @@ namespace ePiggyWeb.DataBase
             user.Password = passwordHash;
             user.Salt = salt;
             await Database.SaveChangesAsync();
-
-            return true;
         }
 
-        public async Task<bool> DeleteUserAsync(int userId)
+        public async Task DeleteUserAsync(string email)
         {
-            return await DeleteUserAsync(x => x.Id == userId);
+            await DeleteUserAsync(x => x.Email == email);
         }
 
-        public async Task<bool> DeleteUserAsync(string email)
-        {
-            return await DeleteUserAsync(x => x.Email == email);
-        }
-
-        public async Task<bool> DeleteUserAsync(Expression<Func<UserModel, bool>> filter)
+        private async Task DeleteUserAsync(Expression<Func<UserModel, bool>> filter)
         {
             var user = await Database.Users.FirstOrDefaultAsync(filter);
 
             if (user is null)
             {
-                return false;
+                throw new ArgumentException();
             }
 
             var id = user.Id;
@@ -110,7 +103,6 @@ namespace ePiggyWeb.DataBase
             await Database.SaveChangesAsync();
 
             Deleted?.Invoke(this, user);
-            return true;
         }
 
         public async Task<UserModel> GetUserAsync(int userId)
@@ -118,12 +110,7 @@ namespace ePiggyWeb.DataBase
             return await GetUserAsync(x => x.Id == userId);
         }
 
-        public async Task<UserModel> GetUserAsync(string email)
-        {
-            return await GetUserAsync(x => x.Email == email);
-        }
-
-        public async Task<UserModel> GetUserAsync(Expression<Func<UserModel, bool>> filter)
+        private async Task<UserModel> GetUserAsync(Expression<Func<UserModel, bool>> filter)
         {
             return await Database.Users.FirstOrDefaultAsync(filter);
         }
@@ -131,44 +118,7 @@ namespace ePiggyWeb.DataBase
         public async Task ChangeCurrency(int userId, string currencyCode)
         {
             var user = await Database.Users.FirstOrDefaultAsync(x => x.Id == userId);
-
             user.Currency = currencyCode;
-
-            await Database.SaveChangesAsync();
-        }
-
-        public async Task ChangeCurrency(int userId, string currencyCode, decimal rate)
-        {
-            var user = await Database.Users.FirstOrDefaultAsync(x => x.Id == userId);
-
-            var goals = await Database.Goals.Where(x => x.UserId == userId).ToListAsync();
-            var incomes = await Database.Incomes.Where(x => x.UserId == userId).ToListAsync();
-            var expenses = await Database.Expenses.Where(x => x.UserId == userId).ToListAsync();
-
-            if (goals != null)
-            {
-                foreach (var goal in goals)
-                {
-                    goal.Price *= rate;
-                }
-            }
-            if (incomes != null)
-            {
-                foreach (var income in incomes)
-                {
-                    income.Amount *= rate;
-                }
-            }
-            if (expenses != null)
-            {
-                foreach (var expense in expenses)
-                {
-                    expense.Amount *= rate;
-                }
-            }
-
-            user.Currency = currencyCode;
-
             await Database.SaveChangesAsync();
         }
     }
