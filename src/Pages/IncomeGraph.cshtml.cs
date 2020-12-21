@@ -17,8 +17,8 @@ namespace ePiggyWeb.Pages
     public class IncomeGraphModel : PageModel
     {
         private readonly ILogger<IncomeGraphModel> _logger;
-        public bool WasException { get; set; }
-        public IEntryList Income { get; set; }
+        public bool WasException { get; private set; }
+        public IEntryList Income { get; private set; }
         private int UserId { get; set; }
         [BindProperty]
         public DateTime StartDate { get; set; }
@@ -30,8 +30,8 @@ namespace ePiggyWeb.Pages
         private IConfiguration Configuration { get; }
         public string CurrencySymbol { get; private set; }
         private CurrencyConverter CurrencyConverter { get; }
-        public Currency Currency { get; set; }
-        public bool CurrencyException { get; set; }
+        private Currency Currency { get; set; }
+        public bool CurrencyException { get; private set; }
         public IncomeGraphModel(EntryDatabase entryDatabase, ILogger<IncomeGraphModel> logger,
             IConfiguration configuration, CurrencyConverter currencyConverter)
         {
@@ -40,6 +40,7 @@ namespace ePiggyWeb.Pages
             Configuration = configuration;
             CurrencyConverter = currencyConverter;
         }
+
         public async Task OnGet()
         {
             TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
@@ -76,8 +77,7 @@ namespace ePiggyWeb.Pages
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId,
-                    EntryType.Income);
+                    UserId, EntryType.Income);
 
                 try
                 {
