@@ -65,6 +65,7 @@ namespace ePiggyWeb.DataBase
                 sqlCommand.Parameters.AddWithValue("@Title", dbGoal.Title);
                 dbGoal.Id = (int)sqlCommand.ExecuteScalar();
             }
+            sqlConnection.Close();
             return true;
         }
 
@@ -118,30 +119,27 @@ namespace ePiggyWeb.DataBase
             return true;
         }
 
-        public async Task<bool> DeleteAsync(Expression<Func<IGoalModel, bool>> filter)
-        {
-            var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
-            Database.Remove(dbGoal ?? throw new InvalidOperationException());
-            await Database.SaveChangesAsync();
-            return true;
-        }
-
         public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList, int userId)
         {
+            var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
+
+            if (sqlConnection.State == ConnectionState.Closed)
+            {
+                sqlConnection.Open();
+            }
+
             var idList = goalList.Select(goal => goal.Id).ToList();
-            return await DeleteListAsync(idList, userId);
-        }
 
-        public async Task<bool> DeleteListAsync(IEnumerable<int> idArray, int userId)
-        {
-            return await DeleteListAsync(PredicateBuilder.BuildGoalFilter(idArray, userId));
-        }
+            var sqlCommand = new SqlCommand("DELETE FROM Goals WHERE Id = @Id AND UserId = @UserId", sqlConnection);
+            sqlCommand.CommandType = CommandType.Text;
+            sqlCommand.Parameters.AddWithValue("@UserId", userId);
 
-        public async Task<bool> DeleteListAsync(Expression<Func<IGoalModel, bool>> filter)
-        {
-            var goalsToRemove = await Database.Goals.Where(filter).ToListAsync();
-            Database.RemoveRange(goalsToRemove);
-            await Database.SaveChangesAsync();
+            foreach (var id in idList)
+            {
+                sqlCommand.Parameters.AddWithValue("@Id", id);
+                sqlCommand.ExecuteNonQuery();
+            }
+            sqlConnection.Close();
             return true;
         }
 
@@ -152,23 +150,58 @@ namespace ePiggyWeb.DataBase
 
         public async Task<int> MoveGoalToExpensesAsync(int goalId, int userId, IEntry expense)
         {
-            var dbGoal = await Database.Goals.FirstOrDefaultAsync(x => x.Id == goalId && x.UserId == userId);
-            Database.Goals.Remove(dbGoal ?? throw new InvalidOperationException());
+            var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
+
+            if (sqlConnection.State == ConnectionState.Closed)
+            {
+                sqlConnection.Open();
+            }
+
+            var sqlCommand = new SqlCommand("DELETE FROM Goals WHERE Id = @Id AND UserId = @UserId", sqlConnection);
+            sqlCommand.CommandType = CommandType.Text;
+            sqlCommand.Parameters.AddWithValue("@Id", goalId);
+            sqlCommand.Parameters.AddWithValue("@UserId", userId);
+            sqlCommand.ExecuteNonQuery();
+
             var dbExpense = new ExpenseModel(expense, userId);
-            await Database.Expenses.AddAsync(dbExpense);
-            await Database.SaveChangesAsync();
+            sqlCommand = new SqlCommand("INSERT INTO Expenses(UserId, Amount, Title) VALUES (@UserId, @Amount, @Title);SELECT CAST(scope_identity() AS int);", sqlConnection);
+            sqlCommand.CommandType = CommandType.Text;
+            sqlCommand.Parameters.AddWithValue("@UserId", expense.UserId);
+            sqlCommand.Parameters.AddWithValue("@Amount", expense.Amount);
+            sqlCommand.Parameters.AddWithValue("@Title", expense.Title);
+            dbExpense.Id = (int)sqlCommand.ExecuteScalar();
+
+            sqlConnection.Close();
             return dbExpense.Id;
         }
 
         public async Task<IGoal> ReadAsync(int id, int userId)
         {
-            return await ReadAsync(x => x.Id == id && x.UserId == userId);
-        }
+            var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
-        public async Task<IGoal> ReadAsync(Expression<Func<IGoalModel, bool>> filter)
-        {
-            var dbGoal = await Database.Goals.FirstOrDefaultAsync(filter);
-            return new Goal(dbGoal);
+            if (sqlConnection.State == ConnectionState.Closed)
+            {
+                sqlConnection.Open();
+            }
+            var sqlCommand = new SqlCommand("SELECT * FROM Goals WHERE Id = @Id AND UserId = @UserId", sqlConnection);
+            sqlCommand.CommandType = CommandType.Text;
+            sqlCommand.Parameters.AddWithValue("@Id", id);
+            sqlCommand.Parameters.AddWithValue("@UserId", userId);
+            var reader = sqlCommand.ExecuteReader();
+
+            var dbGoal = new Goal();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+
+                dbGoal.Id = reader.GetInt32(0);
+                dbGoal.UserId = reader.GetInt32(1);
+                dbGoal.Title = reader.GetString(2);
+                dbGoal.Amount = reader.GetDecimal(3);
+            }
+            sqlConnection.Close();
+            return dbGoal;
         }
 
         public async Task<IGoalList> ReadListAsync(int userId)
@@ -184,7 +217,6 @@ namespace ePiggyWeb.DataBase
             var query = "SELECT * FROM Goals WHERE UserId =" + userId;
             var MyDataSet = new DataSet();
             var MyDataAdapter = new System.Data.SqlClient.SqlDataAdapter(query, sqlConnection);
-
             MyDataAdapter.Fill(MyDataSet);
 
             var table = MyDataSet.Tables[0];
@@ -198,16 +230,9 @@ namespace ePiggyWeb.DataBase
                     UserId = row.Field<int>("UserId")
                 } as IGoal).ToList();
 
+            sqlConnection.Close();
             list.AddRange(items);
             return list;
-        }
-
-        public async Task<IGoalList> ReadListAsync(Expression<Func<IGoalModel, bool>> filter)
-        {
-            var list = await Database.Goals.Where(filter).Select(dbGoal => new Goal(dbGoal)).Cast<IGoal>().ToListAsync();
-            var goalList = new GoalList();
-            goalList.AddRange(list);
-            return goalList;
         }
     }
 }
