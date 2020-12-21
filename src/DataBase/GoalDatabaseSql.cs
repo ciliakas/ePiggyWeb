@@ -18,7 +18,7 @@ namespace ePiggyWeb.DataBase
             Database = database;
         }
 
-        public async Task<int> CreateAsync(IGoal goal, int userid)
+        public async Task CreateAsync(IGoal goal, int userid)
         {
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
@@ -30,7 +30,8 @@ namespace ePiggyWeb.DataBase
             var dbGoal = new GoalModel(goal, userid);
 
             var sqlCommand = new SqlCommand(
-            "INSERT INTO Goals(UserId, Price, Title, Currency) VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
+            "INSERT INTO Goals(UserId, Price, Title, Currency) " +
+                "VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
                     sqlConnection)
             { CommandType = CommandType.Text };
             sqlCommand.Parameters.AddWithValue("@UserId", dbGoal.UserId);
@@ -40,10 +41,9 @@ namespace ePiggyWeb.DataBase
             dbGoal.Id = (int)await sqlCommand.ExecuteScalarAsync();
 
             await sqlConnection.CloseAsync();
-            return dbGoal.Id;
         }
 
-        public async Task<bool> CreateListAsync(IGoalList goalList, int userid)
+        public async Task CreateListAsync(IGoalList goalList, int userid)
         {
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
@@ -53,7 +53,8 @@ namespace ePiggyWeb.DataBase
             }
 
             var sqlCommand = new SqlCommand(
-                    "INSERT INTO Goals(UserId, Price, Title, Currency) VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
+                    "INSERT INTO Goals(UserId, Price, Title, Currency) " +
+                    "VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
                 sqlConnection)
             { CommandType = CommandType.Text };
 
@@ -69,15 +70,14 @@ namespace ePiggyWeb.DataBase
             }
 
             await sqlConnection.CloseAsync();
-            return true;
         }
 
-        public async Task<bool> UpdateAsync(IGoal oldGoal, IGoal newGoal)
+        public async Task UpdateAsync(IGoal oldGoal, IGoal newGoal)
         {
-            return await UpdateAsync(oldGoal.Id, oldGoal.UserId, newGoal);
+            await UpdateAsync(oldGoal.Id, oldGoal.UserId, newGoal);
         }
 
-        public async Task<bool> UpdateAsync(int id, int userId, IGoal newGoal)
+        public async Task UpdateAsync(int id, int userId, IGoal newGoal)
         {
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
@@ -98,15 +98,14 @@ namespace ePiggyWeb.DataBase
             await sqlCommand.ExecuteNonQueryAsync();
 
             await sqlConnection.CloseAsync();
-            return true;
         }
 
-        public async Task<bool> DeleteAsync(IGoal goal)
+        public async Task DeleteAsync(IGoal goal)
         {
-            return await DeleteAsync(goal.Id, goal.UserId);
+            await DeleteAsync(goal.Id, goal.UserId);
         }
 
-        public async Task<bool> DeleteAsync(int id, int userId)
+        public async Task DeleteAsync(int id, int userId)
         {
 
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
@@ -125,10 +124,9 @@ namespace ePiggyWeb.DataBase
             await sqlCommand.ExecuteNonQueryAsync();
 
             await sqlConnection.CloseAsync();
-            return true;
         }
 
-        public async Task<bool> DeleteListAsync(IEnumerable<IGoal> goalList, int userId)
+        public async Task DeleteListAsync(IEnumerable<IGoal> goalList, int userId)
         {
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
@@ -152,15 +150,14 @@ namespace ePiggyWeb.DataBase
             }
 
             await sqlConnection.CloseAsync();
-            return true;
         }
 
-        public async Task<int> MoveGoalToExpensesAsync(IGoal goal, IEntry expense)
+        public async Task MoveGoalToExpensesAsync(IGoal goal, IEntry expense)
         {
-            return await MoveGoalToExpensesAsync(goal.Id, goal.UserId, expense);
+            await MoveGoalToExpensesAsync(goal.Id, goal.UserId, expense);
         }
 
-        public async Task<int> MoveGoalToExpensesAsync(int goalId, int userId, IEntry expense)
+        public async Task MoveGoalToExpensesAsync(int goalId, int userId, IEntry expense)
         {
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
@@ -197,7 +194,6 @@ namespace ePiggyWeb.DataBase
             dbExpense.Id = (int)await sqlCommand.ExecuteScalarAsync();
 
             await sqlConnection.CloseAsync();
-            return dbExpense.Id;
         }
 
         public async Task<IGoal> ReadAsync(int id, int userId)
