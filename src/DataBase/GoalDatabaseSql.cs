@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ePiggyWeb.DataBase
 {
-    public class GoalDatabaseSql
+    public class GoalDatabaseSql : IGoalDatabase
     {
         private PiggyDbContext Database { get; }
         public GoalDatabaseSql(PiggyDbContext database)
@@ -102,6 +102,7 @@ namespace ePiggyWeb.DataBase
 
         public async Task<bool> DeleteAsync(int id, int userId)
         {
+
             var sqlConnection = new SqlConnection(Database.Database.GetDbConnection().ConnectionString);
 
             if (sqlConnection.State == ConnectionState.Closed)
