@@ -108,7 +108,7 @@ else
 
 <form method="post">
     <div class="row ml-2 mr-2">
-        <button asp-page-handler="Delete" type="submit" class="btn btn-danger">Delete Selected <i class="fas fa-trash-alt"></i></button>
+        <button asp-page-handler="Delete" id="DeleteButton" disabled type="submit" class="btn btn-danger">Delete Selected <i class="fas fa-trash-alt"></i></button>
     </div>
     <div class="row ml-2 mr-2 mt-3 mb-3">
         <div class="container border col-12 p-0">
@@ -128,7 +128,7 @@ else
                         {
                             <tr class="table-light border-primary">
                                 <td class="border-primary border entry-table-side">
-                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id" />
+                                    <input class="bigger" name="chkEntry" type="checkbox" value="@item.Id" onClick ="toggleDelete()" />
                                 </td>
                                 <td class=" border-right-0 border-primary text-nowrap entry-column">
                                     <div class="row">
@@ -226,10 +226,32 @@ else
 
 
 <script language="JavaScript">
+    function toggleDelete() {
+        var deleteButton = document.getElementById("DeleteButton");
+        deleteButton.disabled = true;
+        var checkboxes = document.getElementsByName('chkEntry');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            if (checkboxes[i].checked === true) {
+                deleteButton.disabled = false;
+                break;
+            }
+        }
+    }
+
     function toggle(source) {
-        checkboxes = document.getElementsByName('chkEntry');
+        var deleteButton = document.getElementById("DeleteButton");
+        var anyChecked = false;
+        var checkboxes = document.getElementsByName('chkEntry');
         for (var i = 0, n = checkboxes.length; i < n; i++) {
             checkboxes[i].checked = source.checked;
+            if (checkboxes[i].checked === true) {
+                anyChecked = true;
+            }
+        }
+        if (anyChecked) {
+            deleteButton.disabled = false;
+        } else {
+            deleteButton.disabled = true;
         }
     }
 </script>
