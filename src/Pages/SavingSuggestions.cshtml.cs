@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -9,7 +10,6 @@ using ePiggyWeb.DataManagement.Saving;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -29,8 +29,7 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public DateTime StartDate { get; set; }
-        [BindProperty]
-        public DateTime EndDate { get; set; }
+        public DateTime Today { get; set; }
         public CalculationResults MinimalSuggestions { get; set; }
         public CalculationResults RegularSuggestions { get; set; }
         public CalculationResults MaximalSuggestions { get; set; }
@@ -38,14 +37,18 @@ namespace ePiggyWeb.Pages
 
         private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
-        public string ErrorMessage = "";
-
         private GoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         public bool CurrencyException { get; set; }
         public Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
         private CurrencyConverter CurrencyConverter { get; }
+
+        [BindProperty(SupportsGet = true)] 
+        public int Month { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public int Year { get; set; }
+
 
         public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase,
             EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
@@ -59,9 +62,8 @@ namespace ePiggyWeb.Pages
         public async Task OnGet(int id)
         {
             Id = id;
-            TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
+            Today = DateTime.Today;
+            StartDate = new DateTime(Today.Year, Today.Month, 1);
             await SetCurrency();
             await SetData();
         }
@@ -78,13 +80,9 @@ namespace ePiggyWeb.Pages
             CurrencySymbol = Currency.SymbolString;
         }
 
-        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
+        public async Task<IActionResult> OnGetFilter(int id)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate,
-                out var tempEndDate);
-
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
+            StartDate = new DateTime(Year, Month, 1);
 
             Id = id;
             await SetCurrency();
@@ -97,9 +95,7 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var expenses = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
-                    UserId,
-                    EntryType.Expense);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
 
                 Goal = await GoalDatabase.ReadAsync(Id, UserId);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
@@ -122,6 +118,8 @@ namespace ePiggyWeb.Pages
                     Savings = 0;
                 }
 
+                var endDate = StartDate.AddMonths(1).AddDays(-1);
+                Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
                 var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
                 MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
