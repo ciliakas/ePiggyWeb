@@ -96,14 +96,13 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
             Result.BiggestCategory = biggestCategory;
             Result.BiggestCategorySum = sum;
-            var necessarySum = Expenses.GetBy(Importance.Necessary).Sum(entry => entry.Amount);
-            Result.NecessarySum = necessarySum;
-            if (necessarySum == 0)
+            Result.NecessarySum = monthExpenses.GetBy(Importance.Necessary).Sum(entry => entry.Amount);
+            if (Result.NecessarySum == 0)
             {
                 Result.HowMuchBigger = -1;
                 return;
             }
-            Result.HowMuchBigger = ((sum - necessarySum) / necessarySum * 100);
+            Result.HowMuchBigger = ((sum - Result.NecessarySum) / Result.NecessarySum * 100);
         }
 
         private List<IGoal> CalculateSavedUpGoals()
