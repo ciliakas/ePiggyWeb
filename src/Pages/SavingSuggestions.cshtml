@@ -78,6 +78,10 @@
                 Maximal<i class="ml-1 fas fa-search-plus"></i>
             </button>
         </p><hr />
+        @if (!Model.WasException)
+        {
+            <h4 class="text-light mt-2 mb-2">Income: @Model.Savings.ToString("#.##")</h4>
+        }
         <!----------------------------MINIMAL----------------------------------------->
         <div class="collapse" id="minimalSuggestions" data-parent="#SavingType">
             @if (Model.MinimalSuggestions.TimesToRepeatSaving == 0)
@@ -91,7 +95,8 @@
                     <h4 class="text-warning">Example Data used, since You don't have enough entries!</h4>
                     Model.MinimalSuggestions.TimesToRepeatSaving *= -1;
                 }
-                <h4 class="text-light">Using suggestions you would need to save for
+                <h4 class="text-light">
+                    Using suggestions you would need to save for
                     <span class="text-warning">@Model.MinimalSuggestions.TimesToRepeatSaving months</span>
                 </h4>
                 @if (@Model.MinimalSuggestions.TimesToRepeatSaving > 24)
@@ -189,7 +194,8 @@
                     <h4 class="text-warning">Example Data used, since You don't have enough entries!</h4>
                     Model.RegularSuggestions.TimesToRepeatSaving *= -1;
                 }
-                <h4 class="text-light">Using suggestions you would need to save for 
+                <h4 class="text-light">
+                    Using suggestions you would need to save for
                     <span class="text-warning">@Model.RegularSuggestions.TimesToRepeatSaving months</span>
                 </h4>
                 @if (@Model.RegularSuggestions.TimesToRepeatSaving > 24)
