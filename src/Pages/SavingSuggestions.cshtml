@@ -106,7 +106,7 @@
                     <span class="text-warning">@Model.MinimalSuggestions.TimesToRepeatSaving months</span>
                 </h4>
             }
-            <hr/>
+            <hr />
             <!----------------------------PastedCode----------------------------------------->
             <div class="row justify-content-center ml-1 mr-1">
                 <h4 class="text-light mb-2 mt-2">Suggested Expenses improvements (Minimal)</h4>
@@ -116,7 +116,7 @@
                             Expenses
                         </th>
                         <th scope="col">
-                            Suggested <br/>amount
+                            Suggested <br />amount
                         </th>
                     </tr>
                     @foreach (var item in Model.MinimalSuggestions.EntrySuggestions.OrderBy(x => x.Entry.Date))
@@ -150,7 +150,7 @@
                     }
                 </table>
             </div>
-            <hr/>
+            <hr />
             <div class="row justify-content-center ml-1 mr-1">
                 <h4 class="text-light mb-2 mt-2">Suggested Expenses by category (Minimal)</h4>
                 <table class="table table-hover border-primary table-bordered">
@@ -167,17 +167,17 @@
                     {
                         <tr class="table-light border-primary">
                             <td class="border-primary entry-column">
-                                <strong class="text-info">@Html.DisplayFor(m => item.Importance)</strong><br/>
+                                <strong class="text-info">@Html.DisplayFor(m => item.Importance)</strong><br />
                                 <span class="text-info"> Amount: </span>
                                 @NumberFormatter.FormatCurrency(item.OldAverage, Model.CurrencySymbol)
                             </td>
                             <td class="border-primary text-info entry-table-side">
-                            @NumberFormatter.FormatCurrency(item.NewAverage, Model.CurrencySymbol)
+                                @NumberFormatter.FormatCurrency(item.NewAverage, Model.CurrencySymbol)
                         </tr>
                     }
                 </table>
             </div>
-            <hr/>
+            <hr />
             <!----------------------------PastedCode----------------------------------------->
 
 
