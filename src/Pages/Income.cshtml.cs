@@ -50,7 +50,7 @@ namespace ePiggyWeb.Pages
 
         /*Pagination vars*/
         [BindProperty(SupportsGet = true)]
-        public int CurrentPage { get; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
         private static int PageSize => 10;
         public int TotalPages => (int)Math.Ceiling(decimal.Divide(Income.Count, PageSize));

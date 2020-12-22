@@ -4,113 +4,131 @@ using System.Linq;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
 using ePiggyWeb.Utilities;
-using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
     public class SavingCalculator
     {
         private static decimal RegularSavingValue { get; } = 0.25M;
-        private static decimal MaximalSavingValue { get; } = 0.1M;
-        private static decimal MinimalSavingValue { get; } = 0.5M;
+        private static decimal MaximalSavingValue { get; } = 0.5M;
+        private static decimal MinimalSavingValue { get; } = 0.1M;
+        private List<ISavingSuggestion> EntrySuggestions { get; set; }
+        private List<SavingSuggestionByImportance> SavingSuggestionByImportanceList { get; set; }
+        private IEntryList ExpenseList { get; }
+        private IEntryList IncomeList { get; }
+        public decimal MonthlyIncome { get; private set; }
+        private IGoal Goal { get; }
+        private decimal StartingBalance { get; }
+        private SavingType SavingType { get; set; }
+        private int EnumCount { get; }
+        private int MonthsToSave { get; set; }
 
-        public CalculationResults GetSuggestedExpensesOffers(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType, IConfiguration configuration)
+        public SavingCalculator(IEntryList expenseList, IEntryList incomeList, IGoal goal, decimal startingBalance)
         {
-            var entrySuggestions = new List<ISavingSuggestion>();
-            var monthlySuggestions = new List<SavingSuggestionByImportance>();
-            var expensesRandomList = EntryList.RandomList(configuration, EntryType.Expense);
-            var generateRandomData = false;
+            IncomeList = incomeList;
+            ExpenseList = expenseList;
+            Goal = goal;
+            StartingBalance = startingBalance;
+            EnumCount = Enum.GetValues(typeof(Importance)).Length;
+            CalculateMonthlyIncome();
+        }
 
-            var enumCount = Enum.GetValues(typeof(Importance)).Length;
+        public CalculationResults GetSuggestedExpensesOffers(SavingType savingType = SavingType.Regular)
+        {
+            SavingType = savingType;
+            EntrySuggestions = new List<ISavingSuggestion>();
+            SavingSuggestionByImportanceList = new List<SavingSuggestionByImportance>();
+            GetAverages();
+            CalculateSavingTime();
+            return new CalculationResults(EntrySuggestions, SavingSuggestionByImportanceList, MonthsToSave);
+        }
 
-            var sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
-            var sumsOfAmountByImportanceDefault = new decimal[enumCount];
-            var averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
-            var averagesOfAmountByImportanceDefault = new decimal[enumCount];
-            var entryAmounts = new int[enumCount];
-
-            if (entryList.Count == 0)
+        private void CalculateMonthlyIncome()
+        {
+            if (IncomeList.Any())
             {
-                generateRandomData = true;
+                var newest = IncomeList.GetNewestEntryDate();
+                var oldest = IncomeList.GetOldestEntryDate();
+                var months = oldest.Month - newest.Month + 12 * (oldest.Year - newest.Year) + 1;
+                MonthlyIncome = IncomeList.GetSum() / months;
             }
+            else
+            {
+                MonthlyIncome = 0;
+            }
+        }
 
-            var listToUse = generateRandomData ? expensesRandomList : entryList;
-            var groupedByImportance = (from entry in listToUse
-                                       where entry.Importance != 1
-                                       group entry by entry.Importance).ToArray();
+        private void GetAverages()
+        {
+            var groupedByImportance =
+                from entry in ExpenseList
+                where entry.Importance != 1
+                group entry by entry.Importance;
 
             foreach (var group in groupedByImportance)
             {
-                var i = group.Key;
-                var expenses = group.ToIEntryList();
+                var importance = group.Key;
+                var listByImportance = group.ToIEntryList();
 
-                var ratio = enumCount - i;
-                foreach (var entry in expenses)
+                if (listByImportance.Count < 1)
                 {
-                    decimal amountAfterSaving;
-                    switch (savingType)
-                    {
-                        case SavingType.Minimal:
-                            if (entry.Amount * ratio * MinimalSavingValue < entry.Amount)
-                            {
-                                amountAfterSaving = entry.Amount * ratio * MinimalSavingValue;
-                            }
-                            else
-                            {
-                                amountAfterSaving = entry.Amount;
-                            }
-                            break;
-                        case SavingType.Regular:
-                            amountAfterSaving = entry.Amount * ratio * RegularSavingValue;
-                            break;
-                        case SavingType.Maximal:
-                            amountAfterSaving = entry.Amount * ratio * MaximalSavingValue;
-                            break;
-                        default:
-                            throw new Exception("Unexpected saving type");
-                    }
-                    entrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
-
-                    sumsOfAmountByImportanceAdjusted[i - 1] += amountAfterSaving;
-                    sumsOfAmountByImportanceDefault[i - 1] += entry.Amount;
-                    entryAmounts[i - 1]++;
-
+                    SavingSuggestionByImportanceList.Add(new SavingSuggestionByImportance(0,
+                        0, (Importance)importance));
+                    continue;
                 }
-            }
-            var timesToRepeatSaving = 0;
-            var firstTimeThroughWhile = true;
-            var approximateSavedAmount = startingBalance;
-            while (goal.Amount > approximateSavedAmount)
-            {
-                if (!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
+
+                var ratio = EnumCount - importance;
+                var oldest = listByImportance.GetOldestEntryDate();
+                var newest = listByImportance.GetNewestEntryDate();
+
+                var importanceTotal = 0M;
+                var months = 0;
+
+                while (oldest <= newest)
                 {
-                    var entrySuggestionsEmpty = new List<ISavingSuggestion>();
-                    return new CalculationResults(entrySuggestionsEmpty, monthlySuggestions, 0);
-                }
-                firstTimeThroughWhile = false;
-                for (var i = enumCount; i > (int)Importance.Necessary; i--)
-                {
-                    if (entryAmounts[i - 1] != 0)
+                    var listByMonth = listByImportance.GetBy(oldest);
+                    var monthTotal = 0M;
+
+                    foreach (var entry in listByMonth)
                     {
-                        averagesOfAmountByImportanceAdjusted[i - 1] = sumsOfAmountByImportanceAdjusted[i - 1] / entryAmounts[i - 1];
-                        averagesOfAmountByImportanceDefault[i - 1] = sumsOfAmountByImportanceDefault[i - 1] / entryAmounts[i - 1];
-                    }
-                    else
-                    {
-                        averagesOfAmountByImportanceAdjusted[i - 1] = 0;
-                        averagesOfAmountByImportanceDefault[i - 1] = 0;
+                        var amountAfterSaving = SavingType switch
+                        {
+                            SavingType.Minimal => entry.Amount * ratio * MinimalSavingValue,
+                            SavingType.Regular => entry.Amount * ratio * RegularSavingValue,
+                            SavingType.Maximal => entry.Amount * ratio * MaximalSavingValue,
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
+                        amountAfterSaving = amountAfterSaving > entry.Amount ? entry.Amount : amountAfterSaving;
+                        EntrySuggestions.Add(new SavingSuggestion(entry, amountAfterSaving));
+                        monthTotal += entry.Amount;
                     }
 
-                    approximateSavedAmount += averagesOfAmountByImportanceDefault[i - 1] - averagesOfAmountByImportanceAdjusted[i - 1];
+                    importanceTotal += monthTotal;
+                    months++;
+                    oldest = TimeManager.MoveToNextMonth(oldest);
                 }
-                timesToRepeatSaving++;
+
+                var importanceAverage = months > 0 ? importanceTotal / months : 0;
+
+                var newAverage = SavingType switch
+                {
+                    SavingType.Minimal => importanceAverage * ratio * MinimalSavingValue,
+                    SavingType.Regular => importanceAverage * ratio * RegularSavingValue,
+                    SavingType.Maximal => importanceAverage * ratio * MaximalSavingValue,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                SavingSuggestionByImportanceList.Add(new SavingSuggestionByImportance(newAverage, importanceAverage, (Importance)importance));
             }
-            for (var i = enumCount; i > (int)Importance.Necessary; i--)
-            {
-                monthlySuggestions.Add(new SavingSuggestionByImportance(averagesOfAmountByImportanceAdjusted[i - 1], averagesOfAmountByImportanceDefault[i - 1], (Importance)i));
-            }
-            return !generateRandomData ? new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving)
-                                       : new CalculationResults(entrySuggestions, monthlySuggestions, timesToRepeatSaving * -1);
+        }
+
+        private void CalculateSavingTime()
+        {
+            var increasedMonthlySavings = SavingSuggestionByImportanceList.Sum(savingSuggestionByImportance => 
+                savingSuggestionByImportance.OldAverage - savingSuggestionByImportance.NewAverage);
+            var amountToSave = Goal.Amount - StartingBalance;
+            MonthsToSave = (int)Math.Ceiling(decimal.Divide(amountToSave, MonthlyIncome + increasedMonthlySavings));
+            MonthsToSave = MonthsToSave > 120 ? 0 : MonthsToSave;
         }
     }
 }
