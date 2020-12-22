@@ -38,7 +38,7 @@ namespace ePiggyWeb.Pages
             {
                 await SetCurrency();
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Data = await MonthlyReportCalculator.Calculate();
+                Data = await MonthlyReportCalculator.Calculate(UserId);
             }
             catch (Exception ex)
             {

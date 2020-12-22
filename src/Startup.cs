@@ -43,7 +43,7 @@ namespace ePiggyWeb
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<UserDatabase>();
             services.AddScoped<EntryDatabase>();
-            services.AddScoped<IGoalDatabase, GoalDatabaseSql>();
+            services.AddScoped<IGoalDatabase, GoalDatabase>();
             services.Configure<EmailSender>(options => Configuration.GetSection("Email").Bind(options));
             services.AddScoped<HttpClient>();
             services.AddScoped<CurrencyApiAgent>();

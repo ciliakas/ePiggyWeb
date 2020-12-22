@@ -37,7 +37,7 @@ namespace ePiggyWeb.Pages
         public CalculationResults MaximalSuggestions { get; private set; }
         private IConfiguration Configuration { get; }
 
-        private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
+        private readonly CalculatorRunner _calculatorRunner = new CalculatorRunner();
 
         private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
@@ -110,7 +110,7 @@ namespace ePiggyWeb.Pages
                 var endDate = StartDate.AddMonths(1).AddDays(-1);
                 Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
-                var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
+                var suggestionDictionary = _calculatorRunner.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
                 MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
                 RegularSuggestions = suggestionDictionary[SavingType.Regular];
                 MaximalSuggestions = suggestionDictionary[SavingType.Maximal];

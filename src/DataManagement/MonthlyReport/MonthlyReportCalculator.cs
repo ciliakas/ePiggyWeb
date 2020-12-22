@@ -12,7 +12,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 {
     public class MonthlyReportCalculator
     {
-        private int UserId { get; }
+        private int UserId { get; set; }
         private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
 
@@ -26,19 +26,18 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private DateTime StartTime { get; set; }
         private DateTime EndTime { get; set; }
-        public CurrencyConverter CurrencyConverter { get; set; }
+        private CurrencyConverter CurrencyConverter { get; set; }
 
-        public MonthlyReportCalculator(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId,
-            CurrencyConverter currencyConverter)
+        public MonthlyReportCalculator(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, CurrencyConverter currencyConverter)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
-            UserId = userId;
             CurrencyConverter = currencyConverter;
         }
 
-        public async Task<MonthlyReportResult> Calculate()
+        public async Task<MonthlyReportResult> Calculate(int userId)
         {
+            UserId = userId;
             Result = await GatherDataAsync();
             CalculateBiggestExpensesCategory();
             Result.SavedUpGoals = CalculateSavedUpGoals();
@@ -77,7 +76,6 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             var differenceInIncome = thisMonthIncome - previousMonthIncome;
 
             return new MonthlyReportResult(thisMonthExpenses, thisMonthIncome, differenceInIncome, Balance, StartTime, EndTime);
-
         }
 
         private void CalculateBiggestExpensesCategory()
@@ -121,7 +119,6 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
                 Result.HasGoals = false;
                 return;
             }
-
 
             var maxGoal = goals.Aggregate((expensive, next) => next.Amount >= expensive.Amount ? next : expensive);
             var minGoal = goals.Aggregate((cheapest, next) =>

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Saving
 {
-    public class AlternativeSavingCalculator
+    public class SavingCalculator
     {
         private static decimal RegularSavingValue { get; } = 0.25M;
         private static decimal MaximalSavingValue { get; } = 0.1M;
@@ -22,7 +22,7 @@ namespace ePiggyWeb.DataManagement.Saving
             var generateRandomData = false;
 
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
- 
+
             var sumsOfAmountByImportanceAdjusted = new decimal[enumCount];
             var sumsOfAmountByImportanceDefault = new decimal[enumCount];
             var averagesOfAmountByImportanceAdjusted = new decimal[enumCount];
@@ -31,7 +31,7 @@ namespace ePiggyWeb.DataManagement.Saving
 
             if (entryList.Count == 0)
             {
-                generateRandomData = true;              
+                generateRandomData = true;
             }
 
             var listToUse = generateRandomData ? expensesRandomList : entryList;
@@ -82,7 +82,7 @@ namespace ePiggyWeb.DataManagement.Saving
             var approximateSavedAmount = startingBalance;
             while (goal.Amount > approximateSavedAmount)
             {
-                if(!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
+                if (!firstTimeThroughWhile && approximateSavedAmount <= startingBalance) //Can't possibly save for goal
                 {
                     var entrySuggestionsEmpty = new List<ISavingSuggestion>();
                     return new CalculationResults(entrySuggestionsEmpty, monthlySuggestions, 0);
@@ -103,7 +103,7 @@ namespace ePiggyWeb.DataManagement.Saving
 
                     approximateSavedAmount += averagesOfAmountByImportanceDefault[i - 1] - averagesOfAmountByImportanceAdjusted[i - 1];
                 }
-                timesToRepeatSaving++;              
+                timesToRepeatSaving++;
             }
             for (var i = enumCount; i > (int)Importance.Necessary; i--)
             {
