@@ -109,7 +109,6 @@ namespace ePiggyWeb.Pages
                 catch (Exception ex)
                 {
                     CurrencyException = true;
-                    _logger.LogInformation(ex.ToString());
                     throw;
                 }
 
