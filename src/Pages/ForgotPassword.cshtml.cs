@@ -82,7 +82,7 @@ namespace ePiggyWeb.Pages
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");
                 }
-                ErrorMessage = "Password did not match!";
+                ErrorMessage = "Passwords did not match!";
             }
             else
             {
