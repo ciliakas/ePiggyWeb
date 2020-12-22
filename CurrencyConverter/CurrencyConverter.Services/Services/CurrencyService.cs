@@ -51,7 +51,13 @@ namespace CurrencyConverter.Services.Services
             var list =
                 from ecbCurrency in ecbList
                 join symbolCurrency in symbolList on ecbCurrency.Code equals symbolCurrency.Code
-                select new Currency { Name = symbolCurrency.Name, Code = symbolCurrency.Code, Symbol = symbolCurrency.Symbol, Rate = ecbCurrency.Rate };
+                select new Currency
+                {
+                    Name = symbolCurrency.Name,
+                    Code = symbolCurrency.Code,
+                    Symbol = symbolCurrency.Symbol,
+                    Rate = ecbCurrency.Rate
+                };
 
             return list;
         }
