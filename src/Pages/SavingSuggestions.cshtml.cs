@@ -112,8 +112,6 @@ namespace ePiggyWeb.Pages
                     _logger.LogInformation(ex.ToString());
                     throw;
                 }
-                Savings = income.GetSum() - Expenses.GetSum();
-                Savings = Savings > 0 ? Savings : 0;
 
                 var endDate = StartDate.AddMonths(1).AddDays(-1);
                 Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
