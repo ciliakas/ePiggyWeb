@@ -2,7 +2,6 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
-using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.MonthlyReport;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,21 +19,18 @@ namespace ePiggyWeb.Pages
 
         [BindProperty]
         public MonthlyReportResult Data { get; private set; }
-
-        private IGoalDatabase GoalDatabase { get; }
-        private EntryDatabase EntryDatabase { get; }
+        private MonthlyReportCalculator MonthlyReportCalculator { get; }
         private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
         public bool CurrencyException { get; private set; }
         private CurrencyConverter CurrencyConverter { get; }
 
-        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
-            EntryDatabase entryDatabase, CurrencyConverter currencyConverter)
+        public MonthlyReportModel(ILogger<SavingSuggestionsModel> logger, CurrencyConverter currencyConverter, 
+            MonthlyReportCalculator monthlyReportCalculator)
         {
             _logger = logger;
-            GoalDatabase = goalDatabase;
-            EntryDatabase = entryDatabase;
             CurrencyConverter = currencyConverter;
+            MonthlyReportCalculator = monthlyReportCalculator;
         }
         public async Task<IActionResult> OnGet()
         {
@@ -42,8 +38,7 @@ namespace ePiggyWeb.Pages
             {
                 await SetCurrency();
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var monthlyReportCalculator = new MonthlyReportCalculator(GoalDatabase, EntryDatabase, UserId, CurrencyConverter);
-                Data = await monthlyReportCalculator.Calculate();
+                Data = await MonthlyReportCalculator.Calculate();
             }
             catch (Exception ex)
             {

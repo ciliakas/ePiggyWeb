@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataManagement.MonthlyReport;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +48,7 @@ namespace ePiggyWeb
             services.AddScoped<HttpClient>();
             services.AddScoped<CurrencyApiAgent>();
             services.AddScoped<CurrencyConverter>();
+            services.AddScoped<MonthlyReportCalculator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
