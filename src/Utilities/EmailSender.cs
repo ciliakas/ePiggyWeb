@@ -2,24 +2,25 @@
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using ePiggyWeb.DataBase;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace ePiggyWeb.Utilities
 {
     public class EmailSender
     {
         public const string Email = "Email";
-        public string OurEmail { get; set; }
-        public string EmailPassword { get; set; }
-        public string RecoveryMessageSubject { get; set; }
-        public string RecoveryMessageBody { get; set; }
-        public string GreetingMessageSubject { get; set; }
-        public string GreetingMessageBody { get; set; }
-        public string FarewellMessageSubject { get; set; }
-        public string FarewellMessageBody { get; set; }
-        public int MaxRandValue { get; set; }
-        public string SmtpEmail { get; set; }
-        public int Port { get; set; }
+        public string OurEmail { get; }
+        public string EmailPassword { get; }
+        public string RecoveryMessageSubject { get; }
+        public string RecoveryMessageBody { get; }
+        public string GreetingMessageSubject { get; }
+        public string GreetingMessageBody { get; }
+        public string FarewellMessageSubject { get; }
+        public string FarewellMessageBody { get; }
+        public int MaxRandValue { get; }
+        public string SmtpEmail { get; }
+        public int Port { get; }
 
         public async Task<int> SendRecoveryCodeAsync(string email)
         {
@@ -28,13 +29,6 @@ namespace ePiggyWeb.Utilities
             var message = new MailMessage(OurEmail, email, RecoveryMessageSubject, RecoveryMessageBody + randomCode);
             await SendAsync(message);
             return randomCode;
-        }
-
-        public async Task SendFarewellEmailAsync(object sender, int id, UserDatabase userDatabase)
-        {
-            var user = await userDatabase.GetUserAsync(id);
-            if (user is null) return;
-            await SendFarewellEmailAsync(user.Email);
         }
 
         public async Task SendFarewellEmailAsync(string email)

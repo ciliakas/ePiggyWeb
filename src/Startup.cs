@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
+using ePiggyWeb.DataManagement.MonthlyReport;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +22,7 @@ namespace ePiggyWeb
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -42,11 +43,12 @@ namespace ePiggyWeb
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<UserDatabase>();
             services.AddScoped<EntryDatabase>();
-            services.AddScoped<IGoalDatabase, GoalDatabaseSql>();
+            services.AddScoped<IGoalDatabase, GoalDatabase>();
             services.Configure<EmailSender>(options => Configuration.GetSection("Email").Bind(options));
             services.AddScoped<HttpClient>();
             services.AddScoped<CurrencyApiAgent>();
             services.AddScoped<CurrencyConverter>();
+            services.AddScoped<MonthlyReportCalculator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
