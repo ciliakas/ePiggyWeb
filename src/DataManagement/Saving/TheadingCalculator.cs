@@ -11,8 +11,10 @@ namespace ePiggyWeb.DataManagement.Saving
 {
     public class ThreadingCalculator
     {
-        readonly ConcurrentDictionary<SavingType, CalculationResults> fullResults = new ConcurrentDictionary<SavingType, CalculationResults>();
-        public ConcurrentDictionary<SavingType, CalculationResults> GetAllSuggestedExpenses(IEntryList entryList, IGoal goal, decimal startingBalance, IConfiguration configuration)
+        readonly ConcurrentDictionary<SavingType, CalculationResults> _fullResults =
+            new ConcurrentDictionary<SavingType, CalculationResults>();
+        public ConcurrentDictionary<SavingType, CalculationResults> GetAllSuggestedExpenses(IEntryList entryList,
+            IGoal goal, decimal startingBalance, IConfiguration configuration)
         {
             var tasks = new List<Task>();
             var savingTypes = Enum.GetValues(typeof(SavingType));
@@ -24,13 +26,16 @@ namespace ePiggyWeb.DataManagement.Saving
                 
             }
             Task.WaitAll(tasks.ToArray());
-            return fullResults;
+            return _fullResults;
         }
-        private async Task<CalculationResults> ThreadWorkAsync(IEntryList entryList, IGoal goal, decimal startingBalance, SavingType savingType, IConfiguration configuration)
+        private async Task<CalculationResults> ThreadWorkAsync(IEntryList entryList, IGoal goal,
+            decimal startingBalance, SavingType savingType, IConfiguration configuration)
         {
             var alternativeSavingCalculator = new AlternativeSavingCalculator();
-            var result = await Task.Factory.StartNew(() => alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, savingType, configuration));
-            fullResults.TryAdd(savingType, result);
+            var result = await Task.Factory.StartNew(() =>
+                alternativeSavingCalculator.GetSuggestedExpensesOffers(entryList, goal, startingBalance, savingType,
+                    configuration));
+            _fullResults.TryAdd(savingType, result);
             return result;
         }
       
