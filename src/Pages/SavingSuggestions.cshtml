@@ -77,11 +77,13 @@
                     aria-expanded="false" aria-controls="maximalSuggestions">
                 Maximal<i class="ml-1 fas fa-search-plus"></i>
             </button>
-        </p><hr />
+        </p>
         @if (!Model.WasException)
         {
             <h4 class="text-light mt-2 mb-2">Income: @NumberFormatter.FormatCurrency(Model.MonthlyIncome, Model.CurrencySymbol)</h4>
+
         }
+        <hr />
         <!----------------------------MINIMAL----------------------------------------->
         <div class="collapse" id="minimalSuggestions" data-parent="#SavingType">
             @if (Model.MinimalSuggestions.TimesToRepeatSaving == 0)
