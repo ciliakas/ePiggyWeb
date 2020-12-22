@@ -31,6 +31,7 @@ namespace ePiggyWeb.Pages
         private CurrencyConverter CurrencyConverter { get; }
         private Currency Currency { get; set; }
         public bool CurrencyException { get; private set; }
+        public DateTime Today { get; set; }
 
         public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger,
             IConfiguration configuration, CurrencyConverter currencyConverter)
@@ -75,6 +76,7 @@ namespace ePiggyWeb.Pages
         {
             try
             {
+                Today = DateTime.Today;
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var entryList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
                     UserId, EntryType.Expense);
