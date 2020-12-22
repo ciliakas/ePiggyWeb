@@ -139,7 +139,6 @@ else
                                         </div>
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <span class="text-info">Amount:</span>
-                                            @*@NumberFormatter.FormatCurrency(item.Amount, Model.CurrencyException? item.Currency : Model.CurrencySymbol)*@
                                             @NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)
                                         </div>
                                         <div class="col-12 col-md-3 col-lg-2">
