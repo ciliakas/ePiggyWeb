@@ -223,6 +223,7 @@ namespace ePiggyWeb.DataBase
                 dbGoal.UserId = reader.GetInt32(1);
                 dbGoal.Title = reader.GetString(3);
                 dbGoal.Amount = reader.GetDecimal(2);
+                dbGoal.Currency = reader.GetString(4);
             }
 
             await sqlConnection.CloseAsync();
