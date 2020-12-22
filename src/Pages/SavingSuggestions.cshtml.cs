@@ -35,10 +35,6 @@ namespace ePiggyWeb.Pages
         public CalculationResults MinimalSuggestions { get; private set; }
         public CalculationResults RegularSuggestions { get; private set; }
         public CalculationResults MaximalSuggestions { get; private set; }
-        private IConfiguration Configuration { get; }
-
-        private readonly CalculatorRunner _calculatorRunner = new CalculatorRunner();
-
         private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
         public bool CurrencyException { get; private set; }
@@ -50,15 +46,14 @@ namespace ePiggyWeb.Pages
         public int Month { get; set; }
         [BindProperty(SupportsGet = true)]
         public int Year { get; set; }
-        private MyCalc MyCalc { get; set; }
+        private SavingCalculator MyCalc { get; set; }
         public decimal MonthlyIncome => MyCalc.MonthlyIncome;
         public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
-            EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
+            EntryDatabase entryDatabase, CurrencyConverter currencyConverter)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
-            Configuration = configuration;
             CurrencyConverter = currencyConverter;
         }
 
@@ -111,9 +106,8 @@ namespace ePiggyWeb.Pages
                 var endDate = StartDate.AddMonths(1).AddDays(-1);
                 Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
-                MyCalc = new MyCalc(Expenses, income.GetFrom(StartDate).GetTo(endDate), Goal, Savings);
+                MyCalc = new SavingCalculator(Expenses, income.GetFrom(StartDate).GetTo(endDate), Goal, Savings);
 
-                var suggestionDictionary = _calculatorRunner.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
                 MinimalSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Minimal);
                 RegularSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Regular);
                 MaximalSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Maximal);
