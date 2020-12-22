@@ -30,7 +30,7 @@ namespace ePiggyWeb.Pages
         private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
         public bool CurrencyException { get; private set; }
-        public DateTime Today { get; set; }
+        public DateTime Today { get; private set; }
 
         public ComparisonGraphModel(EntryDatabase entryDatabase, ILogger<ComparisonGraphModel> logger,
             CurrencyConverter currencyConverter)

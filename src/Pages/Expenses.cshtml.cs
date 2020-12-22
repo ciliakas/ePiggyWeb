@@ -72,7 +72,7 @@ namespace ePiggyWeb.Pages
         public IEntryList ExpensesToDisplay => Expenses.GetPage(CurrentPage, PageSize);
         public decimal TotalExpenses => Expenses.GetSum();
         private int UserId { get; set; }
-        public DateTime Today { get; set; }
+        public DateTime Today { get; private set; }
 
         public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration,
             CurrencyConverter currencyConverter)

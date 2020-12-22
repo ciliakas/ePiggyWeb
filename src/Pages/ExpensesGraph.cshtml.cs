@@ -31,7 +31,7 @@ namespace ePiggyWeb.Pages
         private CurrencyConverter CurrencyConverter { get; }
         private Currency Currency { get; set; }
         public bool CurrencyException { get; private set; }
-        public DateTime Today { get; set; }
+        public DateTime Today { get; private set; }
 
         public ExpensesGraphModel(EntryDatabase entryDatabase, ILogger<ExpensesGraphModel> logger,
             IConfiguration configuration, CurrencyConverter currencyConverter)

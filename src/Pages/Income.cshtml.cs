@@ -74,7 +74,7 @@ namespace ePiggyWeb.Pages
         public IEntryList IncomeToDisplay => Income.GetPage(CurrentPage, PageSize);
         public decimal TotalIncome => Income.GetSum();
         private int UserId { get; set; }
-        public DateTime Today { get; set; }
+        public DateTime Today { get; private set; }
 
 
         public IncomesModel(EntryDatabase entryDatabase, ILogger<IncomeModel> logger, IConfiguration configuration,
