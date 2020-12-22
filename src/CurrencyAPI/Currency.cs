@@ -5,13 +5,26 @@ namespace ePiggyWeb.CurrencyAPI
 {
     public class Currency
     {
+        public static string DefaultCurrencyCode => "EUR";
         public string Name { get; set; }
 
         public string Code { get; set; }
 
-        public IEnumerable<int> Symbol { get; set; }
+        private IEnumerable<int> _symbol;
+
+        public IEnumerable<int> Symbol
+        {
+            get => _symbol;
+            set
+            {
+                _symbol = value;
+                SymbolString = GetSymbol();
+            }
+        }
 
         public decimal Rate { get; set; }
+
+        public string SymbolString { get; set; }
 
         public string GetSymbol()
         {

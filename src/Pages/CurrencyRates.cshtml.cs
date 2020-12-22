@@ -11,7 +11,7 @@ namespace ePiggyWeb.Pages
     {
         private HttpClient HttpClient { get; }
         private IConfiguration Configuration { get; }
-        public IList<Currency> Currencies { get; set; }
+        public IList<Currency> Currencies { get; private set; }
 
         public CurrencyRatesModel(HttpClient httpClient, IConfiguration configuration)
         {
@@ -20,7 +20,7 @@ namespace ePiggyWeb.Pages
         }
         public async Task OnGet()
         {
-            var currencyConverter = new CurrencyConverter(HttpClient, Configuration);
+            var currencyConverter = new CurrencyApiAgent(HttpClient, Configuration);
             Currencies = await currencyConverter.GetList();
         }
     }

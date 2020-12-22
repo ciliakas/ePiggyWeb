@@ -8,9 +8,8 @@
     <div class="alert alert-danger" role="alert">
         Whoops! Something went wrong!
     </div>
-    <h1 class="text-warning">Example Goals data used:</h1>
 }
-else
+@if (!Model.LoadingException)
 {
     <br />
     <h2 class="text-info">Goals</h2>
@@ -25,6 +24,10 @@ else
             </div>
         </div>
     }
+}
+else
+{
+    <h1 class="text-warning">Example Goals data used:</h1>
 }
 @if (Model.CurrencyException)
 {
@@ -94,12 +97,12 @@ else
                                 }
                                 <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                             </div>
-                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)/@NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)</p>
+                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)/@NumberFormatter.FormatCurrency(item.Amount, Model.CurrencyException ? item.Currency : Model.CurrencySymbol)</p>
                         </div>
                         <div class="card-footer">
                             @if (percent == 100)
                             {
-                                <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" class="btn btn-sm btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-check fa-2x text-success"></i></button>
+                                <button asp-page-handler="Purchased" asp-route-id="@item.Id" asp-route-title="@item.Title" asp-route-amount="@item.Amount" asp-route-currency="@item.Currency" class="btn btn-sm btn-primary" type="submit" title="Add Goal as expense and remove it"><i class="fas fa-check fa-2x text-success"></i></button>
                             }
                             else
                             {
@@ -123,7 +126,6 @@ else
 
 <div class="container bg-primary border p-0 mx-auto mt-3 mb-5">
     <h2 class="text-light mt-5 mb-5">Click on Calculator icon on goals to get suggestions.</h2>
-    <!--Table here somewhere-->
 </div>
 
 
@@ -185,14 +187,3 @@ else
         </form>
     </div>
 </div>
-
-
-<!--<form method="post" asp-page-handler="NewGoal">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="Title" type="text" placeholder="Title*" value="" />
-    <span asp-validation-for="Title" class="text-danger"></span>
-    <input asp-for="Amount" type="text" placeholder="Amount*" value="" />
-    <span asp-validation-for="Amount" class="text-danger"></span>
-    <input type="submit" value="Add" class="btn btn-primary ml-5" />
-    <input class="btn btn-danger ml-2" type="reset" value="Reset" title="Clear all fields">
-</form>-->

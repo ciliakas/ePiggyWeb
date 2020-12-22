@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using ePiggyWeb.Utilities;
 using System.Diagnostics.CodeAnalysis;
+using ePiggyWeb.CurrencyAPI;
 using Microsoft.Extensions.Configuration;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
     public class EntryList : List<IEntry>, IEntryList
     {
-        //I added EntryType to EntryList so we don't have to pass an EntryType as a parameter in methods as often
         public EntryType EntryType { get; set; }
         public EntryList(EntryType entryType)
         {
@@ -87,7 +87,6 @@ namespace ePiggyWeb.DataManagement.Entries
             foreach (var entry in this)
             {
                 sb.Append(entry);
-                //sb.Append("\n");
             }
 
             return sb.ToString();
@@ -104,12 +103,12 @@ namespace ePiggyWeb.DataManagement.Entries
             var minImportance = (int)enumCount.GetValue(0);
             var maxImportance = (int)enumCount.GetValue(enumCount.Length - 1);
 
-
-            foreach (var thing in section.GetChildren())
+            foreach (var configurationSection in section.GetChildren())
             {
                 var amount = random.Next(50, 500);
                 var importance = random.Next(minImportance, maxImportance);
-                IEntry entry = Entry.CreateLocalEntry(thing.Value, amount, DateTime.UtcNow, false, importance);
+                IEntry entry = Entry.CreateLocalEntry(configurationSection.Value, amount, 
+                    DateTime.UtcNow, recurring: false, importance, currency: Currency.DefaultCurrencyCode);
                 list.Add(entry);
             }
 

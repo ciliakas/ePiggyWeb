@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -9,7 +12,6 @@ using ePiggyWeb.DataManagement.Saving;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -18,108 +20,95 @@ namespace ePiggyWeb.Pages
     public class SavingSuggestionsModel : PageModel
     {
         private readonly ILogger<SavingSuggestionsModel> _logger;
-        public bool WasException { get; set; }
-        public IGoal Goal { get; set; }
-        public decimal Savings { get; set; }
+        public bool WasException { get; private set; }
+        public IGoal Goal { get; private set; }
+        public decimal Savings { get; private set; }
         private int UserId { get; set; }
-        public IEntryList Expenses { get; set; }
+        private IEntryList Expenses { get; set; }
 
         [BindProperty]
         public int Id { get; set; }
 
         [BindProperty]
-        public DateTime StartDate { get; set; }
-        [BindProperty]
-        public DateTime EndDate { get; set; }
-        public CalculationResults MinimalSuggestions { get; set; }
-        public CalculationResults RegularSuggestions { get; set; }
-        public CalculationResults MaximalSuggestions { get; set; }
-        public IConfiguration Configuration { get; }
+        private DateTime StartDate { get; set; }
+        public DateTime Today { get; private set; }
+        public CalculationResults MinimalSuggestions { get; private set; }
+        public CalculationResults RegularSuggestions { get; private set; }
+        public CalculationResults MaximalSuggestions { get; private set; }
+        private IConfiguration Configuration { get; }
 
         private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
 
-        public string ErrorMessage = "";
-
         private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
-        private UserDatabase UserDatabase { get; }
-        private CurrencyConverter CurrencyConverter { get; }
+        public bool CurrencyException { get; private set; }
+        private Currency Currency { get; set; }
         public string CurrencySymbol { get; private set; }
-        public decimal CurrencyRate { get; set; }
-        public bool CurrencyException { get; set; }
-        private IMemoryCache Cache { get; }
+        private CurrencyConverter CurrencyConverter { get; }
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase, EntryDatabase entryDatabase, IConfiguration configuration, UserDatabase userDatabase, CurrencyConverter currencyConverter, IMemoryCache cache)
+        [BindProperty(SupportsGet = true)]
+        public int Month { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public int Year { get; set; }
+
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
+            EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
             Configuration = configuration;
-            UserDatabase = userDatabase;
             CurrencyConverter = currencyConverter;
-            Cache = cache;
         }
+
         public async Task OnGet(int id)
         {
             Id = id;
-            TimeManager.GetDate(Request, out var tempStartDate, out var tempEndDate);
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
-            await SetCurrency();
+            Today = DateTime.Today;
+            StartDate = new DateTime(Today.Year, Today.Month, 1);
             await SetData();
+            await SetCurrency();
         }
 
         private async Task SetCurrency()
         {
-            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var userModel = await UserDatabase.GetUserAsync(UserId);
-                try
-                {
-                    userCurrency = await CurrencyConverter.GetCurrency(userModel.Currency);
-                }
-                catch (Exception)
-                {
-                    CurrencySymbol = userModel.Currency;
-                    CurrencyRate = 1;
-                    CurrencyException = true;
-                    return;
-                }
+                CurrencyException = true;
             }
-
-            CurrencySymbol = userCurrency.GetSymbol();
-            CurrencyRate = userCurrency.Rate;
-            var options = CacheKeys.DefaultCurrencyCacheOptions();
-            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
         }
 
-        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
+        public async Task<IActionResult> OnGetFilter(int id)
         {
-            TimeManager.SetDate(startDate, endDate, ref ErrorMessage, Response, Request, out var tempStartDate, out var tempEndDate);
-            StartDate = tempStartDate;
-            EndDate = tempEndDate;
+            StartDate = new DateTime(Year, Month, 1);
 
             Id = id;
             await SetData();
+            await SetCurrency();
             return Page();
         }
 
-        public async Task SetData()
+        private async Task SetData()
         {
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Goal = await GoalDatabase.ReadAsync(Id, UserId);
-                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
+                var goal = await GoalDatabase.ReadAsync(Id, UserId);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                Savings = income.GetSum() - Expenses.GetSum();
-                if (Savings < 0)
-                {
-                    Savings = 0;
-                }
-
-                Expenses = Expenses.GetFrom(StartDate).GetTo(EndDate);
+               
+                Goal = (await CurrencyConverter.ConvertGoalList(new GoalList {goal}, UserId)).First();
+                income = await CurrencyConverter.ConvertEntryList(income, UserId);
+                Expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
+                Savings = income.GetSum() - expenses.GetSum();
+                Savings = Savings < 0 ? 0 : Savings;
+                
+                var endDate = StartDate.AddMonths(1).AddDays(-1);
+                Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
                 var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
                 MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
@@ -130,10 +119,14 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100);
+                Goal = DataManagement.Goals.Goal.CreateLocalGoal(title:"Example Goal", amount:100, currency:"EUR");
                 Savings = 0;
-            }
 
+                if (ex is HttpListenerException || ex is HttpRequestException)
+                {
+                    CurrencyException = true;
+                }
+            }
         }
     }
 }

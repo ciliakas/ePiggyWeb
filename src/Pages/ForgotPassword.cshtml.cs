@@ -15,7 +15,9 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public string EnteredCode { get; set; }
 
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", ErrorMessage = "Password must contain at least one uppercase letter, at least one number, special character and be longer than six characters.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", 
+            ErrorMessage = "Password must contain at least one uppercase letter, at least one number, " +
+                           "special character and be longer than six characters.")]
         [BindProperty]
         [DataType(DataType.Password)]
         public string Password { get; set; }
@@ -30,7 +32,6 @@ namespace ePiggyWeb.Pages
         public string ErrorMessage = "";
 
         public bool CodeSent;
-        public bool Expired;
 
         private Lazy<EmailSender> EmailSender { get; }
         private UserDatabase UserDatabase { get; }
@@ -81,16 +82,12 @@ namespace ePiggyWeb.Pages
                     Response.Cookies.Delete("Email");
                     return RedirectToPage("/login");
                 }
-                else
-                {
-                    ErrorMessage = "Password did not match!";
-                }
+                ErrorMessage = "Passwords did not match!";
             }
             else
             {
                 ErrorMessage = "Wrong code!";
             }
-
             return Page();
         }
 
@@ -100,6 +97,5 @@ namespace ePiggyWeb.Pages
             Response.Cookies.Delete("Email");
             return RedirectToPage("/login");
         }
-
     }
 }

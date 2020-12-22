@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
@@ -25,12 +26,15 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
 
         private DateTime StartTime { get; set; }
         private DateTime EndTime { get; set; }
+        public CurrencyConverter CurrencyConverter { get; set; }
 
-        public MonthlyReportCalculator(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId)
+        public MonthlyReportCalculator(IGoalDatabase goalDatabase, EntryDatabase entryDatabase, int userId,
+            CurrencyConverter currencyConverter)
         {
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
             UserId = userId;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task<MonthlyReportResult> Calculate()
@@ -49,9 +53,16 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             StartTime = month.AddMonths(-1);
             EndTime = month.AddDays(-1);
 
+            Goals = await GoalDatabase.ReadListAsync(UserId);
             Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
             Income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-            Goals = await GoalDatabase.ReadListAsync(UserId);
+
+            /*Allowing exception to bubble here*/
+            Goals = await CurrencyConverter.ConvertGoalList(Goals, UserId);
+            Income = await CurrencyConverter.ConvertEntryList(Income, UserId);
+            Expenses = await CurrencyConverter.ConvertEntryList(Expenses, UserId);
+
+
 
             var expensesTotal = Expenses.GetSum();
             var incomeTotal = Income.GetSum();
@@ -74,9 +85,11 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
             var enumCount = Enum.GetValues(typeof(Importance)).Length;
             var biggestCategory = (Importance)enumCount;
             var sum = 0m;
+            var monthExpenses = Expenses.GetFrom(StartTime).GetTo(EndTime);
+
             foreach (var importance in Enum.GetValues(typeof(Importance)).Cast<Importance>())
             {
-                var expenses = Expenses.GetBy(importance);
+                var expenses = monthExpenses.GetBy(importance);
                 var temp = expenses.Sum(entry => entry.Amount);
                 if (temp < sum) continue;
                 sum = temp;
@@ -109,7 +122,7 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
                 return;
             }
 
-            
+
             var maxGoal = goals.Aggregate((expensive, next) => next.Amount >= expensive.Amount ? next : expensive);
             var minGoal = goals.Aggregate((cheapest, next) =>
                 next.Amount <= cheapest.Amount && next.Amount >= AllSavings ? next : cheapest);
@@ -119,23 +132,6 @@ namespace ePiggyWeb.DataManagement.MonthlyReport
                 Result.HasGoals = false;
                 return;
             }
-            // var max = 0;
-            // var min = decimal.MaxValue;
-            // var minGoal = new Goal();
-            // var maxGoal = new Goal();
-
-            /* foreach (var item in Goals)
-             {
-                 if (item.Amount >= max)
-                 {
-                     max = item.Amount;
-                     maxGoal = (Goal)item;
-                 }
-
-                 if (item.Amount > min || item.Amount <= AllSavings) continue;
-                 min = item.Amount;
-                 minGoal = (Goal)item;
-             }*/
 
             Result.CheapestGoal = minGoal;
             Result.MostExpensiveGoal = maxGoal;

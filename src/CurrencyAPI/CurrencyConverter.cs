@@ -1,82 +1,156 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using ePiggyWeb.DataBase;
+using ePiggyWeb.DataBase.Models;
+using ePiggyWeb.DataManagement.Entries;
+using ePiggyWeb.DataManagement.Goals;
+using ePiggyWeb.Utilities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ePiggyWeb.CurrencyAPI
 {
     public class CurrencyConverter
     {
-        private const string CurrencyApi = "CurrencyAPI";
-        private const string ApiRoute = "APIRoute";
-        private const string ListRoute = "list";
-        private const string CurrencyRoute = "currency";
-        private const string RateRoute = "rate";
-        private const string SymbolsRoute = "symbols";
-        private HttpClient HttpClient { get; set; }
-        private string ConnectionString { get; }
-
-        public CurrencyConverter(HttpClient httpClient, IConfiguration configuration)
+        private CurrencyApiAgent CurrencyApiAgent { get; }
+        private IMemoryCache Cache { get; }
+        private UserDatabase UserDatabase { get; }
+        public CurrencyConverter(CurrencyApiAgent currencyApiAgent, IMemoryCache cache, UserDatabase userDatabase)
         {
-            HttpClient = httpClient;
-            ConnectionString = configuration.GetSection(CurrencyApi).GetSection(ApiRoute).Value;
+            CurrencyApiAgent = currencyApiAgent;
+            Cache = cache;
+            UserDatabase = userDatabase;
         }
 
-        public async Task<Currency> GetCurrency(string code)
+        public async Task<Tuple<IList<Currency>, Exception>> GetCurrencyList(int userId)
         {
-            var message = await SendRequest(ConnectionString + CurrencyRoute + "?code=" + code);
-            var currencyDto = JsonConvert.DeserializeObject<CurrencyDto>(message);
-            var currency = currencyDto.FromDto();
-            return currency;
-        }
+            if (Cache.TryGetValue(CacheKeys.CurrencyList, out IList<Currency> currencyList))
+            {
+                return new Tuple<IList<Currency>, Exception>(currencyList, null);
+            }
 
-
-        public async Task<string> GetCurrencySymbol(string code)
-        {
-            Currency currency;
             try
             {
-                currency = await GetCurrency(code);
+                currencyList = await CurrencyApiAgent.GetList();
             }
-            catch (Exception)
+            catch (Exception apiException)
             {
-                return code;
+                try
+                {
+                    var userModel = await UserDatabase.GetUserAsync(userId);
+                    var userCurrency = new Currency { Code = userModel.Currency };
+                    return new Tuple<IList<Currency>, Exception>(new List<Currency> { userCurrency }, apiException);
+                }
+                catch (Exception dbException)
+                {
+                    return new Tuple<IList<Currency>, Exception>(new List<Currency>(), dbException);
+                }
             }
-            return currency.GetSymbol();
+
+            return new Tuple<IList<Currency>, Exception>(currencyList, null);
         }
 
 
-        public async Task<IList<Currency>> GetList()
+        public async Task<IGoalList> ConvertGoalList(IGoalList goalList, int userId)
         {
-            var message = await SendRequest(ConnectionString + ListRoute);
-            var listDto = JsonConvert.DeserializeObject<List<CurrencyDto>>(message);
-            IList<Currency> list = listDto.Select(dto => dto.FromDto()).ToList();
-            return list;
+            var (userCurrency, getUserCurrencyException) = await GetUserCurrency(userId);
+            if (getUserCurrencyException != null)
+            {
+                throw getUserCurrencyException;
+            }
+
+            var containsForeignCurrency = goalList.Any(x => x.Currency != userCurrency.Code);
+            if (!containsForeignCurrency)
+            {
+                return goalList;
+            }
+
+            var (currencyList, getCurrencyListException) = await GetCurrencyList(userId);
+            if (getCurrencyListException != null)
+            {
+                throw getCurrencyListException;
+            }
+
+            foreach (var goal in goalList.Where(x => x.Currency != userCurrency.Code))
+            {
+                var userRate = userCurrency.Rate;
+                var foreignRate = currencyList.First(x => x.Code == goal.Currency).Rate;
+                var rate = userRate / foreignRate;
+                goal.Amount *= rate;
+            }
+
+            return goalList;
         }
 
-        public async Task<decimal> GetRate(string currencyFrom, string currencyTo)
+        public async Task<IEntryList> ConvertEntryList(IEntryList entryList, int userId)
         {
-            var message = await SendRequest(ConnectionString + RateRoute + "?currencyCode1=" + currencyFrom + "&currencyCode2=" + currencyTo);
-            var rate = JsonConvert.DeserializeObject<decimal>(message);
-            return rate;
+            var (userCurrency, getUserCurrencyException) = await GetUserCurrency(userId);
+            if (getUserCurrencyException != null)
+            {
+                throw getUserCurrencyException;
+            }
+
+            var containsForeignCurrency = entryList.Any(x => x.Currency != userCurrency.Code);
+            if (!containsForeignCurrency)
+            {
+                return entryList;
+            }
+
+            var (currencyList, getCurrencyListException) = await GetCurrencyList(userId);
+            if (getCurrencyListException != null)
+            {
+                throw getCurrencyListException;
+            }
+
+            foreach (var entry in entryList.Where(x => x.Currency != userCurrency.Code))
+            {
+                var userRate = userCurrency.Rate;
+                var foreignRate = currencyList.First(x => x.Code == entry.Currency).Rate;
+                var rate = userRate / foreignRate;
+                entry.Amount *= rate;
+            }
+
+            return entryList;
         }
 
-        public async Task<IList<Currency>> GetSymbols()
+        public async Task<Tuple<Currency, Exception>> GetUserCurrency(int userId)
         {
-            var message = await SendRequest(ConnectionString + SymbolsRoute);
-            var listDto = JsonConvert.DeserializeObject<List<CurrencyDto>>(message);
-            IList<Currency> list = listDto.Select(dto => dto.FromDto()).ToList();
-            return list;
-        }
+            if (!Cache.TryGetValue(CacheKeys.UserCurrency, out Currency userCurrency))
+            {
+                UserModel userModel;
+                try
+                {
+                    userModel = await UserDatabase.GetUserAsync(userId);
+                }
+                catch (Exception ex)
+                {
+                    return new Tuple<Currency, Exception>(new Currency
+                    {
+                        Code = Currency.DefaultCurrencyCode,
+                        Rate = 1,
+                        SymbolString = Currency.DefaultCurrencyCode
+                    }, ex);
+                }
 
-        private async Task<string> SendRequest(string route)
-        {
-            var response = await HttpClient.GetAsync(route);
-            if (!response.IsSuccessStatusCode) throw new Exception();
-            return await response.Content.ReadAsStringAsync();
+                try
+                {
+                    userCurrency = await CurrencyApiAgent.GetCurrency(userModel.Currency);
+                }
+                catch (Exception ex)
+                {
+                    return new Tuple<Currency, Exception>(new Currency
+                    {
+                        Code = userModel.Currency,
+                        Rate = 1,
+                        SymbolString = userModel.Currency
+                    }, ex);
+                }
+            }
+
+            var options = CacheKeys.DefaultCurrencyCacheOptions();
+            Cache.Set(CacheKeys.UserCurrency, userCurrency, options);
+            return new Tuple<Currency, Exception>(userCurrency, null);
         }
     }
 }
