@@ -50,7 +50,8 @@ namespace ePiggyWeb.Pages
         public int Month { get; set; }
         [BindProperty(SupportsGet = true)]
         public int Year { get; set; }
-
+        private MyCalc MyCalc { get; set; }
+        public decimal MonthlyIncome => MyCalc.MonthlyIncome;
         public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
             EntryDatabase entryDatabase, IConfiguration configuration, CurrencyConverter currencyConverter)
         {
@@ -106,14 +107,16 @@ namespace ePiggyWeb.Pages
                 Expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
                 Savings = income.GetSum() - expenses.GetSum();
                 Savings = Savings < 0 ? 0 : Savings;
-                
+
                 var endDate = StartDate.AddMonths(1).AddDays(-1);
                 Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
+                MyCalc = new MyCalc(Expenses, income.GetFrom(StartDate).GetTo(endDate), Goal, Savings);
+
                 var suggestionDictionary = _calculatorRunner.GetAllSuggestedExpenses(Expenses, Goal, Savings, Configuration);
-                MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
-                RegularSuggestions = suggestionDictionary[SavingType.Regular];
-                MaximalSuggestions = suggestionDictionary[SavingType.Maximal];
+                MinimalSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Minimal);
+                RegularSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Regular);
+                MaximalSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Maximal);
             }
             catch (Exception ex)
             {
