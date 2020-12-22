@@ -16,7 +16,7 @@ namespace ePiggyWeb.DataManagement.Saving
         private List<SavingSuggestionByImportance> SavingSuggestionByImportanceList { get; set; }
         private IEntryList ExpenseList { get; }
         private IEntryList IncomeList { get; }
-        public decimal MonthlyIncome { get; set; }
+        public decimal MonthlyIncome { get; private set; }
         private IGoal Goal { get; }
         private decimal StartingBalance { get; }
         private SavingType SavingType { get; set; }
@@ -25,11 +25,6 @@ namespace ePiggyWeb.DataManagement.Saving
 
         public SavingCalculator(IEntryList expenseList, IEntryList incomeList, IGoal goal, decimal startingBalance)
         {
-            // Reikia gauti average income
-            // Tada reikia, kad kas menesi prisidetu recurring + average per menesi
-            // I menesi sutaupai = averageIncome + savedInAMonth
-            // savedInAMonth = 
-
             IncomeList = incomeList;
             ExpenseList = expenseList;
             Goal = goal;
@@ -78,21 +73,28 @@ namespace ePiggyWeb.DataManagement.Saving
 
         private void GetAverages()
         {
-            for (var i = EnumCount; i > (int)Importance.Necessary; i--)
+            var groupedByImportance =
+                from entry in ExpenseList
+                where entry.Importance != 1
+                group entry by entry.Importance;
+
+            foreach (var group in groupedByImportance)
             {
-                var listByImportance = ExpenseList.GetBy((Importance)i);
+                var importance = group.Key;
+                var listByImportance = group.ToIEntryList();
+
                 if (listByImportance.Count < 1)
                 {
                     SavingSuggestionByImportanceList.Add(new SavingSuggestionByImportance(0,
-                        0, (Importance)i));
+                        0, (Importance)importance));
                     continue;
                 }
 
-                var ratio = EnumCount - i;
+                var ratio = EnumCount - importance;
                 var oldest = listByImportance.GetOldestEntryDate();
                 var newest = listByImportance.GetNewestEntryDate();
 
-                var importanceAverage = 0M;
+                var importanceTotal = 0M;
                 var months = 0;
 
                 while (oldest <= newest)
@@ -114,12 +116,12 @@ namespace ePiggyWeb.DataManagement.Saving
                         monthTotal += entry.Amount;
                     }
 
-                    importanceAverage += monthTotal;//listByMonth.Average(x => x.Amount));
+                    importanceTotal += monthTotal;
                     months++;
                     oldest = TimeManager.MoveToNextMonth(oldest);
                 }
 
-                importanceAverage /= months > 0 ? months : 1;
+                var importanceAverage = importanceTotal / months > 0 ? months : 1;
 
                 var newAverage = SavingType switch
                 {
@@ -129,7 +131,7 @@ namespace ePiggyWeb.DataManagement.Saving
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-                SavingSuggestionByImportanceList.Add(new SavingSuggestionByImportance(newAverage, importanceAverage, (Importance)i));
+                SavingSuggestionByImportanceList.Add(new SavingSuggestionByImportance(newAverage, importanceAverage, (Importance)importance));
             }
         }
 
