@@ -97,7 +97,6 @@ namespace ePiggyWeb.Pages
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var goal = await GoalDatabase.ReadAsync(Id, UserId);
                 var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
                 try
                 {
@@ -114,10 +113,7 @@ namespace ePiggyWeb.Pages
                     throw;
                 }
                 Savings = income.GetSum() - Expenses.GetSum();
-                if (Savings < 0)
-                {
-                    Savings = 0;
-                }
+                Savings = Savings > 0 ? Savings : 0;
 
                 var endDate = StartDate.AddMonths(1).AddDays(-1);
                 Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
