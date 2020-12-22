@@ -1,6 +1,10 @@
 using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using ePiggyWeb.DataManagement.Goals;
@@ -8,6 +12,7 @@ using ePiggyWeb.DataManagement.Saving;
 using ePiggyWeb.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ePiggyWeb.Pages
@@ -15,94 +20,110 @@ namespace ePiggyWeb.Pages
     public class SavingSuggestionsModel : PageModel
     {
         private readonly ILogger<SavingSuggestionsModel> _logger;
-        public bool WasException { get; set; }
-        public IGoal Goal { get; set; }
-        public decimal Savings { get; set; }
+        public bool WasException { get; private set; }
+        public IGoal Goal { get; private set; }
+        public decimal Savings { get; private set; }
         private int UserId { get; set; }
-        public IEntryList Expenses { get; set; }
+        private IEntryList Expenses { get; set; }
 
         [BindProperty]
         public int Id { get; set; }
 
         [BindProperty]
-        public DateTime StartDate { get; set; }
-        [BindProperty]
-        public DateTime EndDate { get; set; }
-        public CalculationResults MinimalSuggestions { get; set; }
-        public CalculationResults RegularSuggestions { get; set; }
-        public CalculationResults MaximalSuggestions { get; set; }
-
-        private readonly ThreadingCalculator _threadingCalculator = new ThreadingCalculator();
-
-        public string ErrorMessage = "";
-
-        private GoalDatabase GoalDatabase { get; }
+        private DateTime StartDate { get; set; }
+        public DateTime Today { get; private set; }
+        public CalculationResults MinimalSuggestions { get; private set; }
+        public CalculationResults RegularSuggestions { get; private set; }
+        public CalculationResults MaximalSuggestions { get; private set; }
+        private IGoalDatabase GoalDatabase { get; }
         private EntryDatabase EntryDatabase { get; }
+        public bool CurrencyException { get; private set; }
+        private Currency Currency { get; set; }
+        public string CurrencySymbol { get; private set; }
+        private CurrencyConverter CurrencyConverter { get; }
 
-        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, GoalDatabase goalDatabase, EntryDatabase entryDatabase)
+        [BindProperty(SupportsGet = true)]
+        public int Month { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public int Year { get; set; }
+        private SavingCalculator MyCalc { get; set; }
+        public decimal MonthlyIncome => MyCalc.MonthlyIncome;
+        public SavingSuggestionsModel(ILogger<SavingSuggestionsModel> logger, IGoalDatabase goalDatabase,
+            EntryDatabase entryDatabase, CurrencyConverter currencyConverter)
         {
             _logger = logger;
             GoalDatabase = goalDatabase;
             EntryDatabase = entryDatabase;
+            CurrencyConverter = currencyConverter;
         }
+
         public async Task OnGet(int id)
         {
             Id = id;
-            var today = DateTime.Now;
-            StartDate = new DateTime(today.Year, today.Month, 1);
-            EndDate = DateTime.Today;
+            Today = DateTime.Today;
+            StartDate = new DateTime(Today.Year, Today.Month, 1);
             await SetData();
+            await SetCurrency();
         }
 
-        public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate, int id)
+        private async Task SetCurrency()
         {
-            if (startDate > endDate)
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
             {
-                ErrorMessage = "Start date is bigger than end date!";
-                var today = DateTime.Now;
-                StartDate = new DateTime(today.Year, today.Month, 1);
-                EndDate = DateTime.Today;
+                CurrencyException = true;
             }
-            else
-            {
-                StartDate = startDate;
-                EndDate = endDate;
-            }
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
+        }
+
+        public async Task<IActionResult> OnGetFilter(int id)
+        {
+            StartDate = new DateTime(Year, Month, 1);
 
             Id = id;
             await SetData();
+            await SetCurrency();
             return Page();
         }
 
-        public async Task SetData()
+        private async Task SetData()
         {
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Goal = await GoalDatabase.ReadAsync(Id, UserId);
+                var goal = await GoalDatabase.ReadAsync(Id, UserId);
+                var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                Savings = income.GetSum() - Expenses.GetSum();
-                if (Savings < 0)
-                {
-                    Savings = 0;
-                }
+               
+                Goal = (await CurrencyConverter.ConvertGoalList(new GoalList {goal}, UserId)).First();
+                income = await CurrencyConverter.ConvertEntryList(income, UserId);
+                Expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
+                Savings = income.GetSum() - expenses.GetSum();
+                Savings = Savings < 0 ? 0 : Savings;
 
-                Expenses = Expenses.GetFrom(StartDate).GetTo(EndDate);
+                var endDate = StartDate.AddMonths(1).AddDays(-1);
+                Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
-                var suggestionDictionary = _threadingCalculator.GetAllSuggestedExpenses(Expenses, Goal, Savings);
-                MinimalSuggestions = suggestionDictionary[SavingType.Minimal];
-                RegularSuggestions = suggestionDictionary[SavingType.Regular];
-                MaximalSuggestions = suggestionDictionary[SavingType.Maximal];
+                MyCalc = new SavingCalculator(Expenses, income.GetFrom(StartDate).GetTo(endDate), Goal, Savings);
+
+                MinimalSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Minimal);
+                RegularSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Regular);
+                MaximalSuggestions = MyCalc.GetSuggestedExpensesOffers(SavingType.Maximal);
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100);
+                Goal = DataManagement.Goals.Goal.CreateLocalGoal(title:"Example Goal", amount:100, currency:"EUR");
                 Savings = 0;
-            }
 
+                if (ex is HttpListenerException || ex is HttpRequestException)
+                {
+                    CurrencyException = true;
+                }
+            }
         }
     }
 }

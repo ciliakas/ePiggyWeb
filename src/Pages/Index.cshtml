@@ -15,15 +15,19 @@
    
 }
 
-<div class="container index-Top">
-    <img width="350px" src="images/mainLogo.PNG" alt="" class="title-image mt-2">
+<div class="container index-Top mb-4">
+    <div class="container col-md-6 col-lg-4">
+        <img src="images/mainLogo.PNG" class="title-image mt-2" alt="mainLogo">
+    </div>
     @if (User.Identity.IsAuthenticated)
     {
         <h1 class="display-4">Welcome Back!</h1>
         <p class="lead">Hope You are having good time saving!</p>
         <hr class="my-4">
         <p class="lead">
-            <a class="btn btn-primary btn-lg" asp-page="/Goals" role="button">Your Goals</a>
+            <a class="btn btn-primary mt-2" asp-page="/expenses" role="button"><i class="fas fa-hand-holding-usd"></i>Expenses</a>
+            <a class="btn btn-primary mt-2" asp-page="/income" role="button"><i class="fas fa-coins"></i>Income</a>
+            <a class="btn btn-primary mt-2" asp-page="/goals" role="button"><i class="fas fa-bullseye"></i> Goals </a>
         </p>
     }
     else
@@ -31,9 +35,10 @@
         <h1 class="display-4">Save more!</h1>
         <p class="lead">This is your saving partner that will allow to list and manage your saving!</p>
         <hr class="my-4">
-        <p class="lead">
-            <a class="btn btn-primary btn-lg mb-5" asp-page="/Register" role="button">Get Started</a>
-        </p>
+        <div class="lead mb-5">
+            <a class="btn btn-primary btn-lg" asp-page="/login" role="button">Sign In</a>
+            <a class="btn btn-info btn-lg" asp-page="/register" role="button">Get Started</a>
+        </div>
     }
 </div>
 

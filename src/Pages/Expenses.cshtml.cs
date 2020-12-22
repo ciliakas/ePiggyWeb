@@ -1,7 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ePiggyWeb.CurrencyAPI;
 using ePiggyWeb.DataBase;
 using ePiggyWeb.DataManagement.Entries;
 using Microsoft.AspNetCore.Authorization;
@@ -16,133 +18,177 @@ namespace ePiggyWeb.Pages
     [Authorize]
     public class ExpensesModel : PageModel
     {
+        /*DI objects*/
         private readonly ILogger<ExpensesModel> _logger;
-        public bool WasException { get; set; }
-        public IEntryList Expenses { get; set; }
+        private EntryDatabase EntryDatabase { get; }
+        private IConfiguration Configuration { get; }
+        private CurrencyConverter CurrencyConverter { get; }
 
-        [Required(ErrorMessage = "Required")]
+        /*New Entry vars*/
+        [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
-        [StringLength(30)]
+        [StringLength(25)]
         public string Title { get; set; }
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Amount Required.")]
         [BindProperty]
-        [Range(0, 99999999.99)]
+        [Range(0, 99999999.99, ErrorMessage = "Amount out of range!")]
         public decimal Amount { get; set; }
         [BindProperty]
         public DateTime Date { get; set; }
         [BindProperty]
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Importance Required.")]
         public int Importance { get; set; }
         [BindProperty]
         public bool Recurring { get; set; }
 
-        private int UserId { get; set; }
-
-        public decimal AllExpenses { get; set; }
-
+        /*Data filter vars*/
         [BindProperty]
         public DateTime StartDate { get; set; }
         [BindProperty]
         public DateTime EndDate { get; set; }
 
-        public string ErrorMessage = "";
+        /*Pagination vars*/
+        [BindProperty(SupportsGet = true)]
+        public int CurrentPage { get; set; } = 1;
 
-        private EntryDatabase EntryDatabase { get; }
-        private IConfiguration Configuration { get; }
+        private static int PageSize => 10;
+        public int TotalPages => (int)Math.Ceiling(decimal.Divide(Expenses.Count, PageSize));
+        public bool ShowPrevious => CurrentPage > 1;
+        public bool ShowNext => CurrentPage < TotalPages;
 
-        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration)
+        /*Currency vars*/
+        private Currency Currency { get; set; }
+        public string CurrencySymbol { get; private set; }
+
+        /*Exception handling vars*/
+        [BindProperty(SupportsGet = true)]
+        public bool WasException { get; private set; }
+        [BindProperty(SupportsGet = true)]
+        public bool CurrencyException { get; private set; }
+        public bool LoadingException { get; private set; }
+
+        /*Display*/
+        public IEntryList Expenses { get; private set; }
+        public IEntryList ExpensesToDisplay => Expenses.GetPage(CurrentPage, PageSize);
+        public decimal TotalExpenses => Expenses.GetSum();
+        private int UserId { get; set; }
+        public DateTime Today { get; private set; }
+
+        public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration,
+            CurrencyConverter currencyConverter)
         {
             EntryDatabase = entryDatabase;
             _logger = logger;
             Configuration = configuration;
+            CurrencyConverter = currencyConverter;
         }
 
         public async Task OnGet()
         {
-            var today = DateTime.Now;
-            StartDate = new DateTime(today.Year, today.Month, 1);
-            EndDate = DateTime.Today;
+            TimeManager.GetDate(Request, out var startDate, out var endDate);
+            await LoadData(startDate, endDate);
+        }
+
+        private async Task LoadData(DateTime startDate, DateTime endDate)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
+            await SetCurrency();
             await SetData();
         }
 
         public async Task<IActionResult> OnGetFilter(DateTime startDate, DateTime endDate)
         {
-            if (startDate > endDate)
-            {
-                ErrorMessage = "Start date is bigger than end date!";
-                var today = DateTime.Now;
-                StartDate = new DateTime(today.Year, today.Month, 1);
-                EndDate = DateTime.Today;
-            }
-            else
-            {
-                StartDate = startDate;
-                EndDate = endDate;
-            }
-            await SetData();
+            TimeManager.SetDate(startDate, endDate, Response);
+            await LoadData(startDate, endDate);
             return Page();
         }
 
         public async Task<IActionResult> OnPostNewEntry()
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    var today = DateTime.Now;
-                    StartDate = new DateTime(today.Year, today.Month, 1);
-                    EndDate = DateTime.Today;
-                    await SetData();
-                    return Page();
-                }
-
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance);
-                await EntryDatabase.CreateAsync(entry, UserId, EntryType.Expense);
-                return RedirectToPage("/expenses");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.ToString());
-                WasException = true;
+                await OnGet();
                 return Page();
             }
-           
-            
-        }
 
-        public async Task<IActionResult> OnPostDelete(int id)
-        {
+            await SetCurrency();
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var entry = Entry.CreateLocalEntry(Title, Amount, Date, Recurring, Importance, Currency.Code);
             try
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                await EntryDatabase.DeleteAsync(id, UserId, EntryType.Expense);
+                await EntryDatabase.CreateAsync(entry, UserId, EntryType.Expense);
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
             }
-            
-            return RedirectToPage("/expenses");
+
+            return RedirectToPage("/expenses", new { WasException, CurrencyException });
+        }
+
+        public async Task<IActionResult> OnPostDelete()
+        {
+            var selected = Request.Form["chkEntry"].ToString();
+            if (string.IsNullOrEmpty(selected))
+            {
+                return RedirectToPage("/expenses");
+            }
+            var selectedList = selected.Split(',');
+            var entryIdList = selectedList.Select(temp => Convert.ToInt32(temp)).ToList();
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            try
+            {
+                await EntryDatabase.DeleteListAsync(entryIdList, UserId, EntryType.Expense);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                WasException = true;
+            }
+
+            return RedirectToPage("/expenses", new { WasException, CurrencyException });
         }
 
         private async Task SetData()
         {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
-                UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                var entryList = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = entryList.GetFrom(StartDate).GetTo(EndDate);
-                AllExpenses = entryList.GetSum();
+                Today = DateTime.Today;
+                var expenseList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
+                    UserId, EntryType.Expense, orderByDate: true);
+
+                try
+                {
+                    Expenses = await CurrencyConverter.ConvertEntryList(expenseList, UserId);
+                }
+                catch (Exception ex)
+                {
+                    CurrencyException = true;
+                    _logger.LogInformation(ex.ToString());
+                    Expenses = expenseList;
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
+                LoadingException = true;
                 Expenses = EntryList.RandomList(Configuration, EntryType.Expense);
-                AllExpenses = Expenses.GetSum();
             }
+        }
+        private async Task SetCurrency()
+        {
+            UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
+            var (currency, exception) = await CurrencyConverter.GetUserCurrency(UserId);
+            if (exception != null)
+            {
+                CurrencyException = true;
+            }
+            Currency = currency;
+            CurrencySymbol = Currency.SymbolString;
         }
     }
 }

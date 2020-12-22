@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ePiggyWeb.DataManagement.Entries;
 
 namespace ePiggyWeb.DataBase.Models
@@ -9,14 +10,16 @@ namespace ePiggyWeb.DataBase.Models
         [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
+        [Column(TypeName = "decimal(18,5)")]
         public decimal Amount { get; set; }
         [StringLength(255)]
         public string Title { get; set; }
         public DateTime Date { get; set; }
         public bool IsMonthly { get; set; }
         public int Importance { get; set; }
-
-        public IncomeModel() {}
+        [StringLength(3)]
+        public string Currency { get; set; }
+        public IncomeModel() { }
 
         public IncomeModel(IEntry entry, int userId)
         {
@@ -26,6 +29,7 @@ namespace ePiggyWeb.DataBase.Models
             Date = entry.Date;
             IsMonthly = entry.Recurring;
             Importance = entry.Importance;
+            Currency = entry.Currency;
         }
 
         public void Edit(IEntry newEntry)
@@ -35,6 +39,7 @@ namespace ePiggyWeb.DataBase.Models
             Date = newEntry.Date;
             IsMonthly = newEntry.Recurring;
             Importance = newEntry.Importance;
+            Currency = newEntry.Currency;
         }
     }
 

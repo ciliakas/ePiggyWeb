@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using ePiggyWeb.DataBase.Models;
 using ePiggyWeb.DataManagement.Goals;
@@ -6,67 +7,49 @@ using ePiggyWeb.Utilities;
 
 namespace ePiggyWeb.DataManagement.Entries
 {
-	public class Entry : IEntry
+    public class Entry : IEntry
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public string Title {get; set; }
+        [StringLength(25, ErrorMessage = "Too long title!")]
+        public string Title { get; set; }
+        [Range(0, 99999999.99, ErrorMessage = "Amount out of range!")]
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
         public bool Recurring { get; set; }
         public int Importance { get; set; }
+        public string Currency { get; set; }
 
-
-        public static Entry CreateLocalEntry(string title, decimal amount, DateTime date, bool recurring, int importance)
+        public Entry()
         {
-            return new Entry(title, amount, date, recurring, importance);
+
         }
 
-        public static Entry CreateLocalEntry(IGoal goal, DateTime date, bool recurring, int importance)
+        public static Entry CreateLocalEntry(string title, decimal amount, DateTime date, bool recurring, int importance, string currency)
         {
-            return new Entry(goal.Title, goal.Amount, date, recurring, importance);
+            return new Entry(title, amount, date, recurring, importance, currency);
         }
 
-        private Entry(string title, decimal amount, DateTime date, bool recurring, int importance)
+        private Entry(string title, decimal amount, DateTime date, bool recurring, int importance, string currency)
         {
             Title = title;
             Amount = amount;
             Date = date;
             Recurring = recurring;
             Importance = importance;
+            Currency = currency;
         }
 
-        public Entry(int id, int userId, string title, decimal amount, DateTime date, bool recurring, int importance) 
-            : this(title, amount, date, recurring, importance)
+        private Entry(int id, int userId, string title, decimal amount, DateTime date, bool recurring, int importance, string currency)
+            : this(title, amount, date, recurring, importance, currency)
         {
             Id = id;
             UserId = userId;
         }
 
-        public Entry(int id, int userId, IEntry entry) 
-            : this(id, userId, entry.Title, entry.Amount, entry.Date, entry.Recurring, entry.Importance) { }
+        public Entry(IEntryModel dbEntry) : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, 
+            dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance, dbEntry.Currency) { }
 
-        public Entry(IEntryModel dbEntry) 
-            : this(dbEntry.Id, dbEntry.UserId, dbEntry.Title, dbEntry.Amount, dbEntry.Date, dbEntry.IsMonthly, dbEntry.Importance) { }
-
-        public Entry(int id, IGoal goal, DateTime date, bool recurring, int importance) 
-            : this(id, goal.UserId, goal.Title, goal.Amount, date, recurring, importance) { }
-
-        public Entry(int id, IGoalModel dbGoal, DateTime date, bool recurring, int importance)
-            : this(id, dbGoal.UserId, dbGoal.Title, dbGoal.Price, date, recurring, importance) { }
-
-        public Entry()
-		{
-			Id = 0;
-            UserId = 0;
-			Amount = 0;
-			Title = "unnamed";
-			Date = DateTime.Now;
-			Recurring = false;
-			Importance = 0;
-        }
-
-        //For simpler editing in other methods
         public void Edit(IEntry newEntry)
         {
             Title = newEntry.Title;
@@ -74,12 +57,14 @@ namespace ePiggyWeb.DataManagement.Entries
             Date = newEntry.Date;
             Recurring = newEntry.Recurring;
             Importance = newEntry.Importance;
+            Currency = newEntry.Currency;
         }
 
         public void Edit(IGoal goal)
         {
             Title = goal.Title;
             Amount = goal.Amount;
+            Currency = goal.Currency;
         }
 
         public int CompareTo(IGoal other)

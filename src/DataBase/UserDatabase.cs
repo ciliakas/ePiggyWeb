@@ -11,14 +11,8 @@ namespace ePiggyWeb.DataBase
 {
     public class UserDatabase
     {
-        public event EventHandler<UserModel> LoggedIn;
-
-        public delegate void RegisterEvent(object? sender, UserModel user);
-
-        public event RegisterEvent Registered;
-        //public event EventHandler<UserModel> Registered;
-
-        public event EventHandler<UserModel> Deleted;
+        private const string DefaultCurrency = "EUR";
+        public event EventHandler<UserModel>? LoggedIn, Registered, Deleted;
 
         private PiggyDbContext Database { get; }
         public UserDatabase(PiggyDbContext database)
@@ -28,7 +22,7 @@ namespace ePiggyWeb.DataBase
 
         public async Task<int> RegisterAsync(string email, string pass)
         {
-            var userExists = await Database.Users.AnyAsync(a => a.Email == email); //Find if email is in db
+            var userExists = await Database.Users.AnyAsync(a => a.Email == email);
             if (userExists)
             {
                 //This email is already in use
@@ -37,7 +31,7 @@ namespace ePiggyWeb.DataBase
             var salt = HashingProcessor.CreateSalt();
             var passwordHash = HashingProcessor.GenerateHash(pass, salt);
 
-            var user = new UserModel { Email = email, Password = passwordHash, Salt = salt };
+            var user = new UserModel { Email = email, Password = passwordHash, Salt = salt , Currency = DefaultCurrency};
             Database.Add(user);
             await Database.SaveChangesAsync();
 
@@ -48,9 +42,9 @@ namespace ePiggyWeb.DataBase
 
         public async Task<int> AuthenticateAsync(string email, string pass)
         {
-            var user = await GetUserAsync(email);
+            var user = await Database.Users.FirstOrDefaultAsync(x => x.Email == email);
 
-            if (user == null)
+            if (user is null)
             {
                 //User couldn't be found
                 return -1;
@@ -63,17 +57,17 @@ namespace ePiggyWeb.DataBase
             }
 
             LoggedIn?.Invoke(this, user);
-
+            
             return user.Id;
         }
 
-        public async Task<bool> ChangePasswordAsync(string email, string pass)
+        public async Task ChangePasswordAsync(string email, string pass)
         {
             var user = await Database.Users.FirstOrDefaultAsync(a => a.Email == email);
 
-            if (user == null)
+            if (user is null)
             {
-                return false;
+                throw new ArgumentException();
             }
 
             var salt = HashingProcessor.CreateSalt();
@@ -82,26 +76,20 @@ namespace ePiggyWeb.DataBase
             user.Password = passwordHash;
             user.Salt = salt;
             await Database.SaveChangesAsync();
-
-            return true;
         }
 
-        public async Task<bool> DeleteUserAsync(int userId)
+        public async Task DeleteUserAsync(string email)
         {
-            return await DeleteUserAsync(x => x.Id == userId);
+            await DeleteUserAsync(x => x.Email == email);
         }
 
-        public async Task<bool> DeleteUserAsync(string email)
-        {
-            return await DeleteUserAsync(x => x.Email == email);
-        }
-
-        public async Task<bool> DeleteUserAsync(Expression<Func<UserModel, bool>> filter)
+        private async Task DeleteUserAsync(Expression<Func<UserModel, bool>> filter)
         {
             var user = await Database.Users.FirstOrDefaultAsync(filter);
+
             if (user is null)
             {
-                return false;
+                throw new ArgumentException();
             }
 
             var id = user.Id;
@@ -115,7 +103,6 @@ namespace ePiggyWeb.DataBase
             await Database.SaveChangesAsync();
 
             Deleted?.Invoke(this, user);
-            return true;
         }
 
         public async Task<UserModel> GetUserAsync(int userId)
@@ -123,14 +110,16 @@ namespace ePiggyWeb.DataBase
             return await GetUserAsync(x => x.Id == userId);
         }
 
-        public async Task<UserModel> GetUserAsync(string email)
-        {
-            return await GetUserAsync(x => x.Email == email);
-        }
-
-        public async Task<UserModel> GetUserAsync(Expression<Func<UserModel, bool>> filter)
+        private async Task<UserModel> GetUserAsync(Expression<Func<UserModel, bool>> filter)
         {
             return await Database.Users.FirstOrDefaultAsync(filter);
+        }
+
+        public async Task ChangeCurrency(int userId, string currencyCode)
+        {
+            var user = await Database.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            user.Currency = currencyCode;
+            await Database.SaveChangesAsync();
         }
     }
 }

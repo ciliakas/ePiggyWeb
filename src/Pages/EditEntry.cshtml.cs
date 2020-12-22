@@ -15,8 +15,9 @@ namespace ePiggyWeb.Pages
         [BindProperty]
         public Entry Entry { get; set; }
 
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Title Required.")]
         [BindProperty]
+        [StringLength(25, ErrorMessage = "Too long title!")]
         public string Title { get; set; }
 
         [BindProperty]
@@ -41,11 +42,9 @@ namespace ePiggyWeb.Pages
                 Title = Entry.Title;
                 return;
             }
-
-            OnPostCancel(); //I entry is empty going back
+            OnPostCancel();
         }
 
-        /*Editing and redirecting according to EntryType*/
         public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
@@ -59,14 +58,11 @@ namespace ePiggyWeb.Pages
                 await EntryDatabase.UpdateAsync(Entry.Id, Entry.UserId, Entry, EntryType.Income);
                 return RedirectToPage("/Income");
             }
-            else
-            {
-                await EntryDatabase.UpdateAsync(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
-                return RedirectToPage("/Expenses");
-            }
+
+            await EntryDatabase.UpdateAsync(Entry.Id, Entry.UserId ,Entry, EntryType.Expense);
+            return RedirectToPage("/Expenses");
         }
 
-        /*If cancel pressed return to previous page*/
         public IActionResult OnPostCancel()
         {
             return RedirectToPage(EntryTypeInt == 1 ? "/Income" : "/Expenses");
