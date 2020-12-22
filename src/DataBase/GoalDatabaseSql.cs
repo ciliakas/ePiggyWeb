@@ -52,16 +52,15 @@ namespace ePiggyWeb.DataBase
                 await sqlConnection.OpenAsync();
             }
 
-
             foreach (var goal in goalList)
             {
                 var dbGoal = new GoalModel(goal, userid);
 
                 var sqlCommand = new SqlCommand(
-                    "INSERT INTO Goals(UserId, Price, Title, Currency) " +
-                    "VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
-                sqlConnection)
-                { CommandType = CommandType.Text };
+                        "INSERT INTO Goals(UserId, Price, Title, Currency) " +
+                        "VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
+                        sqlConnection)
+                    { CommandType = CommandType.Text };
                 sqlCommand.Parameters.AddWithValue("@UserId", dbGoal.UserId);
                 sqlCommand.Parameters.AddWithValue("@Price", dbGoal.Price);
                 sqlCommand.Parameters.AddWithValue("@Title", dbGoal.Title);
@@ -137,14 +136,13 @@ namespace ePiggyWeb.DataBase
 
             var idList = goalList.Select(goal => goal.Id).ToList();
 
-            var sqlCommand = new SqlCommand("DELETE FROM Goals WHERE Id = @Id AND UserId = @UserId", sqlConnection)
-            {
-                CommandType = CommandType.Text
-            };
-            sqlCommand.Parameters.AddWithValue("@UserId", userId);
-
             foreach (var id in idList)
             {
+                var sqlCommand = new SqlCommand("DELETE FROM Goals WHERE Id = @Id AND UserId = @UserId", sqlConnection)
+                {
+                    CommandType = CommandType.Text
+                };
+                sqlCommand.Parameters.AddWithValue("@UserId", userId);
                 sqlCommand.Parameters.AddWithValue("@Id", id);
                 await sqlCommand.ExecuteNonQueryAsync();
             }
