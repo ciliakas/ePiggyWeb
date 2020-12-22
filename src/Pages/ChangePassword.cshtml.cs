@@ -107,6 +107,8 @@ namespace ePiggyWeb.Pages
         {
             if (!ModelState.IsValid)
             {
+                await SetCurrencyList();
+                await SetUserCurrency();
                 return Page();
             }
 
@@ -124,6 +126,8 @@ namespace ePiggyWeb.Pages
             }
 
             ErrorMessage = "Passwords did not match!";
+            await SetCurrencyList();
+            await SetUserCurrency();
             return Page();
         }
 
