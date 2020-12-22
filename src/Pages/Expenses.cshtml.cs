@@ -72,6 +72,7 @@ namespace ePiggyWeb.Pages
         public IEntryList ExpensesToDisplay => Expenses.GetPage(CurrentPage, PageSize);
         public decimal TotalExpenses => Expenses.GetSum();
         private int UserId { get; set; }
+        public DateTime Today { get; set; }
 
         public ExpensesModel(EntryDatabase entryDatabase, ILogger<ExpensesModel> logger, IConfiguration configuration,
             CurrencyConverter currencyConverter)
@@ -155,6 +156,7 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
+                Today = DateTime.Today;
                 var expenseList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
                     UserId, EntryType.Expense, orderByDate: true);
 
