@@ -128,7 +128,7 @@ namespace ePiggyWeb.DataManagement.Saving
                 savingSuggestionByImportance.OldAverage - savingSuggestionByImportance.NewAverage);
             var amountToSave = Goal.Amount - StartingBalance;
             MonthsToSave = (int)Math.Ceiling(decimal.Divide(amountToSave, MonthlyIncome + increasedMonthlySavings));
-            if (MonthsToSave > 240)
+            if (MonthsToSave > 120)
             {
                 MonthsToSave = 0;
             }
