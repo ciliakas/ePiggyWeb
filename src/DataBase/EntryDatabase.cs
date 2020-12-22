@@ -29,6 +29,7 @@ namespace ePiggyWeb.DataBase
             if (!localEntry.Recurring)
             {
                 await CreateSingleAsync(localEntry, userId, entryType);
+                return;
             }
 
             await CreateListAsync(RecurringUpdater.CreateRecurringList(localEntry, entryType), userId);
@@ -58,16 +59,8 @@ namespace ePiggyWeb.DataBase
                 };
                 dictionary.Add(entry, dbEntry);
             }
-            // Setting all of the ID's to local Entries, just so this method remains usable both with local and only database usage
             await Database.AddRangeAsync(dictionary.Values);
             await Database.SaveChangesAsync();
-
-            entryList.Clear();
-            foreach (var (key, value) in dictionary)
-            {
-                key.Id = value.Id;
-                entryList.Add(key);
-            }
         }
 
         public async Task UpdateAsync(int id, int userId, IEntry updatedEntry, EntryType entryType)
