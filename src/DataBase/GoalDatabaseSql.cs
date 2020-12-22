@@ -52,16 +52,16 @@ namespace ePiggyWeb.DataBase
                 await sqlConnection.OpenAsync();
             }
 
-            var sqlCommand = new SqlCommand(
-                    "INSERT INTO Goals(UserId, Price, Title, Currency) " +
-                    "VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
-                sqlConnection)
-            { CommandType = CommandType.Text };
 
             foreach (var goal in goalList)
             {
                 var dbGoal = new GoalModel(goal, userid);
 
+                var sqlCommand = new SqlCommand(
+                    "INSERT INTO Goals(UserId, Price, Title, Currency) " +
+                    "VALUES (@UserId, @Price, @Title, @Currency);SELECT CAST(scope_identity() AS int);",
+                sqlConnection)
+                { CommandType = CommandType.Text };
                 sqlCommand.Parameters.AddWithValue("@UserId", dbGoal.UserId);
                 sqlCommand.Parameters.AddWithValue("@Price", dbGoal.Price);
                 sqlCommand.Parameters.AddWithValue("@Title", dbGoal.Title);
