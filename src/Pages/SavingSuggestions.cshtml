@@ -81,6 +81,7 @@
         @if (!Model.WasException)
         {
             <h4 class="text-light mt-2 mb-2">Income: @NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)</h4>
+            <hr />
         }
         <!----------------------------MINIMAL----------------------------------------->
         <div class="collapse" id="minimalSuggestions" data-parent="#SavingType">
