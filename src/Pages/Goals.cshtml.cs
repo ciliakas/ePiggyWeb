@@ -183,7 +183,7 @@ namespace ePiggyWeb.Pages
             return RedirectToPage("/goals", new { WasException, CurrencyException });
         }
 
-        public async Task<IActionResult> OnPostPurchased(int id, string title, string amount, string currency)
+        public async Task<IActionResult> OnPostPurchased(int id, string title, string amount)
         {
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             await SetCurrency();
@@ -191,7 +191,7 @@ namespace ePiggyWeb.Pages
             {
                 decimal.TryParse(amount, out var parsedAmount);
                 var entry = Entry.CreateLocalEntry(title, parsedAmount, DateTime.Today, recurring: false,
-                    importance: 1, currency);
+                    importance: 1, Currency.Code);
                 await GoalDatabase.MoveGoalToExpensesAsync(id, UserId, entry);
                 return RedirectToPage("/expenses");
             }
