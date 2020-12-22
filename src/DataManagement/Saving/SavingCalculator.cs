@@ -49,21 +49,8 @@ namespace ePiggyWeb.DataManagement.Saving
             {
                 var newest = IncomeList.GetNewestEntryDate();
                 var oldest = IncomeList.GetOldestEntryDate();
-                var months = 0;
-                while (oldest <= newest)
-                {
-                    months++;
-                    oldest = TimeManager.MoveToNextMonth(oldest);
-                }
-
-                if (months < 1)
-                {
-                    MonthlyIncome = 0;
-                }
-                else
-                {
-                    MonthlyIncome = IncomeList.GetSum() / months;
-                }
+                var months = oldest.Month - newest.Month + 12 * (oldest.Year - newest.Year) + 1;
+                MonthlyIncome = IncomeList.GetSum() / months;
             }
             else
             {
@@ -121,7 +108,7 @@ namespace ePiggyWeb.DataManagement.Saving
                     oldest = TimeManager.MoveToNextMonth(oldest);
                 }
 
-                var importanceAverage = importanceTotal / months > 0 ? months : 1;
+                var importanceAverage = months > 0 ? importanceTotal / months : 0;
 
                 var newAverage = SavingType switch
                 {
@@ -137,10 +124,11 @@ namespace ePiggyWeb.DataManagement.Saving
 
         private void CalculateSavingTime()
         {
-            var increasedMonthlySavings = SavingSuggestionByImportanceList.Sum(savingSuggestionByImportance => savingSuggestionByImportance.OldAverage - savingSuggestionByImportance.NewAverage);
+            var increasedMonthlySavings = SavingSuggestionByImportanceList.Sum(savingSuggestionByImportance => 
+                savingSuggestionByImportance.OldAverage - savingSuggestionByImportance.NewAverage);
             var amountToSave = Goal.Amount - StartingBalance;
             MonthsToSave = (int)Math.Ceiling(decimal.Divide(amountToSave, MonthlyIncome + increasedMonthlySavings));
-            if (MonthsToSave > 1000)
+            if (MonthsToSave > 240)
             {
                 MonthsToSave = 0;
             }
