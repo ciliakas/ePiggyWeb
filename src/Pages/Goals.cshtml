@@ -97,7 +97,7 @@ else
                                 }
                                 <div class="progress-bar bg-@color" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" title="Progress">@percent%</div>
                             </div>
-                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)/@NumberFormatter.FormatCurrency(item.Amount, Model.CurrencySymbol)</p>
+                            <p class="card-text" title="Saved/Required">@NumberFormatter.FormatCurrency(Model.Savings, Model.CurrencySymbol)/@NumberFormatter.FormatCurrency(item.Amount, Model.CurrencyException ? item.Currency : Model.CurrencySymbol)</p>
                         </div>
                         <div class="card-footer">
                             @if (percent == 100)

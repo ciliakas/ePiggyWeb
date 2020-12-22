@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -94,12 +95,13 @@ namespace ePiggyWeb.Pages
             try
             {
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
-                Goal = await GoalDatabase.ReadAsync(Id, UserId);
+                var goal = await GoalDatabase.ReadAsync(Id, UserId);
                 var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
                 try
                 {
+                    Goal = (await CurrencyConverter.ConvertGoalList(new GoalList {goal}, UserId)).First();
                     income = await CurrencyConverter.ConvertEntryList(income, UserId);
                     Expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
                     Savings = income.GetSum() - expenses.GetSum();
