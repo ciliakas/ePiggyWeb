@@ -44,8 +44,8 @@
                         <input asp-for="Amount" type="text" placeholder="Amount" value="" />
                     </div>
                     <div class="col-12 col-md-4 col-lg-3 mb-1">
-                        <input asp-for="Date" type="date" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()"
-                               value="@DateTime.Now.ToShortDateString()" />
+                        <input asp-for="Date" type="date" min="2016-01-01" max="@Model.Today.AddMonths(1).ToShortDateString()"
+                               value="@Model.Today.ToShortDateString()" />
                     </div>
                 </div>
                 <div class="row justify-content-center mb-3">
@@ -83,9 +83,9 @@
         <input type="hidden" name="handler" value="Filter" />
         <label class="text-light col-md-4">Period:</label>
         <div class="row justify-content-center">
-            <input class="col-md-3 col-sm-5 col-5" onchange="handleFilter(this)"  for="startDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" asp-for="StartDate" type="date" value="@Model.StartDate.ToShortDateString()" />
+            <input asp-for="StartDate" class="col-md-3 col-sm-5 col-5" for="startDate" max="@Model.Today.AddMonths(1).ToShortDateString()" min="2016-01-01" onchange="handleFilter(this)" type="date" value="@Model.StartDate.ToShortDateString()" />
             <label class="text-light ml-2 mr-2"> - </label>
-            <input class="col-md-3 col-sm-5 col-5" onchange="handleFilter(this)"  for="endDate" min="2016-01-01" max="@DateTime.Now.AddMonths(1).ToShortDateString()" asp-for="EndDate" type="date" value="@Model.EndDate.ToShortDateString()" />
+            <input asp-for="EndDate" class="col-md-3 col-sm-5 col-5" for="endDate" max="@Model.Today.AddMonths(1).ToShortDateString()" min="2016-01-01" onchange="handleFilter(this)" type="date" value="@Model.EndDate.ToShortDateString()" />
         </div>
         <button type="submit" id ="FilterButton" class="btn btn-warning col-sm-6 col-md-2 col-lg-1 col-4 mt-3">Filter<i class="fas fa-filter"></i></button>
     </form>

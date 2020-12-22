@@ -74,6 +74,7 @@ namespace ePiggyWeb.Pages
         public IEntryList IncomeToDisplay => Income.GetPage(CurrentPage, PageSize);
         public decimal TotalIncome => Income.GetSum();
         private int UserId { get; set; }
+        public DateTime Today { get; private set; }
 
 
         public IncomesModel(EntryDatabase entryDatabase, ILogger<IncomeModel> logger, IConfiguration configuration,
@@ -159,6 +160,7 @@ namespace ePiggyWeb.Pages
             UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
             try
             {
+                Today = DateTime.Today;
                 var incomeList = await EntryDatabase.ReadListAsync(x => x.Date >= StartDate && x.Date <= EndDate,
                     UserId, EntryType.Income, orderByDate: true);
                 try

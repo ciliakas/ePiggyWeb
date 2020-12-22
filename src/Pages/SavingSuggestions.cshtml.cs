@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ePiggyWeb.CurrencyAPI;
@@ -97,28 +99,14 @@ namespace ePiggyWeb.Pages
                 UserId = int.Parse(User.FindFirst(ClaimTypes.Name).Value);
                 var goal = await GoalDatabase.ReadAsync(Id, UserId);
                 var expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
-                Expenses = await EntryDatabase.ReadListAsync(UserId, EntryType.Expense);
                 var income = await EntryDatabase.ReadListAsync(UserId, EntryType.Income);
-                try
-                {
-                    Goal = (await CurrencyConverter.ConvertGoalList(new GoalList {goal}, UserId)).First();
-                    income = await CurrencyConverter.ConvertEntryList(income, UserId);
-                    Expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
-                    Savings = income.GetSum() - expenses.GetSum();
-                    Savings = Savings < 0 ? 0 : Savings;
-                }
-                catch (Exception ex)
-                {
-                    CurrencyException = true;
-                    _logger.LogInformation(ex.ToString());
-                    throw;
-                }
-                Savings = income.GetSum() - Expenses.GetSum();
-                if (Savings < 0)
-                {
-                    Savings = 0;
-                }
-
+               
+                Goal = (await CurrencyConverter.ConvertGoalList(new GoalList {goal}, UserId)).First();
+                income = await CurrencyConverter.ConvertEntryList(income, UserId);
+                Expenses = await CurrencyConverter.ConvertEntryList(expenses, UserId);
+                Savings = income.GetSum() - expenses.GetSum();
+                Savings = Savings < 0 ? 0 : Savings;
+                
                 var endDate = StartDate.AddMonths(1).AddDays(-1);
                 Expenses = Expenses.GetFrom(StartDate).GetTo(endDate);
 
@@ -131,8 +119,13 @@ namespace ePiggyWeb.Pages
             {
                 _logger.LogInformation(ex.ToString());
                 WasException = true;
-                Goal = DataManagement.Goals.Goal.CreateLocalGoal("Example Goal", 100, "EUR");
+                Goal = DataManagement.Goals.Goal.CreateLocalGoal(title:"Example Goal", amount:100, currency:"EUR");
                 Savings = 0;
+
+                if (ex is HttpListenerException || ex is HttpRequestException)
+                {
+                    CurrencyException = true;
+                }
             }
         }
     }
